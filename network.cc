@@ -204,4 +204,3 @@ network::network (names* names_mod)
   devs = NULL;
   lastdev = NULL;
 }
-

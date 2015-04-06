@@ -84,8 +84,3 @@ class network {
 };
 
 #endif /* network_h */
-
-
-
-
-

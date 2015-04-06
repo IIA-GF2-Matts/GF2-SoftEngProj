@@ -60,9 +60,3 @@ public:
 };
 
 #endif /* devices_h */
-
-
-
-
-
-

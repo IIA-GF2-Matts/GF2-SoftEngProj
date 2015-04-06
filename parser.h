@@ -32,4 +32,3 @@ class parser {
 };
 
 #endif /* parser_h */
-

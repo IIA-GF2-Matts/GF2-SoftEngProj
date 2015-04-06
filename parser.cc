@@ -23,10 +23,3 @@ parser::parser (network* network_mod, devices* devices_mod,
   /* any other initialisation you want to do? */
 
 }
-
-
-
-
-
-
-

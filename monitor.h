@@ -63,4 +63,3 @@ class monitor {
 };
 
 #endif /* monitor_h */
-

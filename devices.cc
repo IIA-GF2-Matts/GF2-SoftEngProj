@@ -463,5 +463,3 @@ devices::devices (names* names_mod, network* net_mod)
   qpin    = nmz->lookup("Q");
   qbarpin = nmz->lookup("QBAR");
 }
-
-

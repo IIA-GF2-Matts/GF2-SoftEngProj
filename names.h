@@ -41,6 +41,3 @@ public:
 };
 
 #endif /* names_h */
-
-
-

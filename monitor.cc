@@ -179,9 +179,3 @@ monitor::monitor (names* names_mod, network* network_mod)
   netz = network_mod;
   mtab.used = 0;
 }
-
-
-
-
-
-

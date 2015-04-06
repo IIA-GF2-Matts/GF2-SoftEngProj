@@ -375,12 +375,3 @@ userint::userint (names* names_mod, devices* devices_mod, monitor* monitor_mod)
   dmz = devices_mod;
   mmz = monitor_mod;
 }
-
-
-
-
-
-
-
-
-
