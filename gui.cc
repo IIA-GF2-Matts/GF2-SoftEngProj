@@ -102,25 +102,25 @@ void MyGLCanvas::InitGL()
 }
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
-  // Callback function for when the canvas is exposed
+  // Event handler for when the canvas is exposed
 {
   int w, h;
   wxString text;
 
   wxPaintDC dc(this); // required for correct refreshing under MS windows
   GetClientSize(&w, &h);
-  text.Printf("Canvas redrawn by OnPaint callback, canvas size is %d by %d", w, h);
+  text.Printf("Canvas redrawn by OnPaint event handler, canvas size is %d by %d", w, h);
   Render(text);
 }
 
 void MyGLCanvas::OnSize(wxSizeEvent& event)
-  // Callback function for when the canvas is resized
+  // Event handler for when the canvas is resized
 {
   init = false;; // this will force the viewport and projection matrices to be reconfigured on the next paint
 }
 
 void MyGLCanvas::OnMouse(wxMouseEvent& event)
-  // Callback function for mouse events inside the GL canvas
+  // Event handler for mouse events inside the GL canvas
 {
   wxString text;
   int w, h;;
@@ -186,20 +186,20 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 }
 
 void MyFrame::OnExit(wxCommandEvent &event)
-  // Callback for the exit menu item
+  // Event handler for the exit menu item
 {
   Close(true);
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
-  // Callback for the about menu item
+  // Event handler for the about menu item
 {
   wxMessageDialog about(this, "Example wxWidgets GUI\nAndrew Gee\nJune 2014", "About Logsim", wxICON_INFORMATION | wxOK);
   about.ShowModal();
 }
 
 void MyFrame::OnButton(wxCommandEvent &event)
-  // Callback for the push button
+  // Event handler for the push button
 {
   int n, ncycles;
 
@@ -210,7 +210,7 @@ void MyFrame::OnButton(wxCommandEvent &event)
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
-  // Callback for the spin control
+  // Event handler for the spin control
 {
   wxString text;
 
@@ -219,7 +219,7 @@ void MyFrame::OnSpin(wxSpinEvent &event)
 }
 
 void MyFrame::OnText(wxCommandEvent &event)
-  // Callback for the text entry field
+  // Event handler for the text entry field
 {
   wxString text;
 

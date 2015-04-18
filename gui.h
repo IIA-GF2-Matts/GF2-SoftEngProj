@@ -31,11 +31,11 @@ class MyFrame: public wxFrame
   monitor *mmz;                           // pointer to monitor class
   int cyclescompleted;                    // how many simulation cycles have been completed
   void runnetwork(int ncycles);           // function to run the logic network
-  void OnExit(wxCommandEvent& event);     // callback for exit menu item
-  void OnAbout(wxCommandEvent& event);    // callback for about menu item
-  void OnButton(wxCommandEvent& event);   // callback for push button
-  void OnSpin(wxSpinEvent& event);        // callback for spin control
-  void OnText(wxCommandEvent& event);     // callback for text entry field
+  void OnExit(wxCommandEvent& event);     // event handler for exit menu item
+  void OnAbout(wxCommandEvent& event);    // event handler for about menu item
+  void OnButton(wxCommandEvent& event);   // event handler for push button
+  void OnSpin(wxSpinEvent& event);        // event handler for spin control
+  void OnText(wxCommandEvent& event);     // event handler for text entry field
   DECLARE_EVENT_TABLE()
 };
     
@@ -53,9 +53,9 @@ class MyGLCanvas: public wxGLCanvas
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
   names *nmz;                        // pointer to names class, used to extract signal names
   void InitGL();                     // function to initialise OpenGL context
-  void OnSize(wxSizeEvent& event);   // callback for when canvas is resized
-  void OnPaint(wxPaintEvent& event); // callback for when canvas is exposed
-  void OnMouse(wxMouseEvent& event); // callback for mouse events inside canvas
+  void OnSize(wxSizeEvent& event);   // event handler for when canvas is resized
+  void OnPaint(wxPaintEvent& event); // event handler for when canvas is exposed
+  void OnMouse(wxMouseEvent& event); // event handler for mouse events inside canvas
   DECLARE_EVENT_TABLE()
 };
     
