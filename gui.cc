@@ -153,6 +153,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
 {
   SetIcon(wxIcon(wx_icon));
 
+  cyclescompleted = 0;
   nmz = names_mod;
   dmz = devices_mod;
   mmz = monitor_mod;
