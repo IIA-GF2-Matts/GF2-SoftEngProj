@@ -49,6 +49,9 @@ class MyGLCanvas: public wxGLCanvas
  private:
   wxGLContext *context;              // OpenGL rendering context
   bool init;                         // has the OpenGL context been initialised?
+  int pan_x;                         // the current x pan
+  int pan_y;                         // the current y pan
+  double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
   names *nmz;                        // pointer to names class, used to extract signal names

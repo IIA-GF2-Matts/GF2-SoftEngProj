@@ -24,6 +24,9 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   mmz = monitor_mod;
   nmz = names_mod;
   init = false;
+  pan_x = 0;
+  pan_y = 0;
+  zoom = 1.0;
   cyclesdisplayed = -1;
 }
 
@@ -99,6 +102,8 @@ void MyGLCanvas::InitGL()
   glOrtho(0, w, 0, h, -1, 1); 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
+  glTranslated(pan_x, pan_y, 0.0);
+  glScaled(zoom, zoom, zoom);
 }
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
@@ -124,14 +129,36 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 {
   wxString text;
   int w, h;;
+  static int last_x, last_y;
 
   GetClientSize(&w, &h);
-  if (event.ButtonDown()) text.Printf("Mouse button %d pressed at %d %d", event.GetButton(), event.m_x, h-event.m_y);
+  if (event.ButtonDown()) {
+    last_x = event.m_x;
+    last_y = event.m_y;
+    text.Printf("Mouse button %d pressed at %d %d", event.GetButton(), event.m_x, h-event.m_y);
+  }
   if (event.ButtonUp()) text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
-  if (event.Dragging()) text.Printf("Mouse dragged to %d %d", event.m_x, h-event.m_y);
+  if (event.Dragging()) {
+    pan_x += event.m_x - last_x;
+    pan_y -= event.m_y - last_y;
+    last_x = event.m_x;
+    last_y = event.m_y;
+    init = false;
+    text.Printf("Mouse dragged to %d %d, pan now %d %d", event.m_x, h-event.m_y, pan_x, pan_y);
+  }
   if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
+  if (event.GetWheelRotation() < 0) {
+    zoom = zoom * (1.0 - (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    init = false;
+    text.Printf("Negative mouse wheel rotation, zoom now %f", zoom);
+  }
+  if (event.GetWheelRotation() > 0) {
+    zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    init = false;
+    text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
+  }
 
-  if (event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
+  if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
 }
 
 // MyFrame ///////////////////////////////////////////////////////////////////////////////////////
