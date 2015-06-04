@@ -1,6 +1,6 @@
 OPENGL_LIBS = -lglut -lGL -lGLU
 
-CXX = $(shell wx-config --cxx)
+CXX = $(shell wx-config --version=3.0 --cxx)
 
 SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc
 
@@ -13,15 +13,15 @@ G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o
 .SUFFIXES:	.o .cc
 
 .cc.o :
-	$(CXX) -c `wx-config --cxxflags` -g -o $@ $<
+	$(CXX) -c `wx-config --version=3.0 --cxxflags` -g -o $@ $<
 
 all:    logsim guitest
 
 logsim:	$(L_OBJECTS)
-	$(CXX) -o logsim $(L_OBJECTS) `wx-config --libs --gl_libs` $(OPENGL_LIBS)
+	$(CXX) -o logsim $(L_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
 guitest: $(G_OBJECTS)
-	 $(CXX) -o guitest $(G_OBJECTS) `wx-config --libs --gl_libs` $(OPENGL_LIBS)
+	 $(CXX) -o guitest $(G_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
 clean: 
 	rm -f *.o logsim guitest
