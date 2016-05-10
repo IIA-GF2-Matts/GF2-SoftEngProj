@@ -10,25 +10,36 @@ using namespace std;
 
 names::names(void)  /* the constructor */
 {
-  /* over to you */
 }
 
 name names::lookup (namestring str)
 {
-  /* over to you */
+	if (str == "") return blankname;
+
+	return _nameSet.insert(str).first;
 }
 
 name names::cvtname (namestring str)
 {
-  /* over to you */
+	if (str == "") return blankname;
+
+	return _nameSet.find(str);
 }
 
 void names::writename (name id)
 {
-  /* over to you */
+	if (id != blankname) {
+		std::cout << "(blank)";
+	}
+	else {
+		std::cout << *id;
+	}
 }
 
 int names::namelength (name id)
 {
-  /* over to you */
+	if (id == blankname)
+		return 0;
+	
+	return id->length();
 }

@@ -2,19 +2,21 @@
 #define names_h
 
 #include <string>
+#include <set>
 
 using namespace std;
 
+
+typedef string namestring;
+typedef std::set<namestring>::const_iterator name;
+
 const int maxnames  = 200;  /* max number of distinct names */
 const int maxlength = 8;    /* max chars in a name string   */
-const int blankname = -1;   /* special name                 */
-
-typedef int name;
-typedef string namestring;
+const name blankname;       /* special name                 */
 
 class names{
 
-  /* put stuff that the class uses internally here */
+  std::set<namestring> _nameSet;
 
 
 public:
