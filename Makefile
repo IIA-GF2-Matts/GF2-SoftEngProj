@@ -2,9 +2,9 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 
 CXX = $(shell wx-config --version=3.0 --cxx)
 
-SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc
+SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc
 
-L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o
+L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o
 
 G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o
 
