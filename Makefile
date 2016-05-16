@@ -31,6 +31,7 @@ depend:
 
 # DO NOT DELETE
 
+scanner.o: scanner.h iposstream.h names.h cistring.h errorhandler.h
 logsim.o: logsim.h names.h devices.h network.h monitor.h parser.h userint.h
 logsim.o: gui.h
 names.o: names.h cistring.h
