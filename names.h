@@ -4,10 +4,12 @@
 #include <string>
 #include <set>
 
+#include "cistring.h"
+
 using namespace std;
 
 
-typedef string namestring;
+typedef cistring namestring;
 typedef std::set<namestring>::const_iterator name;
 
 const int maxnames  = 200;  /* max number of distinct names */
