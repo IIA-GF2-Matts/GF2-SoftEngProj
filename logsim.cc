@@ -20,7 +20,8 @@ bool MyApp::OnInit()
   netz = new network(nmz);
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
-  smz = new scanner(nmz, wxString(argv[1]).mb_str());
+  smz = new fscanner();
+  smz->open(std::string(wxString(argv[1]).mb_str()));
   pmz = new parser(netz, dmz, mmz, smz);
 
   if (pmz->readin ()) { // check the logic file parsed correctly
