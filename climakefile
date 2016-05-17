@@ -1,0 +1,24 @@
+
+
+CC = g++
+RM = rm -f
+
+TARGET = logsim.exe
+COMPILE_OPTIONS = -g -std=c++11 -Wall
+LINK_OPTIONS =
+
+SRCS = logsim.cc scanner.cc parser.cc devices.cc cistring.cc iposstream.cc monitor.cc names.cc network.cc userint.cc errorhandler.cc
+OBJS = $(SRCS:.cc=.o)
+
+$(TARGET): $(OBJS)
+	$(CC) $(COMPILE_OPTIONS) $(OBJS) -o$(TARGET) $(LINK_OPTIONS)
+
+$(OBJS): %.o : %.h
+
+%.o: %.cc
+	$(CC) $(COMPILE_OPTIONS) -c $< -o $@
+
+clean:
+	$(RM) $(OBJS) ./$(TARGET)
+
+all: $(TARGET)
