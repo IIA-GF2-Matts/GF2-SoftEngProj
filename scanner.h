@@ -2,6 +2,7 @@
 #include <string>
 #include <istream>
 #include <fstream>
+#include <sstream>
 
 #include "iposstream.h" // SourcePos
 #include "names.h" // namestring
@@ -102,5 +103,12 @@ public:
 };
 
 
+class strscanner : public scanner
+{
+private:
+    std::istringstream _iss;
+public:
+    strscanner(std::string str);
+};
 
 #endif

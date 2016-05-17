@@ -234,3 +234,13 @@ void fscanner::open(std::string fname) {
 
     scanner::open(&_ifs, fname);
 }
+
+
+// class strscanner
+
+strscanner::strscanner(std::string str)
+        : scanner(), _iss(std::ifstream::in | std::ifstream::binary) {
+
+    _iss.str(str);
+    scanner::open(&_iss, "");
+}
