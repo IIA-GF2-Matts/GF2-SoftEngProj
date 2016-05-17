@@ -27,8 +27,8 @@ private:
     network* _netz;
     devices* _devz;
     monitor* _mons;
-    names* _nms;
     scanner _scan;
+    names* _nms;
     std::ostream& errs;
 
     /// Steps over the next token, and peeks the one after

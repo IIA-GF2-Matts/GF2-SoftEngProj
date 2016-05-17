@@ -76,7 +76,7 @@ const char* matterror::what() const throw () {
 
 /// Create a new matterror, and builds the message.
 matterror::matterror(std::string message, std::string file, SourcePos pos)
-    : _pos(pos), _file(file), _message(message) {
+    : _message(message), _file(file), _pos(pos) {
     std::ostringstream oss;
 
     if (file != "") {
