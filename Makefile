@@ -13,15 +13,15 @@ G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o
 .SUFFIXES:	.o .cc
 
 .cc.o :
-	$(CXX) -c `wx-config --version=3.0 --cxxflags` -g -o $@ $<
+	$(CXX) -std=c++11 -c `wx-config --version=3.0 --cxxflags` -g -o $@ $<
 
 all:    logsim guitest
 
 logsim:	$(L_OBJECTS)
-	$(CXX) -o logsim $(L_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
+	$(CXX) -std=c++11 -o logsim $(L_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
 guitest: $(G_OBJECTS)
-	 $(CXX) -o guitest $(G_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
+	 $(CXX) -std=c++11 -o guitest $(G_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
 clean:
 	rm -f *.o logsim guitest
