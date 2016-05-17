@@ -1,6 +1,7 @@
 
 
 #include <string>
+#include <ostream>
 
 #include "names.h"
 #include "scanner.h"
@@ -16,7 +17,7 @@
 struct Signal {
     name device;
     name pin;
-}
+};
 
 
 /// Parser class. Constructs the device network from a token stream,
@@ -25,9 +26,10 @@ class parser
 private:
     network* _netz;
     devices* _devz;
-    monitors* _mons;
+    monitor* _mons;
     names* _nms;
-    scanner* _scan;
+    scanner _scan;
+    std::ostream& errs;
 
     /// Steps over the next token, and peeks the one after
     void stepAndPeek(Token& tk);
@@ -63,7 +65,7 @@ private:
 
 public:
     /// Construct a parser to work on the pointers to other classes
-    parser(network* netz, devices* devz, monitors* mons, scanner* scan, names* nms);
+    parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms);
     ~parser();
 
     /** Reads the definition of the logic system and builds the            */
