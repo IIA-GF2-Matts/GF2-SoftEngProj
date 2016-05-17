@@ -63,12 +63,18 @@ class ScannerTest : public ::testing::Test {
         return _tokMap[tp];
     }
 
-    void testscannerTokenError(std::string s) {
+    void openAndloopThroughTokenStream(std::string s){
         std::istringstream iss(s);
 
         scanner scan;
+        scan.open(&iss, "");
 
-        EXPECT_THROW(scan.open(&iss, "");, matterror);
+        while (scan.step().type != EndOfFile) {
+        }
+    }
+
+    void testscannerError(std::string s) {
+        EXPECT_THROW(openAndloopThroughTokenStream(s), matterror);
     }
 
     void testscannerToken(std::string s, TokType t) {
@@ -296,25 +302,80 @@ TEST_F(ScannerTest, NestedLineCommentTokenStream){
 
 }
 
+TEST_F(ScannerTest, BlockCommentTokenStream){
+    testscannerTokenStream("sadf/**/as", {
+        Token(Identifier, "sadf"),
+        Token(AsKeyword),
+        Token(EndOfFile)
+    });
+
+    testscannerTokenStream("sadf/*\n*/as", {
+        Token(Identifier, "sadf"),
+        Token(AsKeyword),
+        Token(EndOfFile)
+    });
+
+
+    testscannerTokenStream("sadf/*//*/as", {
+        Token(Identifier, "sadf"),
+        Token(AsKeyword),
+        Token(EndOfFile)
+    });
+
+
+    testscannerTokenStream("sadf/*/* /*/as", {
+        Token(Identifier, "sadf"),
+        Token(AsKeyword),
+        Token(EndOfFile)
+    });
+
+
+
+}
+
+TEST_F(ScannerTest, NumberTokenStream){
+    testscannerTokenStream("1234.33", {
+        Token(Number, 1234),
+        Token(Dot),
+        Token(Number, 33),
+        Token(EndOfFile)
+    });
+
+
+    testscannerTokenStream("01", {
+        Token(Number, 1),
+        Token(EndOfFile)
+    });
+}
+
 // ERRORS
 
 TEST_F(ScannerTest, ErrorUnderscore){
-    testscannerTokenError("_G_");
-    testscannerTokenError("_dev");
-    testscannerTokenError("_01");
+    testscannerError("_G_");
+    testscannerError("_dev");
+    testscannerError("_01");
 }
 
 TEST_F(ScannerTest, ErrorIllegalCharacters){
-    testscannerTokenError("@");
-    testscannerTokenError("#");
-    testscannerTokenError("[");
-    testscannerTokenError("]");
-    testscannerTokenError("<");
-    testscannerTokenError("*");
-    testscannerTokenError("(");
+    testscannerError("@");
+    testscannerError("#");
+    testscannerError("[");
+    testscannerError("]");
+    testscannerError("<");
+    testscannerError("*");
+    testscannerError("(");
+    testscannerError("-");
+}
+
+TEST_F(ScannerTest, NestedBlockToken){
+    testscannerError("asdf /*/* */*/as");
+}
+
+TEST_F(ScannerTest, BigNumberToken){
+    testscannerError("1234567891234567");
 }
 
 
-TEST_F(ScannerTest, BigNumberToken){
-    testscannerTokenError("1234567891234567");
+TEST_F(ScannerTest, NegativeNumberToken){
+    testscannerError("-1234");
 }
