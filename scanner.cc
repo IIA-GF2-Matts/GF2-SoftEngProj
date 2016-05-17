@@ -63,10 +63,10 @@ Token scanner::readNext() {
 	    else if (c == '*') {
             bool hadStar = false;
             for (;;) {
-                c = readchar();
+                c = readChar();
 
                 if (_ips.eof()) {
-                    throw matterror("Unterminated block comment.")
+                    throw matterror("Unterminated block comment.", _file, p);
                 }
 
                 if (hadStar && c == '/') {
