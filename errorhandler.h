@@ -25,7 +25,7 @@ public:
     std::string getErrorMessage();
 
     /// Returns the complete error message for printing.
-    virtual const char* what() const noexcept;
+    virtual const char* what() const throw ();
 
     /// Create a new matterror, and builds the message.
     matterror(std::string message, std::string file, SourcePos pos);

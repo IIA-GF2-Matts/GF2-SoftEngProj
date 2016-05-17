@@ -69,7 +69,7 @@ std::string matterror::getErrorMessage() {
 
 
 /// Returns the complete error message for printing.
-const char* matterror::what() const noexcept {
+const char* matterror::what() const throw () {
     return _errorMessage.c_str();
 }
 
