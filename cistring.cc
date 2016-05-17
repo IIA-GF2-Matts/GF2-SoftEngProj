@@ -1,6 +1,7 @@
 
 #include <cctype>
 #include <string>
+#include <ostream>
 
 #include "cistring.h"
 
@@ -41,4 +42,12 @@ const char* ci_char_traits::find( const char* s, int n, char a ) {
 	}
 
 	return s;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const cistring& obj)
+{
+	os << obj.c_str();
+
+    return os;
 }
