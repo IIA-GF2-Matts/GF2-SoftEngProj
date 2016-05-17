@@ -1,5 +1,6 @@
-#ifndef parser_h
-#define parser_h
+
+
+#include <string>
 
 #include "names.h"
 #include "scanner.h"
@@ -8,27 +9,68 @@
 #include "monitor.h"
 
 
-using namespace std;
+#ifndef GF2_PARSER_H
+#define GF2_PARSER_H
 
-class parser {
-  network* netz; // instantiations of various classes for parser to use.
-  devices* dmz; 
-  monitor* mmz;
-  scanner* smz;
-
-  /* put other stuff that the class uses internally here */
-  /* also declare internal functions                     */
+/// Signal struct, representing a DEVICE.PIN pair.
+struct Signal {
+    name device;
+    name pin;
+}
 
 
- public:
-  bool readin ();
-    /* Reads the definition of the logic system and builds the             */
-    /* corresponding internal representation via calls to the 'Network'    */
-    /* module and the 'Devices' module.                                    */
+/// Parser class. Constructs the device network from a token stream,
+class parser
+{
+private:
+    network* _netz;
+    devices* _devz;
+    monitors* _mons;
+    names* _nms;
+    scanner* _scan;
 
-  parser (network* network_mod, devices* devices_mod,
-	  monitor* monitor_mod, scanner* scanner_mod);
-    /* the constructor takes pointers to various other classes as parameters */
+    /// Steps over the next token, and peeks the one after
+    void stepAndPeek(Token& tk);
+
+    /// file = { statement } ;
+    void parseFile(Token& tk);
+
+    /// statement = definedevice | definemonitor ;
+    void parseStatement(Token& tk);
+
+    /// definedevice = "dev" , devicename , [ "=" , type ] , data ;
+    void parseDefineDevice(Token& tk);
+
+    /// data = optionset | ";" ;
+    void parseData(Token& tk, name dv);
+
+    /// optionset = "{" , { option } , "}" ;
+    void parseOptionSet(Token& tk, name dv);
+
+    /// option = key , ":" , value , ";" ;
+    /// value = signalname | number ;
+    void parseOption(Token& tk, name dv);
+
+    /// definemonitor = "monitor" , monitorset , ";" ;
+    /// monitorset = monitor , { "," , monitor } ;
+    void parseDefineMonitor(Token& tk);
+
+    /// signalname , [ "as" , signalname ] ;
+    void parseMonitor(Token& tk);
+
+    /// signalname = devicename , [ "." , pin ] ;
+    Signal parseSignalName(Token& tk);
+
+public:
+    /// Construct a parser to work on the pointers to other classes
+    parser(network* netz, devices* devz, monitors* mons, scanner* scan, names* nms);
+    ~parser();
+
+    /** Reads the definition of the logic system and builds the            */
+    /** corresponding internal representation via calls to the 'Network'   */
+    /** module and the 'Devices' module.                                   */
+    bool readin();
 };
 
-#endif /* parser_h */
+
+#endif
