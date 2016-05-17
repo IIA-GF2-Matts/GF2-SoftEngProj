@@ -54,14 +54,18 @@ Token scanner::readNext() {
         SourcePos p = _ips.Pos;
         c = readChar();
 
-        if (c != '/') {
-            throw matterror("Illegal character sequence '/' in file.", _file, p);
-        }
+        if (c == '/') {
+	        // Read until a newline.
+	        do {
+	            c = readChar();
+	        } while (!_ips.eof() && (c != '\n'));
+	    }
+	    else if (c == '*') {
 
-        // Read until a newline.
-        do {
-            c = readChar();
-        } while (!_ips.eof() && (c != '\n'));
+	    }
+        else {
+        	throw matterror("Illegal character sequence '/' in file.", _file, p);
+        }
 
         if (_ips.eof()) {
             ret.at = _ips.Pos;
@@ -115,6 +119,11 @@ Token scanner::readNext() {
                 }
                 else if (ret.name == "as") {
                     ret.type = TokType::AsKeyword;
+                }
+                else if (ret.name == "CLOCK" || ret.name == "SWITCH" || ret.name == "AND" 
+                	  || ret.name == "NAND"  || ret.name == "OR"     || ret.name == "NOR" 
+                	  || ret.name == "DTYPE" || ret.name == "XOR") {
+                		ret.type = TokType::DeviceType;
                 }
             }
             else {

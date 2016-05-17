@@ -26,7 +26,8 @@ enum TokType {
     CloseBrace,
     Dot,
     Number,
-    Identifier
+    Identifier,
+    DeviceType
 };
 
 
