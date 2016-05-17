@@ -61,7 +61,20 @@ Token scanner::readNext() {
 	        } while (!_ips.eof() && (c != '\n'));
 	    }
 	    else if (c == '*') {
+            bool hadStar = false;
+            for (;;) {
+                c = readchar();
 
+                if (_ips.eof()) {
+                    throw matterror("Unterminated block comment.")
+                }
+
+                if (hadStar && c == '/') {
+                    break;
+                }
+
+                hadStar = (c == '*');
+            }
 	    }
         else {
         	throw matterror("Illegal character sequence '/' in file.", _file, p);
@@ -120,8 +133,8 @@ Token scanner::readNext() {
                 else if (ret.name == "as") {
                     ret.type = TokType::AsKeyword;
                 }
-                else if (ret.name == "CLOCK" || ret.name == "SWITCH" || ret.name == "AND" 
-                	  || ret.name == "NAND"  || ret.name == "OR"     || ret.name == "NOR" 
+                else if (ret.name == "CLOCK" || ret.name == "SWITCH" || ret.name == "AND"
+                	  || ret.name == "NAND"  || ret.name == "OR"     || ret.name == "NOR"
                 	  || ret.name == "DTYPE" || ret.name == "XOR") {
                 		ret.type = TokType::DeviceType;
                 }
