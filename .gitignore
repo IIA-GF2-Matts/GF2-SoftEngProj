@@ -4,3 +4,4 @@
 *.a
 logsim
 guitest
+*_unittest
