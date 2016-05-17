@@ -130,6 +130,10 @@ Token scanner::readNext() {
             if (std::isdigit(c)) {
                 ret.type = TokType::Number;
                 ret.number = readNumber(c);
+
+                if (ret.number < 0) {
+                    throw matterror("Number is too large to be represented in Mattlab.", _file, ret.at);
+                }
             }
             else if (std::isalpha(c)) {
                 ret.type = TokType::Identifier;
@@ -195,6 +199,16 @@ int scanner::readNumber(int c1) {
 
     while(std::isdigit(_ips.peek())) {
         ret = ret*10 + (_ips.get() - '0');
+
+        if (ret < 0) {
+            // Overflow.
+            // Consume remaining digits and return -1.
+
+            while(std::isdigit(_ips.peek())) {
+                _ips.get();
+            }
+            return -1;
+        }
     }
 
     return ret;
