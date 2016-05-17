@@ -6,7 +6,7 @@ SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc u
 
 L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o
 
-G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o
+G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o cistring.o
 
 # implementation
 
