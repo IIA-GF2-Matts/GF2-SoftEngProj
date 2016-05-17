@@ -6,6 +6,11 @@
 #include <sstream>
 #include "errorhandler.h"
 
+//#define TOK(T) Token(T)
+//#define TOK(T, d) Token(T, d)
+
+//using namespace TokType;
+
 /*
 
 
@@ -26,6 +31,24 @@
 
     */
 
+std::map<TokType, const char*> _tokMap = {
+    {EndOfFile, "EndOfFile"},
+    {DevKeyword, "Device"},
+    {MonitorKeyword, "Monitors"},
+    {AsKeyword, "As"},
+    {Equals, "Equals"},
+    {Colon, "Colon"},
+    {SemiColon, "SemiColon"},
+    {Comma, "Comma"},
+    {Brace, "Brace"},
+    {CloseBrace, "CloseBrace"},
+    {Dot, "Dot"},
+    {Number, "Number"},
+    {Identifier, "Identifier"},
+    {DeviceType, "Type"}
+};
+
+
 class ScannerTest : public ::testing::Test {
     protected:
         virtual void SetUp() {
@@ -33,6 +56,11 @@ class ScannerTest : public ::testing::Test {
 
     virtual void TearDown() {
 
+    }
+
+
+    const char* TokTypeText(TokType tp) {
+        return _tokMap[tp];
     }
 
     void testscannerTokenError(std::string s) {
@@ -54,75 +82,218 @@ class ScannerTest : public ::testing::Test {
         Token tk = scan.step();
 
         EXPECT_EQ(t, tk.type);
-        EXPECT_EQ(TokType::EndOfFile, scan.step().type);
+        EXPECT_EQ(EndOfFile, scan.step().type);
+    }
+
+    void testscannerTokenStream(std::string s, std::vector<Token> stream) {
+
+        strscanner scan(s);
+
+        int tn = 0;
+        Token tk;
+        do {
+            tk = scan.step();
+
+            EXPECT_EQ(stream[tn].type, tk.type) << "Token type different at position " << tn
+                << ", expected " << TokTypeText(stream[tn].type)
+                << " got " << TokTypeText(tk.type);
+
+            if (tk.type == Identifier) {
+                EXPECT_EQ(stream[tn].name, tk.name) << "Itentifier name different at position " << tn
+                << ", expected " << stream[tn].name
+                << " got " << tk.name;
+            }
+            else if (tk.type == Number) {
+                EXPECT_EQ(stream[tn].number, tk.number) << "Itentifier number different at position " << tn
+                << ", expected " << stream[tn].number
+                << " got " << tk.number;
+            }
+
+            tn++;
+        } while (tk.type != EndOfFile);
     }
 };
 
 TEST_F(ScannerTest, PunctuationToken){
-    testscannerToken("=", TokType::Equals);
-    testscannerToken(":", TokType::Colon);
-    testscannerToken(",", TokType::Comma);
-    testscannerToken(";", TokType::SemiColon);
-    testscannerToken("{", TokType::Brace);
-    testscannerToken("}", TokType::CloseBrace);
-    testscannerToken(".", TokType::Dot);
+    testscannerToken("=", Equals);
+    testscannerToken(":", Colon);
+    testscannerToken(",", Comma);
+    testscannerToken(";", SemiColon);
+    testscannerToken("{", Brace);
+    testscannerToken("}", CloseBrace);
+    testscannerToken(".", Dot);
 }
 
 TEST_F(ScannerTest, DeviceTypeToken){
-    testscannerToken("CLOCK",  TokType::DeviceType);
-    testscannerToken("SWITCH", TokType::DeviceType);
-    testscannerToken("AND",    TokType::DeviceType);
-    testscannerToken("NAND",   TokType::DeviceType);
-    testscannerToken("OR",     TokType::DeviceType);
-    testscannerToken("NOR",    TokType::DeviceType);
-    testscannerToken("DTYPE",  TokType::DeviceType);
-    testscannerToken("XOR",    TokType::DeviceType);
+    testscannerToken("CLOCK",  DeviceType);
+    testscannerToken("SWITCH", DeviceType);
+    testscannerToken("AND",    DeviceType);
+    testscannerToken("NAND",   DeviceType);
+    testscannerToken("OR",     DeviceType);
+    testscannerToken("NOR",    DeviceType);
+    testscannerToken("DTYPE",  DeviceType);
+    testscannerToken("XOR",    DeviceType);
 }
 
 TEST_F(ScannerTest, CaseInsensitiveToken){
-    testscannerToken("ClOcK",   TokType::DeviceType);
-    testscannerToken("dEv",     TokType::DevKeyword);
-    testscannerToken("monItOR", TokType::MonitorKeyword);
-    testscannerToken("nand",    TokType::DeviceType);
-    testscannerToken("DEV",     TokType::DevKeyword);
+    testscannerToken("ClOcK",   DeviceType);
+    testscannerToken("dEv",     DevKeyword);
+    testscannerToken("monItOR", MonitorKeyword);
+    testscannerToken("nand",    DeviceType);
+    testscannerToken("DEV",     DevKeyword);
 }
 
 
 TEST_F(ScannerTest, KeywordToken){
-    testscannerToken("dev",     TokType::DevKeyword);
-    testscannerToken("monitor", TokType::MonitorKeyword);
-    testscannerToken("as",      TokType::AsKeyword);
+    testscannerToken("dev",     DevKeyword);
+    testscannerToken("monitor", MonitorKeyword);
+    testscannerToken("as",      AsKeyword);
 }
 
 TEST_F(ScannerTest, IdentifierToken){
-    testscannerToken("G1",    TokType::Identifier);
-    testscannerToken("SW1",   TokType::Identifier);
-    testscannerToken("hello", TokType::Identifier);
+    testscannerToken("G1",    Identifier);
+    testscannerToken("SW1",   Identifier);
+    testscannerToken("hello", Identifier);
 }
 
 TEST_F(ScannerTest, IdentifierTokenUnderscore){
-    testscannerToken("G_",    TokType::Identifier);
-    testscannerToken("S_W1",   TokType::Identifier);
-    testscannerToken("h1_", TokType::Identifier);
+    testscannerToken("G_",    Identifier);
+    testscannerToken("S_W1",   Identifier);
+    testscannerToken("h1_", Identifier);
 }
 
 TEST_F(ScannerTest, NumberToken){
-    testscannerToken("1",   TokType::Number);
-    testscannerToken("123", TokType::Number);
-    testscannerToken("000", TokType::Number);
+    testscannerToken("1",   Number);
+    testscannerToken("123", Number);
+    testscannerToken("000", Number);
 }
 
 TEST_F(ScannerTest, LineCommentToken){
-    testscannerToken("// Testing dev\n// Another comment?\n123", TokType::Number);
-    testscannerToken("// Testing clock\n123// Another comment?",   TokType::Number);
-    testscannerToken("//*/dev\nas",   TokType::AsKeyword);
+    testscannerToken("// Testing dev\n// Another comment?\n123", Number);
+    testscannerToken("// Testing clock\n123// Another comment?",   Number);
+    testscannerToken("//*/dev\nas",   AsKeyword);
 }
 
 TEST_F(ScannerTest, BlockCommentToken){
-    testscannerToken("/* dev\n// Another comment?\nCLOCK*/dev", TokType::DevKeyword);
-    testscannerToken("/*** dev\n// Another comment?\nCLOCK***/dev", TokType::DevKeyword);
-    testscannerToken("/* *///dev\n123", TokType::Number);
-    testscannerToken("/**/123", TokType::Number);
+    testscannerToken("/* dev\n// Another comment?\nCLOCK*/dev", DevKeyword);
+    testscannerToken("/*** dev\n// Another comment?\nCLOCK***/dev", DevKeyword);
+    testscannerToken("/* *///dev\n123", Number);
+    testscannerToken("/**/123", Number);
+}
+
+
+
+
+
+
+// TOKEN STREAMS
+
+
+
+// device definitions
+
+TEST_F(ScannerTest, DeviceDefinitionTokenStream){
+    testscannerTokenStream("dev D1 = DTYPE { I1 : 0; }", {
+        Token(DevKeyword),
+        Token(Identifier, "D1"),
+        Token(Equals),
+        Token(DeviceType, "DTYPE"),
+        Token(Brace),
+        Token(Identifier, "I1"),
+        Token(Colon),
+        Token(Number, 0),
+        Token(SemiColon),
+        Token(CloseBrace),
+        Token(EndOfFile)
+    });
+}
+
+TEST_F(ScannerTest, DeviceTypeDefinitionTokenStream){
+    testscannerTokenStream("dev D1 = DTYPE;", {
+        Token(DevKeyword),
+        Token(Identifier, "D1"),
+        Token(Equals),
+        Token(DeviceType, "DTYPE"),
+        Token(SemiColon),
+        Token(EndOfFile)
+    });
+}
+
+TEST_F(ScannerTest, DeviceOptionsDefinitionTokenStream){
+    testscannerTokenStream("dev D1 {key:value}", {
+        Token(DevKeyword),
+        Token(Identifier, "D1"),
+        Token(Brace),
+        Token(Identifier, "key"),
+        Token(Colon),
+        Token(Identifier, "value"),
+        Token(CloseBrace),
+        Token(EndOfFile)
+    });
+}
+
+TEST_F(ScannerTest, PreceedingKeywordIdentifiersTokenStream){
+    testscannerTokenStream("dev devdevdevid dev;", {
+        Token(DevKeyword),
+        Token(Identifier, "devdevdevid"),
+        Token(DevKeyword),
+        Token(SemiColon),
+        Token(EndOfFile)
+    });
+}
+
+TEST_F(ScannerTest, IdentifiersDotTokenStream){
+    testscannerTokenStream("G1.I1", {
+        Token(Identifier, "G1"),
+        Token(Dot),
+        Token(Identifier, "I1"),
+        Token(EndOfFile)
+    });
+
+    testscannerTokenStream("dev_.I1", {
+        Token(Identifier, "dev_"),
+        Token(Dot),
+        Token(Identifier, "I1"),
+        Token(EndOfFile)
+    });
+}
+
+
+TEST_F(ScannerTest, LineCommentNewlinesTokenStream){
+    testscannerTokenStream("monitor//. as //asdf \r\n 3", {
+        Token(MonitorKeyword),
+        Token(Number, 3),
+        Token(EndOfFile)
+    });
+
+    testscannerTokenStream("monitor//. as //asdf \n 3", {
+        Token(MonitorKeyword),
+        Token(Number, 3),
+        Token(EndOfFile)
+    });
+}
+
+TEST_F(ScannerTest, NestedLineCommentTokenStream){
+    testscannerTokenStream("monitor//. as //asdf \n 3", {
+        Token(MonitorKeyword),
+        Token(Number, 3),
+        Token(EndOfFile)
+    });
+
+
+    testscannerTokenStream("monitor///*. as /*/asdf \n 3", {
+        Token(MonitorKeyword),
+        Token(Number, 3),
+        Token(EndOfFile)
+    });
+
+
+    testscannerTokenStream("monitor//*. as /*/asdf \n 3", {
+        Token(MonitorKeyword),
+        Token(Number, 3),
+        Token(EndOfFile)
+    });
+
 }
 
 // ERRORS
@@ -141,4 +312,9 @@ TEST_F(ScannerTest, ErrorIllegalCharacters){
     testscannerTokenError("<");
     testscannerTokenError("*");
     testscannerTokenError("(");
+}
+
+
+TEST_F(ScannerTest, BigNumberToken){
+    testscannerTokenError("1234567891234567");
 }
