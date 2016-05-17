@@ -1,17 +1,27 @@
-#include "logsim.h"
-#include "userint.h"
-#include "gui.h"
-#include <GL/glut.h>
+
 
 // #define USE_GUI
 
+#include <iostream>
+
+#include "logsim.h"
+#include "userint.h"
+
+#ifdef USE_GUI
+#include "gui.h"
+#include <GL/glut.h>
+#endif
+
+#ifdef USE_GUI
 IMPLEMENT_APP(MyApp)
-  
+#endif
+
+
 bool MyApp::OnInit()
   // This function is automatically called when the application starts
 {
   if (argc != 2) { // check we have one command line argument
-    wcout << "Usage:      " << argv[0] << " [filename]" << endl;
+    std::cout << "Usage:      " << argv[0] << " [filename]" << std::endl;
     exit(1);
   }
 
@@ -20,9 +30,8 @@ bool MyApp::OnInit()
   netz = new network(nmz);
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
-  smz = new fscanner();
-  smz->open(std::string(wxString(argv[1]).mb_str()));
-  pmz = new parser(netz, dmz, mmz, smz);
+  smz.open(argv[1]);
+  parser* pmz = new parser(netz, dmz, mmz, smz, nmz);
 
   if (pmz->readin ()) { // check the logic file parsed correctly
 #ifdef USE_GUI
@@ -41,3 +50,18 @@ bool MyApp::OnInit()
   }
   return(false); // exit the application
 }
+
+
+#ifndef USE_GUI
+
+int main(int argc, char const *argv[])
+{
+  MyApp app;
+  app.argc = argc;
+  app.argv = argv;
+  app.OnInit();
+
+  return 0;
+}
+
+#endif
