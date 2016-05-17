@@ -144,7 +144,7 @@ Token scanner::readNext() {
 
 
 namestring scanner::readName(int c1) {
-    std::ostringstream oss;
+    std::basic_ostringstream<char, ci_char_traits> oss;
     oss << char(c1);
 
     while (std::isalnum(_ips.peek()) || _ips.peek() == '_') {
