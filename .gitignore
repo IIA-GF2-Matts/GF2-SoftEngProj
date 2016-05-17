@@ -5,3 +5,4 @@
 logsim
 guitest
 *_unittest
+*.exe
