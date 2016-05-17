@@ -26,6 +26,19 @@ Token::Token(SourcePos pos, TokType t)
 {
 }
 
+Token::Token(TokType t)
+    : at(0, 0, 0), type(t) {
+}
+
+Token::Token(TokType t, namestring s)
+    : at(0, 0, 0), type(t), name(s) {
+}
+
+Token::Token(TokType t, int num)
+    : at(0, 0, 0), type(t), number(num) {
+}
+
+
 
 
 // class scanner

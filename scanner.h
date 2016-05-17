@@ -44,6 +44,9 @@ public:
 
     Token();
     Token(SourcePos pos, TokType t);
+    Token(TokType t);
+    Token(TokType t, namestring s);
+    Token(TokType t, int n);
 };
 
 
