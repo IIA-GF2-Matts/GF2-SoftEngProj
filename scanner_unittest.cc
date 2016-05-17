@@ -4,6 +4,7 @@
 
 #include <string>
 #include <sstream>
+#include "errorhandler.h"
 
 /*
 
@@ -34,6 +35,13 @@ class ScannerTest : public ::testing::Test {
 
     }
 
+    void testscannerTokenError(std::string s) {
+        std::istringstream iss(s);
+
+        scanner scan;
+
+        EXPECT_THROW(scan.open(&iss, "");, matterror);
+    }
 
     void testscannerToken(std::string s, TokType t) {
 
@@ -92,6 +100,12 @@ TEST_F(ScannerTest, IdentifierToken){
     testscannerToken("hello", TokType::Identifier);
 }
 
+TEST_F(ScannerTest, IdentifierTokenUnderscore){
+    testscannerToken("G_",    TokType::Identifier);
+    testscannerToken("S_W1",   TokType::Identifier);
+    testscannerToken("h1_", TokType::Identifier);
+}
+
 TEST_F(ScannerTest, NumberToken){
     testscannerToken("1",   TokType::Number);
     testscannerToken("123", TokType::Number);
@@ -109,4 +123,22 @@ TEST_F(ScannerTest, BlockCommentToken){
     testscannerToken("/*** dev\n// Another comment?\nCLOCK***/dev", TokType::DevKeyword);
     testscannerToken("/* *///dev\n123", TokType::Number);
     testscannerToken("/**/123", TokType::Number);
+}
+
+// ERRORS
+
+TEST_F(ScannerTest, ErrorUnderscore){
+    testscannerTokenError("_G_");
+    testscannerTokenError("_dev");
+    testscannerTokenError("_01");
+}
+
+TEST_F(ScannerTest, ErrorIllegalCharacters){
+    testscannerTokenError("@");
+    testscannerTokenError("#");
+    testscannerTokenError("[");
+    testscannerTokenError("]");
+    testscannerTokenError("<");
+    testscannerTokenError("*");
+    testscannerTokenError("(");
 }
