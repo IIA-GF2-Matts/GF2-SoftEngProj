@@ -71,11 +71,8 @@ void parser::parseDefineDevice(Token& tk) {
     if (tk.type != TokType::Identifier) {
         throw matterror("Expected a device name.", _scan.getFile(), tk.at);
     }
-    if (deviceTypes.find(tk.name) != deviceTypes.end()) {
-    	throw matterror("Device name must not be the same as a reserved device type", _scan.getFile(), tk.at);
-    }
-    // dev, as, monitor should be handled by the scanner
-    // may want to test anyway
+    // dev, as, monitor are handled by the scanner and made *Keywords
+    // device types are handled by the scanner and made DeviceTypes
 
     nameToken = tk;
     name dv = blankname;
@@ -95,25 +92,8 @@ void parser::parseDefineDevice(Token& tk) {
 
         // Create device of type, add it to the network
         name newDeviceName = _nms->lookup(nameToken.name);
-
         devlink newDeviceLink;
-        if (tk.name == "CLOCK") {
-    		_netz->adddevice(aclock, newDeviceName, newDeviceLink);
-    	} else if (tk.name == "SWITCH") {
-    		_netz->adddevice(aswitch, newDeviceName, newDeviceLink);
-    	} else if (tk.name == "AND") {
-    		_netz->adddevice(andgate, newDeviceName, newDeviceLink);
-    	} else if (tk.name == "NAND") {
-    		_netz->adddevice(nandgate, newDeviceName, newDeviceLink);
-    	} else if (tk.name == "OR") {
-    		_netz->adddevice(orgate, newDeviceName, newDeviceLink);
-    	} else if (tk.name == "NOR") {
-    		_netz->adddevice(norgate, newDeviceName, newDeviceLink);
-    	} else if (tk.name == "DTYPE") {
-    		_netz->adddevice(xorgate, newDeviceName, newDeviceLink);
-    	} else if (tk.name == "XOR") {
-    		_netz->adddevice(dtype, newDeviceName, newDeviceLink);
-    	} 
+        _netz->adddevice(tk.devtype, newDeviceName, newDeviceLink);
 
         stepAndPeek(tk);
     }
