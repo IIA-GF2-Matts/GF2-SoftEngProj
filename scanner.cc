@@ -150,7 +150,7 @@ Token scanner::readNext() {
                 else if (ret.name == "as") {
                     ret.type = TokType::AsKeyword;
                 }
-                else if (deviceTypes.find(tk.name) != deviceTypes.end()) {
+                else if (deviceTypes.find(ret.name) != deviceTypes.end()) {
                 	ret.type = TokType::DeviceType;
                 }
             }
