@@ -8,6 +8,7 @@
 #include "iposstream.h" // SourcePos
 #include "names.h" // namestring
 #include "cistring.h"
+#include "network.h"
 
 
 #ifndef GF2_SCANNER_H
