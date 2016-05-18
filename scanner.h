@@ -3,7 +3,7 @@
 #include <istream>
 #include <fstream>
 #include <sstream>
-#include <set>
+#include <map>
 
 #include "iposstream.h" // SourcePos
 #include "names.h" // namestring
@@ -33,9 +33,16 @@ enum TokType {
     DeviceType
 };
 
-const std::set<cistring> deviceTypes = 
-    {"CLOCK", "SWITCH", "AND", "NAND", "OR", 
-        "NOR", "DTYPE", "XOR"};
+const std::map<namestring, devicekind> deviceTypes = {
+    {"CLOCK", aclock},
+    {"SWITCH", aswitch},
+    {"AND", andgate},
+    {"NAND", nandgate},
+    {"OR", orgate},
+    {"NOR", norgate},
+    {"DTYPE", dtype},
+    {"XOR", xorgate}
+};
 
 
 /// Token class. Represents a lexical element in the source.
@@ -47,6 +54,7 @@ public:
     TokType type; ///< The type of the token
     namestring name; ///< If type == TokType::Identifier, this is the string name
     int number; ///< If type == TokType::Number, this is the integer value.
+    devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
 
     Token();
     Token(SourcePos pos, TokType t);
