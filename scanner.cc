@@ -9,6 +9,7 @@
 #include "iposstream.h"
 #include "cistring.h"
 #include "errorhandler.h"
+#include "network.h"
 
 #include "scanner.h"
 
@@ -36,6 +37,9 @@ Token::Token(TokType t, namestring s)
 
 Token::Token(TokType t, int num)
     : at(0, 0, 0), type(t), number(num) {
+    if (t == TokType::DeviceType) {
+        devtype = devicekind(num);
+    }
 }
 
 
@@ -150,8 +154,12 @@ Token scanner::readNext() {
                 else if (ret.name == "as") {
                     ret.type = TokType::AsKeyword;
                 }
-                else if (deviceTypes.find(ret.name) != deviceTypes.end()) {
-                	ret.type = TokType::DeviceType;
+                else { // Check for device types
+                    auto it = deviceTypes.find(ret.name);
+                    if (it != deviceTypes.end()) {
+                	   ret.type = TokType::DeviceType;
+                       ret.devtype = it->second;
+                    }
                 }
             }
             else {

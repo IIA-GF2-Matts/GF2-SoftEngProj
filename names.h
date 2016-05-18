@@ -14,7 +14,7 @@ typedef std::set<namestring>::const_iterator name;
 
 const int maxnames  = 200;  /* max number of distinct names */
 const int maxlength = 8;    /* max chars in a name string   */
-const name blankname;       /* special name                 */
+const name blankname;       /* special name (defaults to end iterator)*/
 
 class names{
 
