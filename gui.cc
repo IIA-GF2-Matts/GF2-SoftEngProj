@@ -1,6 +1,6 @@
 #include "gui.h"
 #include <GL/glut.h>
-#include "wx_icon.xpm"
+#include "logo32.xpm"
 #include <iostream>
 
 using namespace std;
@@ -38,7 +38,13 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 {
   float y;
   unsigned int i;
+  unsigned int j;
   asignal s;
+  name mon_name;
+  name mon_name_2;
+  wxString mon_name_text;
+  wxString output_text;
+
 
   if (cycles >= 0) cyclesdisplayed = cycles;
 
@@ -49,38 +55,100 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   }
   glClear(GL_COLOR_BUFFER_BIT);
 
+  int w, h;
+  GetClientSize(&w, &h);
+  float dy = 10.0;              // plot lines at +- dx
+  float plot_height = 4 * dy;   // height allocated 2x plot height
+
+  float label_width = 100.0;    // x allowed for labels at start
+  float end_width = w - 10;     // dist between end and side
+
+  // example_text.Printf("%d", mmz->moncount());
+
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw the first monitor signal, get trace from monitor class
 
-    glColor3f(1.0, 0.0, 0.0);
-    glBegin(GL_LINE_STRIP);
-    for (i=0; i<cyclesdisplayed; i++) {
-      if (mmz->getsignaltrace(0, i, s)) {
-	if (s==low) y = 10.0;
-	if (s==high) y = 30.0;
-	glVertex2f(20*i+10.0, y); 
-	glVertex2f(20*i+30.0, y);
+  float dx = (end_width - label_width) / cyclesdisplayed; // dx between points
+
+    for (j = 0; j<mmz->moncount(); j++) {
+      // draw x axis
+      glColor3f(0.4, 0.4, 0.4);
+      glBegin(GL_LINE_STRIP);
+      y = h - (j+1)*plot_height - dy;
+      glVertex2f(label_width-5, y);
+      glVertex2f(end_width, y);
+      glEnd();
+
+      // draw trace
+      glColor3f(0.0, 1.0, 0.0);
+      glBegin(GL_LINE_STRIP);
+      for (i=0; i<cyclesdisplayed; i++) {
+        if (mmz->getsignaltrace(j, i, s)) {
+          if (s==low) y = h - ((j+1) * plot_height + dy);
+          if (s==high) y = h - ((j+1) * plot_height - dy);
+          glVertex2f(dx*i + label_width, y); 
+          glVertex2f(dx*(i+1) + label_width, y);
+        }
+      }
+      glEnd();
+      // draw text label
+      glRasterPos2f(10, h - 5 - (j+1)*plot_height);
+      mmz->getmonname(j, mon_name, mon_name_2);
+      mon_name_text = mon_name ->c_str();
+      for (i = 0; i < mon_name_text.Len(); i++)
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mon_name_text[i]);
+
+      if (mon_name_2 != blankname) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, '.');
+
+        mon_name_text = mon_name_2->c_str();
+        for (i = 0; i < mon_name_text.Len(); i++)
+          glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mon_name_text[i]);
       }
     }
+
+    // draw verticle line
+    glColor3f(0.4, 0.4, 0.4);
+    glBegin(GL_LINE_STRIP);
+    glVertex2f(label_width-5, h-dy);
+    glVertex2f(label_width-5, h-(2*dy + plot_height*mmz->moncount()));
     glEnd();
 
-  } else { // draw an artificial trace
 
-    glColor3f(0.0, 1.0, 0.0);
+  } else { // draw title screen
+
     glBegin(GL_LINE_STRIP);
-    for (i=0; i<5; i++) {
-      if (i%2) y = 10.0;
-      else y = 30.0;
-      glVertex2f(20*i+10.0, y); 
-      glVertex2f(20*i+30.0, y);
+    for (i=0; i<10; i++) {
+      if (i%2) y = h - 2*plot_height - dy*2;
+      else y = h - 2*plot_height + dy*2;
+      glVertex2f(20*i+label_width, y); 
+      glVertex2f(20*i+20.0 + label_width, y);
     }
     glEnd();
+    output_text = "Welcome to MattLab Logic Simulator";
+    glColor3f(0.0, 1.0, 0.0);
+    glRasterPos2f(label_width, h/2);
+    for (i = 0; i < mon_name_text.Len(); i++) 
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, output_text[i]);
     
+    string logo[5] = {
+      "   _[]_[]_[]_[]_[]_[]_[]_[]_",
+      "  |                         |",
+      "   )     M A T T L A B      |",
+      "  |                         |",
+      "   `[]`[]`[]`[]`[]`[]`[]`[]` "
+    };
+    for (j=0; j<5; j++) {
+      glRasterPos2f(label_width, h/2 - 20*(j+1));
+      for (i=0; i<logo[j].length(); i++)
+        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, logo[j][i]);
+    }
+
   }
 
-  // Example of how to use GLUT to draw text on the canvas
-  glColor3f(0.0, 0.0, 1.0);
-  glRasterPos2f(10, 100);
-  for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
+  // // Example of how to use GLUT to draw text on the canvas
+  // glColor3f(1.0, 0.0, 0.0);
+  // glRasterPos2f(10, 100);
+  // for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
 
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
   glFlush();
@@ -95,15 +163,15 @@ void MyGLCanvas::InitGL()
   GetClientSize(&w, &h);
   SetCurrent(*context);
   glDrawBuffer(GL_BACK);
-  glClearColor(1.0, 1.0, 1.0, 0.0);
+  glClearColor(0.15, 0.15, 0.15, 0.0);
   glViewport(0, 0, (GLint) w, (GLint) h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   glOrtho(0, w, 0, h, -1, 1); 
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glTranslated(pan_x, pan_y, 0.0);
-  glScaled(zoom, zoom, zoom);
+  glTranslated(0.0, pan_y, 0.0);
+  //glScaled(zoom, zoom, zoom);
 }
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
@@ -139,8 +207,8 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   }
   if (event.ButtonUp()) text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
   if (event.Dragging()) {
-    pan_x += event.m_x - last_x;
-    pan_y -= event.m_y - last_y;
+    // pan_x += event.m_x - last_x;
+    // pan_y -= event.m_y - last_y;
     last_x = event.m_x;
     last_y = event.m_y;
     init = false;
@@ -148,14 +216,15 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   }
   if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
   if (event.GetWheelRotation() < 0) {
-    zoom = zoom * (1.0 - (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
     init = false;
-    text.Printf("Negative mouse wheel rotation, zoom now %f", zoom);
+    text.Printf("Negative mouse wheel rotation, pan_y now %d", pan_y);
   }
   if (event.GetWheelRotation() > 0) {
-    zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
+    if (pan_y < 0) pan_y = 0;
     init = false;
-    text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
+    text.Printf("Positive mouse wheel rotation, pan_y now %d", pan_y);
   }
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
@@ -178,7 +247,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
   // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
   // using sizers
 {
-  SetIcon(wxIcon(wx_icon));
+  SetIcon(wxIcon(logo32));
 
   cyclescompleted = 0;
   nmz = names_mod;
@@ -206,7 +275,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxString& title, const wxPoint& pos, co
   spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
   button_sizer->Add(spin, 0 , wxALL, 10);
 
-  button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
+  // button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
   topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 
   SetSizeHints(400, 400);

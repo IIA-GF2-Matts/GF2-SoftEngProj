@@ -1,6 +1,6 @@
 
 
-// #define USE_GUI
+#define USE_GUI
 
 #include <iostream>
 
