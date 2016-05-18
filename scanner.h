@@ -3,9 +3,11 @@
 #include <istream>
 #include <fstream>
 #include <sstream>
+#include <set>
 
 #include "iposstream.h" // SourcePos
 #include "names.h" // namestring
+#include "cistring.h"
 
 
 #ifndef GF2_SCANNER_H
@@ -30,6 +32,10 @@ enum TokType {
     Identifier,
     DeviceType
 };
+
+const std::set<cistring> deviceTypes = 
+    {"CLOCK", "SWITCH", "AND", "NAND", "OR", 
+        "NOR", "DTYPE", "XOR"};
 
 
 /// Token class. Represents a lexical element in the source.

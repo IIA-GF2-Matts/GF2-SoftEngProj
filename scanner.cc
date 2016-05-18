@@ -150,10 +150,8 @@ Token scanner::readNext() {
                 else if (ret.name == "as") {
                     ret.type = TokType::AsKeyword;
                 }
-                else if (ret.name == "CLOCK" || ret.name == "SWITCH" || ret.name == "AND"
-                	  || ret.name == "NAND"  || ret.name == "OR"     || ret.name == "NOR"
-                	  || ret.name == "DTYPE" || ret.name == "XOR") {
-                		ret.type = TokType::DeviceType;
+                else if (deviceTypes.find(tk.name) != deviceTypes.end()) {
+                	ret.type = TokType::DeviceType;
                 }
             }
             else {
