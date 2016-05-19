@@ -1,6 +1,6 @@
 OPENGL_LIBS = -lglut -lGL -lGLU
 
-CXX = $(shell wx-config --version=3.0 --cxx)
+CXX = $(shell wx-config --version=3.0 --cxx) -DUSE_GUI -std=c++11
 
 SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc
 
@@ -14,15 +14,15 @@ G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o cistring.o
 .SUFFIXES:	.o .cc
 
 .cc.o :
-	$(CXX) -std=c++11 -c `wx-config --version=3.0 --cxxflags` -g -o $@ $<
+	$(CXX) -c `wx-config --version=3.0 --cxxflags` -g -o $@ $<
 
 all:    logsim guitest
 
 logsim:	$(L_OBJECTS)
-	$(CXX) -std=c++11 -o logsim $(L_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
+	$(CXX) -o logsim $(L_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
 guitest: $(G_OBJECTS)
-	 $(CXX) -std=c++11 -o guitest $(G_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
+	 $(CXX) -o guitest $(G_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
 clean:
 	rm -f *.o logsim guitest scanner_unittest
@@ -64,7 +64,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 
 #unittests
 
-scanner_unittest.o : scanner_unittest.cc scanner.h 
+scanner_unittest.o : scanner_unittest.cc scanner.h
 	$(CXX) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c scanner_unittest.cc
 
 scanner_unittest : scanner.o scanner_unittest.o gtest_main.a iposstream.o cistring.o names.o errorhandler.o

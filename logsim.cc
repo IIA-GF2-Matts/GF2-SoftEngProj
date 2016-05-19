@@ -1,7 +1,4 @@
 
-
-#define USE_GUI
-
 #include <iostream>
 
 #include "logsim.h"
@@ -30,7 +27,11 @@ bool MyApp::OnInit()
   netz = new network(nmz);
   dmz = new devices(nmz, netz);
   mmz = new monitor(nmz, netz);
+#ifdef USE_GUI
+  smz.open(std::string(wxString(argv[1]).mb_str()));
+#else
   smz.open(argv[1]);
+#endif
   parser* pmz = new parser(netz, dmz, mmz, smz, nmz);
 
   if (pmz->readin ()) { // check the logic file parsed correctly
