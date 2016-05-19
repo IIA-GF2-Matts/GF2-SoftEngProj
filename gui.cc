@@ -43,7 +43,6 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   name mon_name;
   name mon_name_2;
   wxString mon_name_text;
-  wxString output_text;
 
 
   if (cycles >= 0) cyclesdisplayed = cycles;
@@ -118,27 +117,27 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
     glBegin(GL_LINE_STRIP);
     for (i=0; i<10; i++) {
-      if (i%2) y = h - 2*plot_height - dy*2;
-      else y = h - 2*plot_height + dy*2;
+      if (i%2) y = h/2 + 40 - dy;
+      else y = h/2 + 40 + dy;
       glVertex2f(20*i+label_width, y); 
       glVertex2f(20*i+20.0 + label_width, y);
     }
     glEnd();
-    output_text = "Welcome to MattLab Logic Simulator";
+    mon_name_text = "Welcome to MattLab Logic Simulator";
     glColor3f(0.0, 1.0, 0.0);
     glRasterPos2f(label_width, h/2);
     for (i = 0; i < mon_name_text.Len(); i++) 
-      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, output_text[i]);
+      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, mon_name_text[i]);
     
     string logo[5] = {
-      "   _[]_[]_[]_[]_[]_[]_[]_[]_",
-      "  |                         |",
-      "   )     M A T T L A B      |",
-      "  |                         |",
-      "   `[]`[]`[]`[]`[]`[]`[]`[]` "
+      "    _[]_[]_[]_[]_[]_[]_[]_[]_",
+      "   |                         |",
+      "    )     M A T T L A B      |",
+      "   |                         |",
+      "    `[]`[]`[]`[]`[]`[]`[]`[]` "
     };
     for (j=0; j<5; j++) {
-      glRasterPos2f(label_width, h/2 - 20*(j+1));
+      glRasterPos2f(label_width, h/2 - 20*(j+2));
       for (i=0; i<logo[j].length(); i++)
         glutBitmapCharacter(GLUT_BITMAP_9_BY_15, logo[j][i]);
     }
