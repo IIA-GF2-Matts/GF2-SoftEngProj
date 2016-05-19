@@ -50,6 +50,9 @@ public:
     /* Returns the kind of device corresponding to the given name.         */
     /* 'baddevice' is returned if the name is not a legal device.          */
 
+  name getname(devicekind k) const;
+    /* Returns the name id of the given devicekind                         */
+
   void writedevice (devicekind k);
     /* Prints out the given device kind.                                   */
 

@@ -411,6 +411,17 @@ void devices::executedevices (bool& ok)
 
 /***********************************************************************
  *
+ * Returns the name of the device type.
+ *
+ */
+name devices::getname (devicekind k) const
+{
+  return dtab[k];
+}
+
+
+/***********************************************************************
+ *
  * Prints out the given device kind.
  * Used by showdevice.
  *
