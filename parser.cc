@@ -9,6 +9,7 @@
 
 parser::parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
     : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms), errs(cout) {
+    	_devz->debug(true);
 }
 
 parser::~parser() {
@@ -75,13 +76,15 @@ void parser::parseDefineDevice(Token& tk) {
     // device types are handled by the scanner and made DeviceTypes
 
     nameToken = tk;
-    name dv = blankname;
-    // Todo: Name lookup
+    name dv = _nms->lookup(nameToken.name);
 
     stepAndPeek(tk);
 
     if (tk.type == TokType::Equals) {
         // Semantic check: has devicename been defined before?
+        if (_netz->finddevice(dv) != NULL) {
+        	throw matterror("Device types may not be assigned to devices that already exist.", _scan.getFile(), tk.at);
+        }
 
         stepAndPeek(tk);
 
@@ -91,9 +94,24 @@ void parser::parseDefineDevice(Token& tk) {
         }
 
         // Create device of type, add it to the network
-        name newDeviceName = _nms->lookup(nameToken.name);
         devlink newDeviceLink;
-        _netz->adddevice(tk.devtype, newDeviceName, newDeviceLink);
+        bool success;
+        // setting 0 as default varient for the time being
+        // TODO: this may need to be changed for switches, clocks
+
+        // debug:
+        /*
+        _devz->makedevice(tk.devtype, dv, 0, success);
+        std::cout << "made device ";
+        _nms->writename(dv);
+        std::cout << " regtype ";
+        _devz->writedevice(_devz->devkind(dv));
+        cout << std::endl;
+        */
+        if (!success) {
+			throw matterror("Unable to add device.", _scan.getFile(), tk.at);
+			// TODO: Better error message? Shouldn't ever reach here.
+        }
 
         stepAndPeek(tk);
     }
@@ -132,6 +150,24 @@ void parser::parseOptionSet(Token& tk, name dv) {
     stepAndPeek(tk);
 }
 
+bool isLegalGateInputNamestring(namestring s, int maxn) {
+	// Todo: Probably a cleaner way to do this
+	if (s.at(0) != 'I')
+		return false;
+	int val = 0;
+	if (s.length() == 2 && std::isdigit(s.at(1))) {
+		val = s.at(1) - '0';
+	} else if (s.length() == 3
+		&& std::isdigit(s.at(1))
+		&& std::isdigit(s.at(2))){
+		val = (s.at(1) - '0')*10
+			+ (s.at(2) - '0');
+	} else {
+		return false;
+	}
+	return (val >= 1 && val <= maxn);
+}
+
 
 // option = key , ":" , value , ";" ;
 void parser::parseOption(Token& tk, name dv) {
@@ -143,6 +179,49 @@ void parser::parseOption(Token& tk, name dv) {
 
     key = tk;
     // Todo: Name lookup.
+    switch(_devz->devkind(dv)) {
+    	// Todo: quality check errors
+    	case aswitch:
+    		if (key.name != "InitialValue")
+    			throw matterror("Switches may only have an `InitialValue` attribute.", _scan.getFile(), key.at);
+    		break;
+    	case aclock:
+    		if (key.name != "Period")
+    			throw matterror("Clocks may only have a `Period` attribute.", _scan.getFile(), key.at);
+    		break;
+    	case andgate:
+    		if (!isLegalGateInputNamestring(key.name, 16))
+    			throw matterror("AND gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+    		break;
+    	case nandgate:
+    		if (!isLegalGateInputNamestring(key.name, 16))
+    			throw matterror("NAND gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+    		break;
+    	case orgate:
+    		if (!isLegalGateInputNamestring(key.name, 16))
+    			throw matterror("OR gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+    		break;
+    	case norgate:
+    		if (!isLegalGateInputNamestring(key.name, 16))
+    			throw matterror("NOR gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+    		break;
+    	case xorgate:
+    		if (!isLegalGateInputNamestring(key.name, 2))
+    			throw matterror("XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", _scan.getFile(), key.at);
+    		break;
+    	case dtype:
+    		if (!(key.name == "DATA" || key.name == "CLK" || key.name == "SET" || key.name == "CLEAR"))
+    			throw matterror("DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned", _scan.getFile(), key.at);
+    			// Todo: closest word suggestion
+    		break;
+    	case baddevice:
+    	default:
+    		// Should never reach here
+    		// Todo: better error message?
+    		throw matterror("Could not assign key to a bad device type", _scan.getFile(), key.at);
+    }
+
+    // Todo: check if key has already been defined for particular device
 
     stepAndPeek(tk);
 
