@@ -8,6 +8,7 @@
 #include "network.h"
 #include "devices.h"
 #include "monitor.h"
+#include "errorhandler.h"
 
 
 #ifndef GF2_PARSER_H
@@ -29,7 +30,7 @@ private:
     monitor* _mons;
     scanner _scan;
     names* _nms;
-    std::ostream& errs;
+    errorcollector errs;
 
     /// Steps over the next token, and peeks the one after
     void stepAndPeek(Token& tk);

@@ -8,7 +8,7 @@
 
 
 parser::parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
-    : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms), errs(cout) {
+    : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms) {
         //_devz->debug(true);
 }
 
@@ -38,10 +38,19 @@ void parser::parseFile(Token& tk) {
             parseStatement(tk);
         }
         catch (matterror& e) {
-            errs << e.what() << std::endl;
-            return;
+            errs.report(e);
+
+            // Todo: Can we recover from here?
+            // Keep reading until we see "dev" or "monitor" keywords?
+            break;
         }
     }
+
+    // TODO: Check for errors after parsing.
+
+    std::cout << "File parsed with "
+            << errs.errors.size() << " errors and "
+            << errs.warnings.size() << " warnings." << std::endl;
 }
 
 
@@ -142,12 +151,14 @@ void parser::parseOptionSet(Token& tk, name dv) {
         if (tk.type == TokType::EndOfFile) {
             throw matterror("Unterminated braces.", _scan.getFile(), tk.at);
         }
+
         try {
             parseOption(tk, dv);
         }
         catch (matterror& e) {
-            errs << e.what() << "\n";
+            errs.report(e);
 
+            // Consume tolens until you get to the end of option/block.
             while (tk.type != TokType::SemiColon) {
                 if (tk.type == TokType::CloseBrace) {
                     stepAndPeek(tk);
@@ -250,7 +261,7 @@ void parser::parseOption(Token& tk, name dv) {
         // Switch
         if (value.type != TokType::Number || (value.number != 0 && value.number != 1))
             throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), value.at);
-        
+
         asignal sig = value.number ? high : low;
         bool success = false;
 
@@ -260,7 +271,7 @@ void parser::parseOption(Token& tk, name dv) {
 
         stepAndPeek(tk);
 
-    } else if (dvl->kind == aclock) { 
+    } else if (dvl->kind == aclock) {
         // Clock
         if (value.type != TokType::Number || value.number < 1 || value.number > 32767)
             throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), value.at);
@@ -322,13 +333,14 @@ void parser::parseMonitor(Token& tk) {
 
     if (tk.type == TokType::AsKeyword) {
         stepAndPeek(tk);
+        Token tkSig = tk;
         Signal alisig = parseSignalName(tk);
 
         // Warn if signal exists
         if (doesSignalExist(alisig)) {
-            // Todo: warn
+            // mattwarning w("Alias signal name already exists.", _scan.getFile(), tkSig);
+            errs.report(mattwarning("Alias signal name already exists.", _scan.getFile(), tkSig.at));
         }
-        stepAndPeek(tk);
     }
 
     bool success = false;
@@ -340,7 +352,7 @@ void parser::parseMonitor(Token& tk) {
 
 bool parser::doesSignalExist(Signal& sig) {
     devlink dvlnk = _netz->finddevice(sig.device);
-    if (dvlnk == NULL) 
+    if (dvlnk == NULL)
         return false;
     if (_netz->findoutput(dvlnk, sig.pin) == NULL)
         return false;
