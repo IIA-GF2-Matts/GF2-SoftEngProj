@@ -2,11 +2,15 @@
 
 #include <string>
 #include <exception>
+#include <list>
 
 #include "iposstream.h"
 
 #ifndef GF2_ERRORHANDLER_H
 #define GF2_ERRORHANDLER_H
+
+
+
 
 
 /// Specific exception type for Matt language errors
@@ -38,6 +42,19 @@ class mattwarning : public matterror {
 public:
     /// Create a new matterror, and builds the message.
     mattwarning(std::string message, std::string file, SourcePos pos);
+};
+
+
+/// Utility class for collecting errors to list later.
+class errorcollector {
+public:
+    std::list<matterror> errors;
+    std::list<mattwarning> warnings;
+
+    void report(matterror e);
+    void report(mattwarning w);
+
+    errorcollector();
 };
 
 

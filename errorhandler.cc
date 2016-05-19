@@ -6,10 +6,33 @@
 #include <iomanip>
 #include <algorithm>
 #include <cctype>
+#include <iostream>
 
 #include "iposstream.h"
 
 #include "errorhandler.h"
+
+
+
+// class errorcollector
+
+errorcollector::errorcollector() {
+}
+
+void errorcollector::report(matterror e) {
+    std::cout << e.what() << std::endl;
+    errors.push_back(e);
+}
+
+void errorcollector::report(mattwarning w) {
+    std::cout << w.what() << std::endl;
+    warnings.push_back(w);
+}
+
+
+
+
+
 
 /// Reads the source file, and gets the line the error occured on.
 std::string matterror::getErrorLine() {
