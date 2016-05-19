@@ -167,6 +167,8 @@ void parser::parseOptionSet(Token& tk, name dv) {
 
                 stepAndPeek(tk);
             }
+
+            stepAndPeek(tk);
         }
     }
 
@@ -284,6 +286,7 @@ void parser::parseOption(Token& tk, name dv) {
         Signal sig = parseSignalName(tk);
         // Ensure signal exists
         if (!doesSignalExist(sig)) {
+            // TODO: Separate into two errors. First for device not existing, second for pin invalid.
             throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
         }
         // connect the gate
