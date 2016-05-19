@@ -122,8 +122,8 @@ matterror::matterror(std::string message, std::string file, SourcePos pos, bool 
     }
 
     if (_srcLineErrCol >= 0) {
-        oss << std::setfill('-') << std::setw(_srcLineErrCol + (warning ? 1 : 6) ) << "^ "
-            << (warning ? "" : "ERROR") << "\n";
+        oss << std::setfill('-') << std::setw(_srcLineErrCol) << "^"
+            << (warning ? "" : " ERROR") << "\n";
     }
 
     _errorMessage = oss.str();
