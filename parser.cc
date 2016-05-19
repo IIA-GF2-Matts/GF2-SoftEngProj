@@ -9,7 +9,7 @@
 
 parser::parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
     : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms), errs(cout) {
-    	_devz->debug(true);
+    	//_devz->debug(true);
 }
 
 parser::~parser() {
@@ -98,10 +98,10 @@ void parser::parseDefineDevice(Token& tk) {
         bool success;
         // setting 0 as default varient for the time being
         // TODO: this may need to be changed for switches, clocks
-
-        // debug:
-        /*
         _devz->makedevice(tk.devtype, dv, 0, success);
+
+        // Debug
+        /*
         std::cout << "made device ";
         _nms->writename(dv);
         std::cout << " regtype ";
@@ -172,16 +172,19 @@ bool isLegalGateInputNamestring(namestring s, int maxn) {
 
 // option = key , ":" , value , ";" ;
 void parser::parseOption(Token& tk, name dv) {
-    Token key;
+    Token key, value;
+    devlink dvl = _netz->finddevice(dv);
 
     if (tk.type != TokType::Identifier) {
         throw matterror("Expected a key.", _scan.getFile(), tk.at);
     }
 
     key = tk;
+    name keyname = _nms->lookup(key.name);
+
     // Todo: Name lookup.
     // Todo: not sure why  _devz->devkind(dv)  wasn't working (always returns baddevice)
-    switch(_netz->finddevice(dv)->kind) {
+    switch(dvl->kind) {
     	// Todo: quality check errors
     	case aswitch:
     		if (key.name != "InitialValue")
@@ -232,22 +235,42 @@ void parser::parseOption(Token& tk, name dv) {
     }
 
     stepAndPeek(tk);
+    value = tk;
 
-    if (tk.type == TokType::Identifier) {
-        Signal value = parseSignalName(tk);
+    if (dvl->kind == aswitch) {
+    	// Switch
+		if (value.type != TokType::Number || value.number != 0 && value.number != 1)
+			throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), key.at);
+		
+		asignal sig = value.number ? high : low;
+		bool success = false;
 
-        // Todo: Create the connection.
-        // if (is connection not setting a property)
-        // netz->makeconnection(dv, key, value.device, value.pin, ok);
-    }
-    else if (tk.type == TokType::Number) {
-        Token num = tk;
+		_devz->setswitch(dv, sig, success);
+		if (!success)
+			throw matterror("Could not set switch initial value", _scan.getFile(), key.at);
 
-        // Todo: Check the value
-        // Checl property is not already set.
-        // Set the property.
+	    stepAndPeek(tk);
 
-        stepAndPeek(tk);
+   	} else if (dvl->kind == aclock) { 
+   		// Clock
+		// Todo: number range test is probably largely pointless
+		if (value.type != TokType::Number || value.number < 1 || value.number >= 32767)
+			throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), key.at);
+		dvl->frequency = value.number;
+
+	    stepAndPeek(tk);
+
+    } else {
+		// A gate
+    	Signal sig = parseSignalName(tk);
+    	// connect the gate
+    	_netz->addinput(dvl, keyname);
+    	bool success = false;
+    	_netz->makeconnection(dv, keyname, sig.device, sig.pin, success);
+		if (!success)
+			// Todo: improve error message
+			throw matterror("Could not make connection", _scan.getFile(), key.at);
+
     }
 
     if (tk.type != TokType::SemiColon) {
@@ -282,7 +305,10 @@ void parser::parseMonitor(Token& tk) {
     if (tk.type == TokType::AsKeyword) {
         stepAndPeek(tk);
 
-        Signal alias = parseSignalName(tk);
+        //Signal alias = parseSignalName(tk);
+        // Todo: parse alias
+        stepAndPeek(tk);
+
         // Todo: Warn if alias already used.
     }
 
@@ -301,8 +327,13 @@ Signal parser::parseSignalName(Token& tk) {
         throw matterror("Expected a signal name.", _scan.getFile(), tk.at);
     }
 
-    Token devName = tk;
-    // Todo : Name lookup
+    // Todo: handle 0 or 1 connections
+    ret.device = _nms->lookup(tk.name);
+
+    // Ensure device exists
+    if (_netz->finddevice(ret.device) == NULL) {
+    	throw matterror("Devices must be defined before being referenced", _scan.getFile(), tk.at);
+    }
 
     stepAndPeek(tk);
 
@@ -313,9 +344,8 @@ Signal parser::parseSignalName(Token& tk) {
             throw matterror("Expected a pin name.", _scan.getFile(), tk.at);
         }
 
-        Token pinName = tk;
-        // Todo: Name lookup
-
+    	ret.pin = _nms->lookup(tk.name);
+    	// Todo: ensure pin is acceptable identifier
         stepAndPeek(tk);
     }
 
