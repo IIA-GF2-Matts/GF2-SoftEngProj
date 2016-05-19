@@ -28,6 +28,7 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   pan_y = 0;
   zoom = 1.0;
   cyclesdisplayed = -1;
+  int cycle_no = 0;
 }
 
 void MyGLCanvas::Render(wxString example_text, int cycles)
@@ -36,9 +37,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   // When the simulator is run, the number of cycles is passed as a parameter and the first monitor
   // trace is displayed.
 {
-  float y;
-  unsigned int i;
-  unsigned int j;
+  float x, y;
+  unsigned int i, j, k;
   asignal s;
   name mon_name;
   name mon_name_2;
@@ -61,6 +61,13 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
   float label_width = 100.0;    // x allowed for labels at start
   float end_width = w - 10;     // dist between end and side
+  wxString number;
+
+  // x axis number spacing
+  int num_spacing;
+  if (cyclesdisplayed > 0) {
+    num_spacing = 1 + cyclesdisplayed/20;
+  }
 
   // example_text.Printf("%d", mmz->moncount());
 
@@ -76,6 +83,20 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
       glVertex2f(label_width-5, y);
       glVertex2f(end_width, y);
       glEnd();
+      for (i=0; i<=cyclesdisplayed; i++) {
+        x = dx*i + label_width;
+        glBegin(GL_LINE_STRIP);
+        glVertex2f(x, y-3);
+        glVertex2f(x, y+3);
+        glEnd();
+        if (i%num_spacing == 0){
+          glRasterPos2f(x-4, y-12);
+          number = to_string(i);
+          for (k=0; k<number.Len(); k++)
+            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, number[k]);
+        }
+        
+      }
 
       // draw trace
       glColor3f(0.0, 1.0, 0.0);
