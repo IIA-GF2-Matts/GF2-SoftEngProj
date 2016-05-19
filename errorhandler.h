@@ -11,7 +11,7 @@
 
 /// Specific exception type for Matt language errors
 class matterror : public std::exception {
-private:
+protected:
     std::string _errorMessage;
 
     std::string _message;
@@ -29,6 +29,15 @@ public:
 
     /// Create a new matterror, and builds the message.
     matterror(std::string message, std::string file, SourcePos pos);
+    matterror(std::string message, std::string file, SourcePos pos, bool warning);
+};
+
+
+/// Specific exception type for Matt language errors
+class mattwarning : public matterror {
+public:
+    /// Create a new matterror, and builds the message.
+    mattwarning(std::string message, std::string file, SourcePos pos);
 };
 
 

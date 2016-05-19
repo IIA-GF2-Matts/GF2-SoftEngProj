@@ -76,6 +76,11 @@ const char* matterror::what() const throw () {
 
 /// Create a new matterror, and builds the message.
 matterror::matterror(std::string message, std::string file, SourcePos pos)
+        : matterror(message, file, pos, false) {
+}
+
+
+matterror::matterror(std::string message, std::string file, SourcePos pos, bool warning)
     : _message(message), _file(file), _pos(pos) {
     std::ostringstream oss;
 
@@ -85,7 +90,8 @@ matterror::matterror(std::string message, std::string file, SourcePos pos)
 
     _srcLineErrCol = -1;
 
-    oss << "(" << pos.Line << ":" << pos.Column << "," << pos.Abs << "): " << message;
+    oss << "(" << pos.Line << ":" << pos.Column << "): "
+        << (warning ? "Warning: " : "Error: ") << message;
 
     getErrorLine();
     if (!_srcLine.empty()) {
@@ -93,8 +99,17 @@ matterror::matterror(std::string message, std::string file, SourcePos pos)
     }
 
     if (_srcLineErrCol >= 0) {
-        oss << std::setfill('-') << std::setw(_srcLineErrCol+6) << "^ ERROR" << "\n";
+        oss << std::setfill('-') << std::setw(_srcLineErrCol+6) << "^ "
+            << (warning ? "" : "ERROR") << "\n";
     }
 
     _errorMessage = oss.str();
 }
+
+
+// class mattwarning
+
+mattwarning::mattwarning(std::string message, std::string file, SourcePos pos)
+        : matterror(message, file, pos, true) {
+}
+
