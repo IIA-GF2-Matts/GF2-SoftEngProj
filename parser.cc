@@ -92,9 +92,7 @@ void parser::parseDefineDevice(Token& tk) {
             // Todo: Suggest types
             throw matterror("Expected device type.", _scan.getFile(), tk.at);
         }
-
-        // Create device of type, add it to the network
-        devlink newDeviceLink;
+        // make device (which adds it to the network)
         bool success;
         // setting 0 as default varient for the time being
         // TODO: this may need to be changed for switches, clocks
@@ -144,8 +142,21 @@ void parser::parseOptionSet(Token& tk, name dv) {
         if (tk.type == TokType::EndOfFile) {
             throw matterror("Unterminated braces.", _scan.getFile(), tk.at);
         }
+        try {
+            parseOption(tk, dv);
+        }
+        catch (matterror& e) {
+            errs << e.what() << "\n";
 
-        parseOption(tk, dv);
+            while (tk.type != TokType::SemiColon) {
+                if (tk.type == TokType::CloseBrace) {
+                    stepAndPeek(tk);
+                    return;
+                }
+
+                stepAndPeek(tk);
+            }
+        }
     }
 
     stepAndPeek(tk);
@@ -182,8 +193,6 @@ void parser::parseOption(Token& tk, name dv) {
     key = tk;
     name keyname = _nms->lookup(key.name);
 
-    // Todo: Name lookup.
-    // Todo: not sure why  _devz->devkind(dv)  wasn't working (always returns baddevice)
     switch(dvl->kind) {
         // Todo: quality check errors
         case aswitch:
@@ -239,7 +248,7 @@ void parser::parseOption(Token& tk, name dv) {
 
     if (dvl->kind == aswitch) {
         // Switch
-        if (value.type != TokType::Number || value.number != 0 && value.number != 1)
+        if (value.type != TokType::Number || (value.number != 0 && value.number != 1))
             throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), value.at);
         
         asignal sig = value.number ? high : low;
@@ -253,7 +262,7 @@ void parser::parseOption(Token& tk, name dv) {
 
     } else if (dvl->kind == aclock) { 
         // Clock
-        if (value.type != TokType::Number || value.number < 1 || value.number >= 32767)
+        if (value.type != TokType::Number || value.number < 1 || value.number > 32767)
             throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), value.at);
         dvl->frequency = value.number;
 
@@ -262,6 +271,10 @@ void parser::parseOption(Token& tk, name dv) {
     } else {
         // A gate
         Signal sig = parseSignalName(tk);
+        // Ensure signal exists
+        if (!doesSignalExist(sig)) {
+            throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
+        }
         // connect the gate
         _netz->addinput(dvl, keyname);
         bool success = false;
@@ -298,24 +311,40 @@ void parser::parseDefineMonitor(Token& tk) {
 
 // monitor = signalname , [ "as" , signalname ] ;
 void parser::parseMonitor(Token& tk) {
+    Token montk = tk;
 
-    Signal sig = parseSignalName(tk);
+    Signal monsig = parseSignalName(tk);
+
+    // Ensure signal exists
+    if (!doesSignalExist(monsig)) {
+        throw matterror("Devices must be defined before being monitored", _scan.getFile(), montk.at);
+    }
 
     if (tk.type == TokType::AsKeyword) {
         stepAndPeek(tk);
+        Signal alisig = parseSignalName(tk);
 
-        //Signal alias = parseSignalName(tk);
-        // Todo: parse alias
+        // Warn if signal exists
+        if (doesSignalExist(alisig)) {
+            // Todo: warn
+        }
         stepAndPeek(tk);
-
-        // Todo: Warn if alias already used.
     }
 
     bool success = false;
-    _mons->makemonitor(sig.device, sig.pin, success);
+    _mons->makemonitor(monsig.device, monsig.pin, success);
     if (!success)
         // Todo: improve error message
         throw matterror("Could not make monitor", _scan.getFile(), tk.at);
+}
+
+bool parser::doesSignalExist(Signal& sig) {
+    devlink dvlnk = _netz->finddevice(sig.device);
+    if (dvlnk == NULL) 
+        return false;
+    if (_netz->findoutput(dvlnk, sig.pin) == NULL)
+        return false;
+    return true;
 }
 
 
@@ -332,11 +361,6 @@ Signal parser::parseSignalName(Token& tk) {
 
     // Todo: handle 0 or 1 connections
     ret.device = _nms->lookup(tk.name);
-
-    // Ensure device exists
-    if (_netz->finddevice(ret.device) == NULL) {
-        throw matterror("Devices must be defined before being referenced", _scan.getFile(), tk.at);
-    }
 
     stepAndPeek(tk);
 

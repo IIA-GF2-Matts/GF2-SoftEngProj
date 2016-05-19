@@ -63,6 +63,8 @@ private:
     /// signalname = devicename , [ "." , pin ] ;
     Signal parseSignalName(Token& tk);
 
+    bool doesSignalExist(Signal& sig);
+
 public:
     /// Construct a parser to work on the pointers to other classes
     parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms);
