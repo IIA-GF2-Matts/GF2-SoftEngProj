@@ -293,6 +293,7 @@ void parser::parseOption(Token& tk, name dv) {
                 throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
             } else {
                 // ILLEGAL_PIN
+                // todo: make this a function to return message, then throw
                 devicekind dkind = _netz->finddevice(sig.device)->kind;
                 std::ostringstream oss;
 
@@ -349,8 +350,9 @@ void parser::parseDefineMonitor(Token& tk) {
 // monitor = signalname , [ "as" , signalname ] ;
 void parser::parseMonitor(Token& tk) {
     Token montk = tk;
+    Signal monsig, alisig;
 
-    Signal monsig = parseSignalName(tk);
+    monsig = parseSignalName(tk);
 
     // Ensure signal exists
     signal_legality badSignal = isBadSignal(monsig);
@@ -366,7 +368,7 @@ void parser::parseMonitor(Token& tk) {
     if (tk.type == TokType::AsKeyword) {
         stepAndPeek(tk);
         Token tkSig = tk;
-        Signal alisig = parseSignalName(tk);
+        alisig = parseSignalName(tk);
 
         // Warn if signal exists
         if (!isBadSignal(alisig)) {
@@ -376,7 +378,7 @@ void parser::parseMonitor(Token& tk) {
     }
 
     bool success = false;
-    _mons->makemonitor(monsig.device, monsig.pin, success);
+    _mons->makemonitor(monsig.device, monsig.pin, success, alisig.device, alisig.pin);
     if (!success)
         // Todo: improve error message
         throw matterror("Could not make monitor", _scan.getFile(), tk.at);
