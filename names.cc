@@ -28,7 +28,7 @@ name names::cvtname (namestring str)
 
 void names::writename (name id)
 {
-	if (id != blankname) {
+	if (id == blankname) {
 		std::cout << "(blank)";
 	}
 	else {
