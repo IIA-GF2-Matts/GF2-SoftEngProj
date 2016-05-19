@@ -7,6 +7,25 @@
 #include "parser.h"
 
 
+
+bool isLegalGateInputNamestring(namestring s, int maxn) {
+    // Todo: Probably a cleaner way to do this
+    if (s.at(0) != 'I')
+        return false;
+    int val = 0;
+    if (s.length() == 2 && std::isdigit(s.at(1))) {
+        val = s.at(1) - '0';
+    } else if (s.length() == 3
+        && std::isdigit(s.at(1))
+        && std::isdigit(s.at(2))){
+        val = (s.at(1) - '0')*10
+            + (s.at(2) - '0');
+    } else {
+        return false;
+    }
+    return (val >= 1 && val <= maxn);
+}
+
 parser::parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
     : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms) {
         //_devz->debug(true);
@@ -105,6 +124,7 @@ void parser::parseDefineDevice(Token& tk) {
         bool success;
         // setting 0 as default varient for the time being
         // TODO: this may need to be changed for switches, clocks
+        // Todo: if switch, varient -1
         _devz->makedevice(tk.devtype, dv, 0, success);
 
         // Debug
@@ -173,24 +193,6 @@ void parser::parseOptionSet(Token& tk, name dv) {
     }
 
     stepAndPeek(tk);
-}
-
-bool isLegalGateInputNamestring(namestring s, int maxn) {
-    // Todo: Probably a cleaner way to do this
-    if (s.at(0) != 'I')
-        return false;
-    int val = 0;
-    if (s.length() == 2 && std::isdigit(s.at(1))) {
-        val = s.at(1) - '0';
-    } else if (s.length() == 3
-        && std::isdigit(s.at(1))
-        && std::isdigit(s.at(2))){
-        val = (s.at(1) - '0')*10
-            + (s.at(2) - '0');
-    } else {
-        return false;
-    }
-    return (val >= 1 && val <= maxn);
 }
 
 
@@ -285,9 +287,30 @@ void parser::parseOption(Token& tk, name dv) {
         // A gate
         Signal sig = parseSignalName(tk);
         // Ensure signal exists
-        if (!doesSignalExist(sig)) {
-            // TODO: Separate into two errors. First for device not existing, second for pin invalid.
-            throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
+        signal_legality badSignal = isBadSignal(sig);
+        if (badSignal) {
+            if (badSignal == ILLEGAL_DEVICE) {
+                throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
+            } else {
+                // ILLEGAL_PIN
+                devicekind dkind = _netz->finddevice(sig.device)->kind;
+                std::ostringstream oss;
+
+                    oss << *sig.device << " (of type "
+                        << *_devz->getname(dkind)
+                        << ") ";
+
+                if (sig.pin == blankname) {
+                    oss << "has no default output pin.";
+                } else {
+                    oss << "has no output pin " << *sig.pin << ".";
+                }
+
+                if (dkind == dtype)
+                    oss << " Use Q or Qbar.";
+
+                throw matterror(oss.str(), _scan.getFile(), value.at);
+            }
         }
         // connect the gate
         _netz->addinput(dvl, keyname);
@@ -330,8 +353,14 @@ void parser::parseMonitor(Token& tk) {
     Signal monsig = parseSignalName(tk);
 
     // Ensure signal exists
-    if (!doesSignalExist(monsig)) {
-        throw matterror("Devices must be defined before being monitored", _scan.getFile(), montk.at);
+    signal_legality badSignal = isBadSignal(monsig);
+    if (badSignal) {
+        if (badSignal == ILLEGAL_DEVICE) {
+            throw matterror("Devices must be defined before being monitored", _scan.getFile(), montk.at);
+        } else {
+            // ILLEGAL_PIN
+            throw matterror("Unable to monitor unknown pin", _scan.getFile(), montk.at);
+        }
     }
 
     if (tk.type == TokType::AsKeyword) {
@@ -340,7 +369,7 @@ void parser::parseMonitor(Token& tk) {
         Signal alisig = parseSignalName(tk);
 
         // Warn if signal exists
-        if (doesSignalExist(alisig)) {
+        if (!isBadSignal(alisig)) {
             // mattwarning w("Alias signal name already exists.", _scan.getFile(), tkSig);
             errs.report(mattwarning("Alias signal name already exists.", _scan.getFile(), tkSig.at));
         }
@@ -353,15 +382,14 @@ void parser::parseMonitor(Token& tk) {
         throw matterror("Could not make monitor", _scan.getFile(), tk.at);
 }
 
-bool parser::doesSignalExist(Signal& sig) {
+parser::signal_legality parser::isBadSignal(Signal& sig) {
     devlink dvlnk = _netz->finddevice(sig.device);
     if (dvlnk == NULL)
-        return false;
+        return ILLEGAL_DEVICE;
     if (_netz->findoutput(dvlnk, sig.pin) == NULL)
-        return false;
-    return true;
+        return ILLEGAL_PIN;
+    return LEGAL_SIGNAL;
 }
-
 
 // signalname = devicename , [ "." , pin ] ;
 Signal parser::parseSignalName(Token& tk) {

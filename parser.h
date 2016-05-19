@@ -32,6 +32,13 @@ private:
     names* _nms;
     errorcollector errs;
 
+
+    typedef enum {
+        LEGAL_SIGNAL = 0,
+        ILLEGAL_DEVICE,
+        ILLEGAL_PIN
+    } signal_legality;
+
     /// Steps over the next token, and peeks the one after
     void stepAndPeek(Token& tk);
 
@@ -64,7 +71,8 @@ private:
     /// signalname = devicename , [ "." , pin ] ;
     Signal parseSignalName(Token& tk);
 
-    bool doesSignalExist(Signal& sig);
+    // checks whether device and pin are defined
+    signal_legality isBadSignal(Signal& sig);
 
 public:
     /// Construct a parser to work on the pointers to other classes
