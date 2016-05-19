@@ -16,13 +16,14 @@ void devices::outsig (asignal s)
     case low:     cout << "low";     break;
     case rising:  cout << "rising";  break;
     case falling: cout << "falling"; break;
+    case floating: cout << "floating"; break;
   }
 }
 
 
 /***********************************************************************
  *
- * Used to print out device details and signal values 
+ * Used to print out device details and signal values
  * for debugging in executedevices.
  *
  */
@@ -57,8 +58,8 @@ void devices::showdevice (devlink d)
 
 /***********************************************************************
  *
- * Sets the state of the named switch. 'ok' returns false if switch  
- * not found.                                                        
+ * Sets the state of the named switch. 'ok' returns false if switch
+ * not found.
  *
  */
 void devices::setswitch (name sid, asignal level, bool& ok)
@@ -87,7 +88,12 @@ void devices::makeswitch (name id, int setting, bool& ok)
   if (ok) {
     netz->adddevice (aswitch, id, d);
     netz->addoutput (d, blankname);
-    d->swstate = (setting == 0) ? low : high;
+    if (setting == -1) {
+      d->swstate = floating;
+    }
+    else {
+      d->swstate = (setting == 0) ? low : high;
+    }
   }
 }
 
@@ -110,7 +116,7 @@ void devices::makeclock (name id, int frequency)
 
 /***********************************************************************
  *
- * Used to make new AND, NAND, OR, NOR and XOR gates. 
+ * Used to make new AND, NAND, OR, NOR and XOR gates.
  * Called by makedevice.
  *
  */
@@ -162,9 +168,9 @@ void devices::makedtype (name id)
 
 /***********************************************************************
  *
- * Adds a device to the network of the specified kind and name.  The  
- * variant is used with such things as gates where it specifies the   
- * number of inputs. 'ok' returns true if operation succeeds.         
+ * Adds a device to the network of the specified kind and name.  The
+ * variant is used with such things as gates where it specifies the
+ * number of inputs. 'ok' returns true if operation succeeds.
  *
  */
 void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
@@ -357,9 +363,9 @@ void devices::updateclocks (void)
 
 /***********************************************************************
  *
- * Executes all devices in the network to simulate one complete clock 
- * cycle. 'ok' is returned false if network fails to stabilise (i.e.  
- * it is oscillating).                                            
+ * Executes all devices in the network to simulate one complete clock
+ * cycle. 'ok' is returned false if network fails to stabilise (i.e.
+ * it is oscillating).
  *
  */
 void devices::executedevices (bool& ok)
@@ -385,7 +391,7 @@ void devices::executedevices (bool& ok)
         case andgate:  execgate (d, high, high); break;
         case nandgate: execgate (d, high, low);  break;
         case xorgate:  execxorgate (d);          break;
-        case dtype:    execdtype (d);            break;     
+        case dtype:    execdtype (d);            break;
       }
       if (debugging)
 	showdevice (d);
@@ -399,7 +405,7 @@ void devices::executedevices (bool& ok)
 
 /***********************************************************************
  *
- * Prints out the given device kind. 
+ * Prints out the given device kind.
  * Used by showdevice.
  *
  */
@@ -411,8 +417,8 @@ void devices::writedevice (devicekind k)
 
 /***********************************************************************
  *
- * Returns the kind of device corresponding to the given name.   
- * 'baddevice' is returned if the name is not a legal device.    
+ * Returns the kind of device corresponding to the given name.
+ * 'baddevice' is returned if the name is not a legal device.
  *
  */
 devicekind devices::devkind (name id)
@@ -437,10 +443,10 @@ void devices::debug (bool on)
 
 
 /***********************************************************************
- * 
+ *
  * Constructor for the devices class.
  * Registers the names of all the possible devices.
- * 
+ *
  */
 devices::devices (names* names_mod, network* net_mod)
 {
