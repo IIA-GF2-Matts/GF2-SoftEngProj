@@ -3,13 +3,14 @@
 
 using namespace std;
 
+
 /***********************************************************************
  *
- * Sets a monitor on the 'outp' output of device 'dev' by placing an   
- * entry in the monitor table. 'ok' is set true if operation succeeds. 
+ * Sets a monitor on the 'outp' output of device 'dev' by placing an
+ * entry in the monitor table. 'ok' is set true if operation succeeds.
  *
  */
-void monitor::makemonitor (name dev, name outp, bool& ok)
+void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name aliasOutp)
 {
   devlink d;
   outplink o;
@@ -21,9 +22,11 @@ void monitor::makemonitor (name dev, name outp, bool& ok)
       o = netz->findoutput (d, outp);
       ok = (o != NULL);
       if (ok) {
-	mtab.sigs[mtab.used].devid = dev;
-	mtab.sigs[mtab.used].op = o;
-	(mtab.used)++;
+        mtab.sigs[mtab.used].devid = dev;
+        mtab.sigs[mtab.used].op = o;
+        mtab.sigs[mtab.used].aliasDev = aliasDevice;
+        mtab.sigs[mtab.used].aliasPin = aliasOutp;
+        (mtab.used)++;
       }
     }
   }
@@ -32,8 +35,8 @@ void monitor::makemonitor (name dev, name outp, bool& ok)
 
 /***********************************************************************
  *
- * Removes the monitor set the 'outp' output of device 'dev'. 'ok' is  
- * set true if operation succeeds.                                     
+ * Removes the monitor set the 'outp' output of device 'dev'. 'ok' is
+ * set true if operation succeeds.
  *
  */
 void monitor::remmonitor (name dev, name outp, bool& ok)
@@ -58,7 +61,7 @@ void monitor::remmonitor (name dev, name outp, bool& ok)
 
 /***********************************************************************
  *
- * Returns number of signals currently monitored.  
+ * Returns number of signals currently monitored.
  *
  */
 int monitor::moncount (void)
@@ -69,7 +72,7 @@ int monitor::moncount (void)
 
 /***********************************************************************
  *
- * Returns signal level of n'th monitor point. 
+ * Returns signal level of n'th monitor point.
  *
  */
 asignal monitor::getmonsignal (int n)
@@ -80,13 +83,20 @@ asignal monitor::getmonsignal (int n)
 
 /***********************************************************************
  *
- * Returns name of n'th monitor. 
+ * Returns name of n'th monitor.
  *
  */
 void monitor::getmonname (int n, name& dev, name& outp)
 {
-  dev = mtab.sigs[n].devid;
-  outp = mtab.sigs[n].op->id;
+  // Check for alias
+  if (mtab.sigs[n].aliasDev != blankname) {
+    dev = mtab.sigs[n].aliasDev;
+    outp = mtab.sigs[n].aliasPin;
+  }
+  else {
+    dev = mtab.sigs[n].devid;
+    outp = mtab.sigs[n].op->id;
+  }
 }
 
 
@@ -103,8 +113,8 @@ void monitor::resetmonitor (void)
 
 /***********************************************************************
  *
- * Called every clock cycle to record the state of each monitored     
- * signal.                                                            
+ * Called every clock cycle to record the state of each monitored
+ * signal.
  *
  */
 void monitor::recordsignals (void)
@@ -117,7 +127,7 @@ void monitor::recordsignals (void)
 
 /***********************************************************************
  *
- * Access recorded signal trace, returns false if invalid monitor 
+ * Access recorded signal trace, returns false if invalid monitor
  * or cycle.
  *
  */
@@ -132,7 +142,7 @@ bool monitor::getsignaltrace(int m, int c, asignal &s)
 
 /***********************************************************************
  *
- * Displays state of monitored signals.  
+ * Displays state of monitored signals.
  *
  */
 void monitor::displaysignals (void)
@@ -155,7 +165,7 @@ void monitor::displaysignals (void)
 	cout << " ";
       cout << ":";
     }
-    for (i = 0; i < cycles; i++) 
+    for (i = 0; i < cycles; i++)
       switch (disp[n][i]) {
         case high:    cout << "-"; break;
         case low:     cout << "_"; break;
@@ -169,7 +179,7 @@ void monitor::displaysignals (void)
 
 /***********************************************************************
  *
- * Called to initialise the monitor module.  
+ * Called to initialise the monitor module.
  * Remember the names of the shared names and network modules.
  *
  */
