@@ -105,7 +105,8 @@ void parser::parseDefineDevice(Token& tk) {
         std::cout << "made device ";
         _nms->writename(dv);
         std::cout << " regtype ";
-        _devz->writedevice(_devz->devkind(dv));
+        _devz->writedevice(_netz->finddevice(dv)->kind);
+        //_devz->writedevice(_devz->devkind(dv));
         cout << std::endl;
         */
         if (!success) {
@@ -179,7 +180,8 @@ void parser::parseOption(Token& tk, name dv) {
 
     key = tk;
     // Todo: Name lookup.
-    switch(_devz->devkind(dv)) {
+    // Todo: not sure why  _devz->devkind(dv)  wasn't working (always returns baddevice)
+    switch(_netz->finddevice(dv)->kind) {
     	// Todo: quality check errors
     	case aswitch:
     		if (key.name != "InitialValue")
