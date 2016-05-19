@@ -163,6 +163,12 @@ void devices::makedtype (name id)
   netz->addoutput (d, qpin);
   netz->addoutput (d, qbarpin);
   d->memory = low;
+
+  // Default SET and CLR to zero
+  // Todo: Actually check ok.
+  bool ok;
+  netz->makeconnection(id, setpin, zero, blankname, ok);
+  netz->makeconnection(id, clrpin, zero, blankname, ok);
 }
 
 
@@ -468,4 +474,14 @@ devices::devices (names* names_mod, network* net_mod)
   clrpin  = nmz->lookup("CLEAR");
   qpin    = nmz->lookup("Q");
   qbarpin = nmz->lookup("QBAR");
+
+  // Note: Doesn't match name requirement for user.
+  // so cannot be overwritten/reused in user code.
+  zero    = nmz->lookup("0");
+  one     = nmz->lookup("1");
+
+  // Todo: Actually check ok.
+  bool ok;
+  makedevice(aswitch, zero, 0, ok);
+  makedevice(aswitch, one, 1, ok);
 }
