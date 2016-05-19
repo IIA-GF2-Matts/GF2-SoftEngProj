@@ -240,22 +240,21 @@ void parser::parseOption(Token& tk, name dv) {
     if (dvl->kind == aswitch) {
         // Switch
         if (value.type != TokType::Number || value.number != 0 && value.number != 1)
-            throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), key.at);
+            throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), value.at);
         
         asignal sig = value.number ? high : low;
         bool success = false;
 
         _devz->setswitch(dv, sig, success);
         if (!success)
-            throw matterror("Could not set switch initial value", _scan.getFile(), key.at);
+            throw matterror("Could not set switch initial value", _scan.getFile(), value.at);
 
         stepAndPeek(tk);
 
     } else if (dvl->kind == aclock) { 
         // Clock
-        // Todo: number range test is probably largely pointless
         if (value.type != TokType::Number || value.number < 1 || value.number >= 32767)
-            throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), key.at);
+            throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), value.at);
         dvl->frequency = value.number;
 
         stepAndPeek(tk);
@@ -312,7 +311,11 @@ void parser::parseMonitor(Token& tk) {
         // Todo: Warn if alias already used.
     }
 
-    // Todo: Add to monitors list.
+    bool success = false;
+    _mons->makemonitor(sig.device, sig.pin, success);
+    if (!success)
+        // Todo: improve error message
+        throw matterror("Could not make monitor", _scan.getFile(), tk.at);
 }
 
 
