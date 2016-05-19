@@ -1,6 +1,6 @@
 #include <iostream>
 #include "network.h"
- 
+
 using namespace std;
 
 /***********************************************************************
@@ -16,8 +16,8 @@ devlink network::devicelist (void)
 
 /***********************************************************************
  *
- * Returns link to device with specified name. Returns NULL if not       
- * found.                                                               
+ * Returns link to device with specified name. Returns NULL if not
+ * found.
  *
  */
 devlink network::finddevice (name id)
@@ -37,8 +37,8 @@ devlink network::finddevice (name id)
 
 /***********************************************************************
  *
- * Returns link to input of device pointed to by dev with specified    
- * name.  Returns NULL if not found.                                    
+ * Returns link to input of device pointed to by dev with specified
+ * name.  Returns NULL if not found.
  *
  */
 inplink network::findinput (devlink dev, name id)
@@ -50,7 +50,7 @@ inplink network::findinput (devlink dev, name id)
   while ((i != NULL) && (! found)) {
     found = (i->id == id);
     if (! found)
-	i = i->next;
+        i = i->next;
   }
   return i;
 }
@@ -58,8 +58,8 @@ inplink network::findinput (devlink dev, name id)
 
 /***********************************************************************
  *
- * Returns link to output of device pointed to by dev with specified   
- * name.  Returns NULL if not found.                                    
+ * Returns link to output of device pointed to by dev with specified
+ * name.  Returns NULL if not found.
  *
  */
 outplink network::findoutput (devlink dev, name id)
@@ -71,7 +71,7 @@ outplink network::findoutput (devlink dev, name id)
   while ((o != NULL) && (! found)) {
     found = (o->id == id);
     if (! found)
-	o = o->next;
+        o = o->next;
   }
   return o;
 }
@@ -79,8 +79,8 @@ outplink network::findoutput (devlink dev, name id)
 
 /***********************************************************************
  *
- * Adds a device to the device list with given name and returns a link 
- * to it via 'dev'.                                                    
+ * Adds a device to the device list with given name and returns a link
+ * to it via 'dev'.
  *
  */
 void network::adddevice (devicekind dkind, name did, devlink& dev)
@@ -90,12 +90,12 @@ void network::adddevice (devicekind dkind, name did, devlink& dev)
   dev->kind = dkind;
   dev->ilist = NULL;
   dev->olist = NULL;
-  if (dkind != aclock) {        // device goes at head of list 
+  if (dkind != aclock) {        // device goes at head of list
     if (lastdev == NULL)
-	lastdev = dev;
+        lastdev = dev;
     dev->next = devs;
     devs = dev;
-  } else {                      // aclock devices must go last 
+  } else {                      // aclock devices must go last
     dev->next = NULL;
     if (lastdev == NULL) {
       devs = dev;
@@ -110,8 +110,8 @@ void network::adddevice (devicekind dkind, name did, devlink& dev)
 
 /***********************************************************************
  *
- * Adds an input to the device pointed to by 'dev' with the specified  
- * name.                                                               
+ * Adds an input to the device pointed to by 'dev' with the specified
+ * name.
  *
  */
 void network::addinput (devlink dev, name iid)
@@ -126,8 +126,8 @@ void network::addinput (devlink dev, name iid)
 
 /***********************************************************************
  *
- * Adds an output to the device pointed to by 'dev' with the specified 
- * name.                                                               
+ * Adds an output to the device pointed to by 'dev' with the specified
+ * name.
  *
  */
 void network::addoutput (devlink dev, name oid)
@@ -142,9 +142,9 @@ void network::addoutput (devlink dev, name oid)
 
 /***********************************************************************
  *
- * Makes a connection between the 'inp' input of device 'idev' and the 
- * 'outp' output of device 'odev'. 'ok' is set true if operation       
- * succeeds.                                                           
+ * Makes a connection between the 'inp' input of device 'idev' and the
+ * 'outp' output of device 'odev'. 'ok' is set true if operation
+ * succeeds.
  *
  */
 void network::makeconnection (name idev, name inp, name odev, name outp, bool& ok)
@@ -167,7 +167,7 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
 
 /***********************************************************************
  *
- * Checks that all inputs are connected to an output.   
+ * Checks that all inputs are connected to an output.
  *
  */
 void network::checknetwork (bool& ok)
@@ -175,18 +175,29 @@ void network::checknetwork (bool& ok)
   devlink d;
   inplink i;
   ok = true;
-  for (d = devs; d != NULL; d = d->next) 
-    for (i = d->ilist; i != NULL; i = i->next)
-      if (i->connect == NULL) {
-	cout << "Unconnected Input : ";
-	nmz->writename (d->id);
-	if (i->id != blankname) {
-	  cout << ".";
-	  nmz->writename (i->id);
-	}
-	cout << endl;
-	ok = false;
+  for (d = devs; d != NULL; d = d->next) {
+    if (d->kind == aswitch) {
+      if (d->swstate == floating) {
+        cout << "Unconnected Input : ";
+        nmz->writename(d->id);
+        cout << ".InitialValue" << endl;
       }
+    }
+    else {
+      for (i = d->ilist; i != NULL; i = i->next) {
+        if (i->connect == NULL) {
+          cout << "Unconnected Input : ";
+          nmz->writename (d->id);
+          if (i->id != blankname) {
+            cout << ".";
+            nmz->writename (i->id);
+          }
+          cout << endl;
+          ok = false;
+        }
+      }
+    }
+  }
 }
 
 
