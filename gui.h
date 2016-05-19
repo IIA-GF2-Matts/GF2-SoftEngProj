@@ -53,6 +53,7 @@ class MyGLCanvas: public wxGLCanvas
   int pan_y;                         // the current y pan
   double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
+  int cycle_no;
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
   names *nmz;                        // pointer to names class, used to extract signal names
   void InitGL();                     // function to initialise OpenGL context

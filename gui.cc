@@ -28,7 +28,7 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   pan_y = 0;
   zoom = 1.0;
   cyclesdisplayed = -1;
-  int cycle_no = 0;
+  cycle_no = 0;
 }
 
 void MyGLCanvas::Render(wxString example_text, int cycles)
@@ -45,7 +45,10 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
   wxString mon_name_text;
 
 
-  if (cycles >= 0) cyclesdisplayed = cycles;
+  if (cycles >= 0) {
+    cyclesdisplayed = cycles;
+    cycle_no += cycles;
+  }
 
   SetCurrent(*context);
   if (!init) {
@@ -91,7 +94,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
         glEnd();
         if (i%num_spacing == 0){
           glRasterPos2f(x-4, y-12);
-          number = to_string(i);
+          number = to_string(i+ cycle_no-cyclesdisplayed);
           for (k=0; k<number.Len(); k++)
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, number[k]);
         }
