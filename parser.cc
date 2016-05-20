@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <sstream>
 
 #include "errorhandler.h"
 #include "scanner.h"
@@ -195,6 +196,23 @@ void parser::parseOptionSet(Token& tk, name dv) {
     stepAndPeek(tk);
 }
 
+void parser::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
+    devicekind dkind = _netz->finddevice(sig.device)->kind;
+
+    oss << *sig.device << " (of type "
+        << *_devz->getname(dkind)
+        << ") ";
+
+    if (sig.pin == blankname) {
+        oss << "has no default output pin.";
+    } else {
+        oss << "has no output pin " << *sig.pin << ".";
+    }
+
+    if (dkind == dtype)
+        oss << " Use Q or Qbar.";
+}
+
 
 // option = key , ":" , value , ";" ;
 void parser::parseOption(Token& tk, name dv) {
@@ -293,23 +311,9 @@ void parser::parseOption(Token& tk, name dv) {
                 throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
             } else {
                 // ILLEGAL_PIN
-                // todo: make this a function to return message, then throw
-                devicekind dkind = _netz->finddevice(sig.device)->kind;
                 std::ostringstream oss;
-
-                    oss << *sig.device << " (of type "
-                        << *_devz->getname(dkind)
-                        << ") ";
-
-                if (sig.pin == blankname) {
-                    oss << "has no default output pin.";
-                } else {
-                    oss << "has no output pin " << *sig.pin << ".";
-                }
-
-                if (dkind == dtype)
-                    oss << " Use Q or Qbar.";
-
+                oss << "Unable to set input pin. ";
+                getUnknownPinError(sig, oss);
                 throw matterror(oss.str(), _scan.getFile(), value.at);
             }
         }
@@ -361,7 +365,10 @@ void parser::parseMonitor(Token& tk) {
             throw matterror("Devices must be defined before being monitored", _scan.getFile(), montk.at);
         } else {
             // ILLEGAL_PIN
-            throw matterror("Unable to monitor unknown pin", _scan.getFile(), montk.at);
+            std::ostringstream oss;
+            oss << "Unable to set monitor point. ";
+            getUnknownPinError(monsig, oss);
+            throw matterror(oss.str(), _scan.getFile(), montk.at);
         }
     }
 
