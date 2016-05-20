@@ -71,7 +71,7 @@ void MyFrame::OnOpen(wxCommandEvent &event)
     // Event handler for the File->Open menu item
 {
     wxFileDialog openFileDialog(this, _("Open Mattlab file"), "", "",
-                   "Mattlab files (*.matt)|*.matt", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+                   "Mattlab files (*.matt)|*.matt|All Files (*.*)|*.*", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
     if (openFileDialog.ShowModal() == wxID_CANCEL)
         return;
@@ -82,7 +82,9 @@ void MyFrame::OnOpen(wxCommandEvent &event)
 void MyFrame::OnAbout(wxCommandEvent &event)
     // Event handler for the about menu item
 {
-    wxMessageDialog about(this, "Example wxWidgets GUI\nAndrew Gee\nJune 2014", "About Logsim", wxICON_INFORMATION | wxOK);
+    wxMessageDialog about(this, "Mattlab Digital Logic Simulator\n\n"
+        "Produced for Engineering IIA project GF2 2016 by:\n"
+        "Matt March (mdm46)\nMatt Judge (mcj33)\nMatt Diesel (md639)", "About Mattlab", wxICON_INFORMATION | wxOK);
     about.ShowModal();
 }
 
