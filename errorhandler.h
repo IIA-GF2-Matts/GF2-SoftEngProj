@@ -3,8 +3,9 @@
 #include <string>
 #include <exception>
 #include <list>
+#include <ostream>
 
-#include "iposstream.h"
+#include "sourcepos.h"
 
 #ifndef GF2_ERRORHANDLER_H
 #define GF2_ERRORHANDLER_H
@@ -26,6 +27,7 @@ protected:
 
     std::string getErrorLine();
 public:
+    const SourcePos& pos() const;
     std::string getErrorMessage();
 
     /// Returns the complete error message for printing.
@@ -53,6 +55,8 @@ public:
 
     void report(matterror e);
     void report(mattwarning w);
+
+    void print(std::ostream& os) const;
 
     errorcollector();
 };

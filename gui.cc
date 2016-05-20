@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <wx/filedlg.h>
+#include "guierrordialog.h"
 
 using namespace std;
 
@@ -162,6 +163,7 @@ void MyFrame::delNetwork() {
     delete nmz;
 }
 
+
 void MyFrame::openFile(wxString file) {
     if (fileOpen) {
         delNetwork();
@@ -179,7 +181,10 @@ void MyFrame::openFile(wxString file) {
     pmz.readin();
 
     if (pmz.errors().errors.size()) {
-        // Errors occurred
+        ErrorDialog dlg(this, wxID_ANY, pmz.errors());
+
+        dlg.ShowModal();
+
         delNetwork();
         return;
     }

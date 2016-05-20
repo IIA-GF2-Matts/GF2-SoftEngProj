@@ -3,6 +3,7 @@
 #include <exception>
 #include <sstream>
 #include <fstream>
+#include <ostream>
 #include <iomanip>
 #include <algorithm>
 #include <cctype>
@@ -29,10 +30,41 @@ void errorcollector::report(mattwarning w) {
     warnings.push_back(w);
 }
 
+void errorcollector::print(std::ostream& os) const {
+    auto itErr = errors.begin();
+    auto itWarn = warnings.begin();
+
+    for (;;) {
+        if (itErr == errors.end()) {
+            if (itWarn == warnings.end()) {
+                break;
+            }
+
+            os << itWarn->what() << "\n";
+            itWarn++;
+        }
+        else if (itWarn == warnings.end()) {
+            os << itErr->what() << "\n";
+            itErr++;
+        }
+        else {
+            if (itErr->pos().Abs <= itWarn->pos().Abs) {
+                os << itErr->what() << "\n";
+                itErr++;
+            }
+            else {
+                os << itWarn->what() << "\n";
+                itWarn++;
+            }
+        }
+    }
+}
 
 
 
-
+const SourcePos& matterror::pos() const {
+    return _pos;
+}
 
 /// Reads the source file, and gets the line the error occured on.
 std::string matterror::getErrorLine() {

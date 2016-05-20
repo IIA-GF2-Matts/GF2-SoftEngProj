@@ -47,8 +47,11 @@ class network {
   devlink devicelist (void);
     /* Returns list of devices                                             */
 
+  devlink findoutputdevice(const outplink ol);
+    /* Finds the device that creates the output link ol                    */
+
   devlink finddevice (name id);
-   /* Returns link to device with specified name. Returns NULL if not       */
+   /* Returns link to device with specified name. Returns NULL if not      */
    /* found.                                                               */
 
   inplink findinput (devlink dev, name id);

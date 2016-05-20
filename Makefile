@@ -2,9 +2,9 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 
 CXX = $(shell wx-config --version=3.0 --cxx) -DUSE_GUI -std=c++11
 
-SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc
+SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc guierrorhandler.cc
 
-L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o sourcepos.o
+L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o sourcepos.o guierrordialog.o
 
 G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o cistring.o sourcepos.o
 
@@ -85,6 +85,7 @@ parser.o: parser.h names.h network.h devices.h monitor.h
 monitor.o: monitor.h names.h network.h devices.h
 devices.o: devices.h names.h network.h
 userint.o: userint.h names.h network.h devices.h monitor.h
-gui.o: gui.h names.h devices.h network.h monitor.h guicanvas.cc guicanvas.h
+gui.o: gui.h names.h devices.h network.h monitor.h guicanvas.cc guicanvas.h guierrordialog.h
 guicanvas.o: guicanvas.h names.h monitor.h
 guitest.o: guitest.h names.h devices.h network.h monitor.h gui.h
+guierrorhandler.o: guierrordialog.h errorhandler.h
