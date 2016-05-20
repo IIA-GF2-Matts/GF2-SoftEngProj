@@ -62,15 +62,17 @@ void devices::showdevice (devlink d)
  * not found.
  *
  */
-void devices::setswitch (name sid, asignal level, bool& ok)
+void devices::setswitch (name sid, asignal level, bool& ok, SourcePos at)
 {
   devlink d;
   d = netz->finddevice (sid);
   ok = (d != NULL);
   if (ok) {
     ok = (d->kind == aswitch);
-    if (ok)
+    if (ok) {
       d->swstate = level;
+      d->setAt = at;
+    }
   }
 }
 
@@ -98,6 +100,27 @@ void devices::makeswitch (name id, int setting, bool& ok, SourcePos at)
       else {
         d->swstate = (setting == 0) ? low : high;
       }
+    }
+  }
+}
+
+
+/***********************************************************************
+ *
+ * Sets the frequency of the named clock. 'ok' returns false if clock
+ * not found.
+ *
+ */
+void devices::setclock (name sid, int frequency, bool& ok, SourcePos at)
+{
+  devlink d;
+  d = netz->finddevice (sid);
+  ok = (d != NULL);
+  if (ok) {
+    ok = (d->kind == aclock);
+    if (ok) {
+      d->frequency = frequency;
+      d->setAt = at;
     }
   }
 }

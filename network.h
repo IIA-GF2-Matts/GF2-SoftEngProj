@@ -36,6 +36,7 @@ struct devicerec {
   int frequency;        // used when kind == aclock
   int counter;          // used when kind == aclock
   asignal memory;       // used when kind == dtype
+  SourcePos setAt;
 };
 typedef devicerec* devlink;
 

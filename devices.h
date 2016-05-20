@@ -38,8 +38,12 @@ public:
     /* variant is used with such things as gates where it specifies the    */
     /* number of inputs. 'ok' returns true if operation succeeds.          */
 
-  void setswitch (name sid, asignal level, bool& ok);
+  void setswitch (name sid, asignal level, bool& ok, SourcePos at = SourcePos());
     /* Sets the state of the named switch. 'ok' returns false if switch    */
+    /* not found.                                                          */
+
+  void setclock (name sid, int frequency, bool& ok, SourcePos at = SourcePos());
+    /* Sets the frequency of the named clock. 'ok' returns false if clock  */
     /* not found.                                                          */
 
   void executedevices (bool& ok);
