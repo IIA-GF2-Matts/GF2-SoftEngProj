@@ -25,6 +25,7 @@ protected:
 
     std::string _message;
     std::string _file;
+    std::string _fname;
     SourcePos _pos;
     MessageType _type;
     std::string _srcLine;

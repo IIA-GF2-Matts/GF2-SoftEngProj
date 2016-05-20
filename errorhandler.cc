@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cctype>
 #include <iostream>
+#include <iomanip>
 
 #include "iposstream.h"
 
@@ -40,7 +41,6 @@ void errorcollector::report(mattmessage e) {
     std::cout << e.what() << std::endl;
     messages.push_back(e);
     _count[e.getType()]++;
-    messages.p
 }
 
 void errorcollector::print(std::ostream& os) const {
@@ -137,21 +137,66 @@ mattmessage::mattmessage(std::string message, std::string file, SourcePos pos)
 
 
 mattmessage::mattmessage(std::string message, std::string file, SourcePos pos, MessageType typ)
-    : _message(message), _file(file), _pos(pos), _type(typ) {
+    : _message(message), _file(file), _pos(pos), _type(typ), _fname(file) {
     std::ostringstream oss;
+
+    int cmax = 73;
 
     static const std::string mpTypStr[4] = {
         "Error", "Warning", "Note", "Info"
     };
 
+    auto cls = oss.tellp();
+
     if (file != "") {
-        oss << file << " ";
+        auto rsl = file.rfind('/');
+
+        if (rsl == std::string::npos)
+            _fname = file;
+        else {
+            _fname = file.substr(rsl+1);
+        }
+
+        oss << _fname << " ";
     }
 
     _srcLineErrCol = -1;
 
-    oss << "(" << pos.Line << ":" << pos.Column << "): "
-        << mpTypStr[typ] << ": " << message;
+    oss << "(" << pos.Line << ":" << pos.Column << "): ";
+    int p = oss.tellp() - cls;
+    oss << mpTypStr[typ] << ": ";
+    int x = oss.tellp() - cls;
+
+    if ((message.length() + x > cmax)
+            && (x < cmax-20)) {
+        // We can use our funky word wrap
+        int y = 0, z;
+
+        z = message.rfind(' ', cmax-x);
+        if (z == std::string::npos || z <= cmax/2) {
+            z = cmax - x;
+        }
+
+        oss << message.substr(y, z);
+        y = z+1;
+
+        while (y < message.length()) {
+            z = message.rfind(' ', y+cmax-p);
+
+            if (z == std::string::npos || z <= y+cmax/2) {
+                z = y + cmax - p;
+            }
+
+            oss << "\n" << std::setfill(' ')
+                << std::setw(std::min(cmax, int(p+message.length()-y)))
+                << message.substr(y, z-y);
+
+            y = z+1;
+        }
+    }
+    else {
+        oss << message;
+    }
 
     getErrorLine();
 

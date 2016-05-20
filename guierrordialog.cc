@@ -13,7 +13,7 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
         wxWindowID id, 
         const errorcollector& errc)
     : wxDialog(parent, id, "ERROR! YOU IDIOT!", 
-            wxDefaultPosition, wxSize(700, 300)), errs(errc) {
+            wxDefaultPosition, wxSize(720, 400)), errs(errc) {
 
 
     // Setup the Panel and Widgets.
@@ -48,7 +48,7 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
                 , wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
 
     wxFont font1(10, wxFONTFAMILY_TELETYPE, 
-        wxFONTSTYLE_NORMAL, wxFONTSTYLE_NORMAL, 0, "Consolas");
+        wxFONTSTYLE_NORMAL, wxFONTSTYLE_NORMAL, 0, "Courier");
     errorList->SetFont(font1);
 
     std::ostream os(errorList);
