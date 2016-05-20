@@ -180,7 +180,7 @@ void MyFrame::openFile(wxString file) {
 
     pmz.readin();
 
-    if (pmz.errors().errors.size()) {
+    if (pmz.errors().errCount()) {
         ErrorDialog dlg(this, wxID_ANY, pmz.errors());
 
         dlg.ShowModal();
