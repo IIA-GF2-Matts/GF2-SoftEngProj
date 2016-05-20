@@ -302,18 +302,24 @@ void parser::parseOption(Token& tk, name dv) {
         case norgate:
         case xorgate:
         case dtype:
-        default:
-            if (_netz->findinput(dvl, keyname) != NULL) {
+        default: {
+            inplink il = _netz->findinput(dvl, keyname);
+            if (il != NULL && (il->connect != NULL)) {
                 std::ostringstream oss, prevval;
-                outplink ol = _netz->findinput(dvl, keyname)->connect;
+                outplink ol = il->connect;
                 devlink dl = _netz->findoutputdevice(ol);
+                if (dl == NULL)
+                    throw matterror("Should never reach here. Call Tim.", _scan.getFile(), key.at);
+                
                 prevval << *dl->id;
+
                 if (ol->id != blankname)
                     prevval << *ol->id;
                 getPredefinedError(dvl, keyname, prevval.str(), oss);
                 throw matterror(oss.str(), _scan.getFile(), key.at);
             }
             break;
+        }
     }
 
 
@@ -371,7 +377,9 @@ void parser::parseOption(Token& tk, name dv) {
             }
         }
         // connect the gate
-        _netz->addinput(dvl, keyname, key.at);
+        if (!_netz->findinput(dvl, keyname))
+            _netz->addinput(dvl, keyname, key.at);
+
         bool success = false;
         // todo: store token position?
         _netz->makeconnection(dv, keyname, sig.device, sig.pin, success);
