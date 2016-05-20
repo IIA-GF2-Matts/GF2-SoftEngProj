@@ -2,11 +2,11 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 
 CXX = $(shell wx-config --version=3.0 --cxx) -DUSE_GUI -std=c++11
 
-SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc
+SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc
 
-L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o
+L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o sourcepos.o
 
-G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o cistring.o
+G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o cistring.o sourcepos.o
 
 
 # implementation
@@ -75,7 +75,8 @@ scanner_unittest : scanner.o scanner_unittest.o gtest_main.a iposstream.o cistri
 
 # DO NOT DELETE
 
-scanner.o: scanner.h iposstream.h names.h cistring.h errorhandler.h
+iposstream.o: iposstream.h sourcepos.h 
+scanner.o: scanner.h iposstream.h names.h cistring.h errorhandler.h sourcepos.h
 logsim.o: logsim.h names.h devices.h network.h monitor.h parser.h userint.h
 logsim.o: gui.h
 names.o: names.h cistring.h

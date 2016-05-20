@@ -2,25 +2,11 @@
 #include <string>
 #include <istream>
 
+#include "sourcepos.h"
+
 
 #ifndef UTIL_IPOSSTREAM_H
 #define UTIL_IPOSSTREAM_H
-
-
-// Represents a position within a file.
-struct SourcePos {
-	// std::string& File;
-	int Line;
-	int Column;
-	int Abs;
-	int LineStart;
-
-	SourcePos();
-	SourcePos( int, int, int );
-	SourcePos( int, int, int, int );
-
-	friend std::ostream& operator<<( std::ostream&, const SourcePos& );
-};
 
 
 // An input stream that also records character positions.
