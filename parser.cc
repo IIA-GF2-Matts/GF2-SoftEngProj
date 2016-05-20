@@ -129,10 +129,9 @@ void parser::parseDefineDevice(Token& tk) {
         bool success;
         if (tk.devtype == aswitch)
             // -1 sets switch to floating
-            _devz->makedevice(tk.devtype, dv, -1, success);
+            _devz->makedevice(tk.devtype, dv, -1, success, nameToken.at);
         else
-            // Todo: this may need to change for clocks, but works well for gates
-            _devz->makedevice(tk.devtype, dv, 0, success);
+            _devz->makedevice(tk.devtype, dv, 0, success, nameToken.at);
 
         // Debug
         /*
@@ -309,10 +308,10 @@ void parser::parseOption(Token& tk, name dv) {
         if (value.type != TokType::Number || (value.number != 0 && value.number != 1))
             throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), value.at);
 
-        asignal sig = value.number ? high : low;
         bool success = false;
-
-        _devz->setswitch(dv, sig, success);
+        asignal sig = value.number ? high : low;
+        _devz->setswitch(dv, sig, success, key.at);
+        
         if (!success)
             throw matterror("Could not set switch initial value", _scan.getFile(), value.at);
 
@@ -322,7 +321,13 @@ void parser::parseOption(Token& tk, name dv) {
         // Clock
         if (value.type != TokType::Number || value.number < 1 || value.number > 32767)
             throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), value.at);
-        dvl->frequency = value.number;
+
+        bool success = false;
+        // Todo: these might want to store a different token position
+        _devz->setclock(dv, value.number, success, key.at);
+
+        if (!success)
+            throw matterror("Could not set clock period", _scan.getFile(), value.at);
 
         stepAndPeek(tk);
 
@@ -343,8 +348,9 @@ void parser::parseOption(Token& tk, name dv) {
             }
         }
         // connect the gate
-        _netz->addinput(dvl, keyname);
+        _netz->addinput(dvl, keyname, key.at);
         bool success = false;
+        // todo: store token position?
         _netz->makeconnection(dv, keyname, sig.device, sig.pin, success);
         if (!success)
             // Todo: improve error message
