@@ -11,9 +11,7 @@ class ErrorDialog: public wxDialog {
 public:
     ErrorDialog(wxWindow* parent, wxWindowID id, const errorcollector& errc);
     virtual ~ErrorDialog();
-    void onCancel(wxCommandEvent& pEvent);
     void onOk(wxCommandEvent& pEvent);
-    void onCheck(wxCommandEvent& pEvent);
 
 private:
     const errorcollector& errs;

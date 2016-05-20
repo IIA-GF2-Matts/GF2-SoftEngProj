@@ -78,12 +78,3 @@ void ErrorDialog::onOk(wxCommandEvent& WXUNUSED(pEvent))    {
     EndModal(wxID_OK);
     Destroy();
 }
-
-void ErrorDialog::onCheck(wxCommandEvent& pEvent)    {
-    if(pEvent.IsChecked ())    {
-        process_ = true;
-    }
-    else    {
-        process_ = false;
-    }
-}
