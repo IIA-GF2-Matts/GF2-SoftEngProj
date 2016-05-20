@@ -122,10 +122,12 @@ void parser::parseDefineDevice(Token& tk) {
         }
         // make device (which adds it to the network)
         bool success;
-        // setting 0 as default varient for the time being
-        // TODO: this may need to be changed for switches, clocks
-        // Todo: if switch, varient -1
-        _devz->makedevice(tk.devtype, dv, 0, success);
+        if (tk.devtype == aswitch)
+            // -1 sets switch to floating
+            _devz->makedevice(tk.devtype, dv, -1, success);
+        else
+            // Todo: this may need to change for clocks, but works well for gates
+            _devz->makedevice(tk.devtype, dv, 0, success);
 
         // Debug
         /*
