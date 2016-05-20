@@ -218,10 +218,9 @@ void parser::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
 template<typename T>
 void parser::getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss) {
     // todo: note should be a separate note message
-    oss << "Cannot redefine " << *key << " for "
-        << *dvl->id << " (of type "
-        << *_devz->getname(dvl->kind)
-        << "). Note: previously defined as "
+    oss << "Attempt to redefine " //<< *_devz->getname(dvl->kind)
+        << *dvl->id << "." << *key
+        << ". Note: previously defined as "
         << prevval << " at position " << dvl->definedAt;
 }
 
@@ -291,8 +290,11 @@ void parser::parseOption(Token& tk, name dv) {
             }
             break;
         case aclock:
-            if (dvl->frequency != 0) 
-                throw matterror("Clock already has Period defined, may not redefine.", _scan.getFile(), key.at);
+            if (dvl->frequency != 0) {
+                std::ostringstream oss;
+                getPredefinedError(dvl, keyname, dvl->frequency, oss);
+                throw matterror(oss.str(), _scan.getFile(), key.at);
+            }
             break;
         case andgate:
         case nandgate:
@@ -301,8 +303,16 @@ void parser::parseOption(Token& tk, name dv) {
         case xorgate:
         case dtype:
         default:
-            if (_netz->findinput(dvl, keyname) != NULL)
-                throw matterror("Gate already has input pin defined, may not redefine.", _scan.getFile(), key.at);
+            if (_netz->findinput(dvl, keyname) != NULL) {
+                std::ostringstream oss, prevval;
+                outplink ol = _netz->findinput(dvl, keyname)->connect;
+                devlink dl = _netz->findoutputdevice(ol);
+                prevval << *dl->id;
+                if (ol->id != blankname)
+                    prevval << *ol->id;
+                getPredefinedError(dvl, keyname, prevval.str(), oss);
+                throw matterror(oss.str(), _scan.getFile(), key.at);
+            }
             break;
     }
 
