@@ -423,3 +423,8 @@ Signal parser::parseSignalName(Token& tk) {
 
     return ret;
 }
+
+const errorcollector& errors() const {
+    return errs;
+}
+

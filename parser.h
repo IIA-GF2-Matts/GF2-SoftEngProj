@@ -83,6 +83,8 @@ public:
     /** corresponding internal representation via calls to the 'Network'   */
     /** module and the 'Devices' module.                                   */
     bool readin();
+
+    const errorcollector& errors() const;
 };
 
 
