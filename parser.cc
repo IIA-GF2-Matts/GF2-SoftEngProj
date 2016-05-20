@@ -269,7 +269,29 @@ void parser::parseOption(Token& tk, name dv) {
             throw matterror("Could not assign key to a bad device type", _scan.getFile(), key.at);
     }
 
-    // Todo: check if key has already been defined for particular device
+    // check if key has already been defined for particular device
+    switch(dvl->kind) {
+        // Todo: check errors
+        case aswitch:
+            if (dvl->swstate != floating)
+                throw matterror("Switch already has InitialValue defined, may not redefine.", _scan.getFile(), key.at);
+            break;
+        case aclock:
+            if (dvl->frequency != 0)
+                throw matterror("Clock already has Period defined, may not redefine.", _scan.getFile(), key.at);
+            break;
+        case andgate:
+        case nandgate:
+        case orgate:
+        case norgate:
+        case xorgate:
+        case dtype:
+        default:
+            if (_netz->findinput(dvl, keyname) != NULL)
+                throw matterror("Gate already has input pin defined, may not redefine.", _scan.getFile(), key.at);
+            break;
+    }
+
 
     stepAndPeek(tk);
 
