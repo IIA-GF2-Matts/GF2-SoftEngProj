@@ -17,38 +17,44 @@ IMPLEMENT_APP(MyApp)
 bool MyApp::OnInit()
   // This function is automatically called when the application starts
 {
-  if (argc != 2) { // check we have one command line argument
-    std::cout << "Usage:      " << argv[0] << " [filename]" << std::endl;
-    exit(1);
-  }
 
-  // Construct the six classes required by the innards of the logic simulator
-  nmz = new names();
-  netz = new network(nmz);
-  dmz = new devices(nmz, netz);
-  mmz = new monitor(nmz, netz);
 #ifdef USE_GUI
-  smz.open(std::string(wxString(argv[1]).mb_str()));
-#else
-  smz.open(argv[1]);
-#endif
-  parser* pmz = new parser(netz, dmz, mmz, smz, nmz);
 
-  if (pmz->readin ()) { // check the logic file parsed correctly
-#ifdef USE_GUI
     // glutInit cannot cope with Unicode command line arguments, so we pass
     // it some fake ASCII ones instead
     char **tmp1; int tmp2 = 0; glutInit(&tmp2, tmp1);
     // Construct the GUI
-    MyFrame *frame = new MyFrame(NULL, "MattLab Logic simulator", wxDefaultPosition,  wxSize(800, 600), nmz, dmz, mmz);
+    MyFrame *frame = new MyFrame(NULL, wxDefaultPosition,  wxSize(800, 600));
+
+    if (argc >= 2) {
+      frame->openFile(argv[1]);
+    }
+
     frame->Show(true);
     return(true); // enter the GUI event loop
+
 #else
-    // Construct the text-based interface
-    userint umz(nmz, dmz, mmz);
-    umz.userinterface();
+
+    if (argc != 2) { // check we have one command line argument
+      std::cout << "Usage:      " << argv[0] << " [filename]" << std::endl;
+      exit(1);
+    }
+
+    nmz = new names();
+    netz = new network(nmz);
+    dmz = new devices(nmz, netz);
+    mmz = new monitor(nmz, netz);
+    smz.open(argv[1]);
+    parser* pmz = new parser(netz, dmz, mmz, smz, nmz);
+
+    if (pmz->readin ()) { // check the logic file parsed correctly
+      // Construct the text-based interface
+      userint umz(nmz, dmz, mmz);
+      umz.userinterface();
+    }
+
 #endif /* USE_GUI */
-  }
+
   return(false); // exit the application
 }
 
