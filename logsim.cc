@@ -26,11 +26,12 @@ bool MyApp::OnInit()
     // Construct the GUI
     MyFrame *frame = new MyFrame(NULL, wxDefaultPosition,  wxSize(800, 600));
 
+    frame->Show(true);
+    
     if (argc >= 2) {
       frame->openFile(argv[1]);
     }
 
-    frame->Show(true);
     return(true); // enter the GUI event loop
 
 #else
