@@ -341,8 +341,102 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
     stepAndPeek(tk);
 }
 
+
+bool parser::isLegalProperty(devlink dvl, name keyname) {
+    return ( (dvl->kind == aclock && keyname == _nms->lookup("Period"))
+            || (dvl->kind == aswitch && keyname == _nms->lookup("InitialValue")));
+}
+
+
 // value = signalname | number ;
 void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
+    Token valuetk = tk;
+    name keyname = _nms->lookup(keytk.name);
+
+    if (valuetk.type == TokType::Identifier) {
+        // a signal
+        Signal sig = parseSignalName(tk);
+
+        if (isLegalProperty(dvl, keyname)) {
+            throw matterror("Attempt to assign a signal to a property", _scan.getFile(), valuetk.at);
+        }
+
+        assignPin(dvl, keytk, valuetk, sig);
+    } else if (valuetk.type == TokType::Number) {
+        stepAndPeek(tk);
+
+        if (isLegalProperty(dvl, keyname)) {
+            assignProperty(dvl, keytk, valuetk);
+        }
+        else {
+            if (valuetk.number != 0 && tk.number != 1)
+                // Todo: improve error message
+                throw matterror("Invalid signal.", _scan.getFile(), valuetk.at);
+            Signal sig;
+            sig.device = _nms->lookup(valuetk.number  ? "1" : "0");
+            assignPin(dvl, keytk, valuetk, sig);
+        }
+    } else {
+        throw matterror("Expected an Identifier or Number", _scan.getFile(), valuetk.at);
+    }
+}
+
+void parser::assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig) {
+    name keyname = _nms->lookup(keytk.name);
+    // Ensure signal exists
+    signal_legality badSignal = isBadSignal(sig);
+    if (badSignal) {
+        if (badSignal == ILLEGAL_DEVICE) {
+            throw matterror("Devices must be defined before being referenced", _scan.getFile(), valuetk.at);
+        } else {
+            // ILLEGAL_PIN
+            std::ostringstream oss;
+            oss << "Unable to set input pin. ";
+            getUnknownPinError(sig, oss);
+            throw matterror(oss.str(), _scan.getFile(), valuetk.at);
+        }
+    }
+
+    // connect the gate
+    bool success = false;
+    if (!_netz->findinput(dvl, keyname))
+        _netz->addinput(dvl, keyname, keytk.at);
+
+    // todo: store token position?
+    _netz->makeconnection(dvl->id, keyname, sig.device, sig.pin, success);
+    if (!success)
+        // Todo: improve error message
+        throw matterror("Could not make connection", _scan.getFile(), keytk.at);
+}
+
+void parser::assignProperty(devlink dvl, Token keytk, Token valuetk) {
+    bool success = false;
+    if (dvl->kind == aswitch) {
+        // Switch
+        if (valuetk.type != TokType::Number || (valuetk.number != 0 && valuetk.number != 1))
+            throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), valuetk.at);
+
+        asignal sig = valuetk.number ? high : low;
+        _devz->setswitch(dvl->id, sig, success, keytk.at);
+        
+        if (!success)
+            throw matterror("Could not set switch initial value", _scan.getFile(), valuetk.at);
+
+    } else if (dvl->kind == aclock) {
+        // Clock
+        if (valuetk.type != TokType::Number || valuetk.number < 1 || valuetk.number > 32767)
+            throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), valuetk.at);
+
+        // Todo: these might want to store a different token position
+        _devz->setclock(dvl->id, valuetk.number, success, keytk.at);
+
+        if (!success)
+            throw matterror("Could not set clock period", _scan.getFile(), valuetk.at);
+    } 
+}
+
+/*
+
     Token valuetk = tk;
     name keyname = _nms->lookup(keytk.name);
 
@@ -412,6 +506,9 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
             throw matterror("Could not make connection", _scan.getFile(), keytk.at);
     }
 }
+*/
+
+
 
 
 // definemonitor = "monitor" , monitorset , ";" ;

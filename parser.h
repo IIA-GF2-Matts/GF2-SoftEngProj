@@ -87,6 +87,12 @@ private:
     template<typename T>
     void getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss);
 
+    bool isLegalProperty(devlink dl, name keyname);
+    void assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig);
+    void assignProperty(devlink dvl, Token keytk, Token valuetk);
+
+
+
 public:
     /// Construct a parser to work on the pointers to other classes
     parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms);
