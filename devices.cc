@@ -152,7 +152,7 @@ void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok)
  * Called by makedevice.
  *
  */
-void devices::makedtype (name id)
+void devices::makedtype (name id, bool& ok)
 {
   devlink d;
   netz->adddevice (dtype, id, d);
@@ -166,8 +166,8 @@ void devices::makedtype (name id)
 
   // Default SET and CLR to zero
   // Todo: Actually check ok.
-  bool ok;
   netz->makeconnection(id, setpin, zero, blankname, ok);
+  if (!ok) return;
   netz->makeconnection(id, clrpin, zero, blankname, ok);
 }
 
@@ -199,7 +199,7 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
       makegate (dkind, did, 2, ok);
       break;
     case dtype:
-      makedtype(did);
+      makedtype(did, ok);
       break;
   }
 }
