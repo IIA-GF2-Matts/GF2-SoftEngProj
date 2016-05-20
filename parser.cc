@@ -39,7 +39,7 @@ bool parser::readin() {
     Token tk = _scan.peek();
     parseFile(tk);
 
-    return errs.errors.size() == 0;
+    return errs.errCount() == 0;
 }
 
 void parser::stepAndPeek(Token& tk) {
@@ -73,8 +73,8 @@ void parser::parseFile(Token& tk) {
     // TODO: Check for errors after parsing.
 
     std::cout << "File parsed with "
-            << errs.errors.size() << " errors and "
-            << errs.warnings.size() << " warnings." << std::endl;
+            << errs.errCount() << " errors and "
+            << errs.warnCount() << " warnings." << std::endl;
 }
 
 

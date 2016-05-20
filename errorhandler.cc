@@ -20,54 +20,44 @@
 errorcollector::errorcollector() {
 }
 
-void errorcollector::report(matterror e) {
-    std::cout << e.what() << std::endl;
-    errors.push_back(e);
+int errorcollector::count(MessageType typ) const {
+    return _count[typ];
 }
 
-void errorcollector::report(mattwarning w) {
-    std::cout << w.what() << std::endl;
-    warnings.push_back(w);
+int errorcollector::errCount() const {
+    return count(MsgError);
+}
+
+int errorcollector::warnCount() const {
+    return count(MsgWarning);
+}
+
+int errorcollector::infoCount() const {
+    return count(MsgInfo);
+}
+
+void errorcollector::report(mattmessage e) {
+    std::cout << e.what() << std::endl;
+    messages.push_back(e);
+    _count[e.getType()]++;
+    messages.p
 }
 
 void errorcollector::print(std::ostream& os) const {
-    auto itErr = errors.begin();
-    auto itWarn = warnings.begin();
-
-    for (;;) {
-        if (itErr == errors.end()) {
-            if (itWarn == warnings.end()) {
-                break;
-            }
-
-            os << itWarn->what() << "\n";
-            itWarn++;
-        }
-        else if (itWarn == warnings.end()) {
-            os << itErr->what() << "\n";
-            itErr++;
-        }
-        else {
-            if (itErr->pos().Abs <= itWarn->pos().Abs) {
-                os << itErr->what() << "\n";
-                itErr++;
-            }
-            else {
-                os << itWarn->what() << "\n";
-                itWarn++;
-            }
-        }
+    for (auto it : messages) {
+        os << it.what() << "\n\n";
     }
 }
 
 
 
-const SourcePos& matterror::pos() const {
+const SourcePos& mattmessage::pos() const {
     return _pos;
 }
 
+
 /// Reads the source file, and gets the line the error occured on.
-std::string matterror::getErrorLine() {
+std::string mattmessage::getErrorLine() {
 
     if (!_srcLine.empty()) {
         return _srcLine;
@@ -118,26 +108,41 @@ std::string matterror::getErrorLine() {
 }
 
 
-std::string matterror::getErrorMessage() {
+std::string mattmessage::getErrorMessage() {
     return _errorMessage;
 }
 
 
+MessageType mattmessage::getType() const {
+    return _type;
+}
+
+
+bool mattmessage::is(MessageType t) const {
+    return _type == t;
+}
+
+
+
 /// Returns the complete error message for printing.
-const char* matterror::what() const throw () {
+const char* mattmessage::what() const throw () {
     return _errorMessage.c_str();
 }
 
 
-/// Create a new matterror, and builds the message.
-matterror::matterror(std::string message, std::string file, SourcePos pos)
-        : matterror(message, file, pos, false) {
+/// Create a new mattmessage, and builds the message.
+mattmessage::mattmessage(std::string message, std::string file, SourcePos pos)
+        : mattmessage(message, file, pos, MsgInfo) {
 }
 
 
-matterror::matterror(std::string message, std::string file, SourcePos pos, bool warning)
-    : _message(message), _file(file), _pos(pos) {
+mattmessage::mattmessage(std::string message, std::string file, SourcePos pos, MessageType typ)
+    : _message(message), _file(file), _pos(pos), _type(typ) {
     std::ostringstream oss;
+
+    static const std::string mpTypStr[4] = {
+        "Error", "Warning", "Note", "Info"
+    };
 
     if (file != "") {
         oss << file << " ";
@@ -146,25 +151,41 @@ matterror::matterror(std::string message, std::string file, SourcePos pos, bool 
     _srcLineErrCol = -1;
 
     oss << "(" << pos.Line << ":" << pos.Column << "): "
-        << (warning ? "Warning: " : "Error: ") << message;
+        << mpTypStr[typ] << ": " << message;
 
     getErrorLine();
+
     if (!_srcLine.empty()) {
-        oss << "\n" << _srcLine << "\n";
+        oss << "\n" << _srcLine;
     }
 
     if (_srcLineErrCol >= 0) {
-        oss << std::setfill('-') << std::setw(_srcLineErrCol) << "^"
-            << (warning ? "" : " ERROR") << "\n";
+        oss << "\n" << std::setfill('-') << std::setw(_srcLineErrCol) << "^";
+        if (typ == MsgError)
+            oss << "ERROR";
     }
 
     _errorMessage = oss.str();
 }
 
 
+// class matterror
+
+matterror::matterror(std::string message, std::string file, SourcePos pos)
+        : mattmessage(message, file, pos, MsgError) {
+}
+
+
 // class mattwarning
 
 mattwarning::mattwarning(std::string message, std::string file, SourcePos pos)
-        : matterror(message, file, pos, true) {
+        : mattmessage(message, file, pos, MsgWarning) {
+}
+
+
+// class mattnote
+
+mattnote::mattnote(std::string message, std::string file, SourcePos pos)
+        : mattmessage(message, file, pos, MsgWarning) {
 }
 
