@@ -424,7 +424,7 @@ Signal parser::parseSignalName(Token& tk) {
     return ret;
 }
 
-const errorcollector& errors() const {
+const errorcollector& parser::errors() const {
     return errs;
 }
 
