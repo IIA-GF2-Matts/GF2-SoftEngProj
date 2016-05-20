@@ -376,18 +376,28 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
 
     } else {
         // A gate
-        Signal sig = parseSignalName(tk);
-        // Ensure signal exists
-        signal_legality badSignal = isBadSignal(sig);
-        if (badSignal) {
-            if (badSignal == ILLEGAL_DEVICE) {
-                throw matterror("Devices must be defined before being referenced", _scan.getFile(), valuetk.at);
-            } else {
-                // ILLEGAL_PIN
-                std::ostringstream oss;
-                oss << "Unable to set input pin. ";
-                getUnknownPinError(sig, oss);
-                throw matterror(oss.str(), _scan.getFile(), valuetk.at);
+        Signal sig;
+
+        if (tk.type == TokType::Number) {
+            if (tk.number != 0 && tk.number != 1)
+                // Todo: improve error message
+                throw matterror("Invalid signal.", _scan.getFile(), valuetk.at);
+            sig.device = _nms->lookup(tk.number == 0 ? "0" : "1");
+            stepAndPeek(tk);
+        } else {
+            sig = parseSignalName(tk);
+            // Ensure signal exists
+            signal_legality badSignal = isBadSignal(sig);
+            if (badSignal) {
+                if (badSignal == ILLEGAL_DEVICE) {
+                    throw matterror("Devices must be defined before being referenced", _scan.getFile(), valuetk.at);
+                } else {
+                    // ILLEGAL_PIN
+                    std::ostringstream oss;
+                    oss << "Unable to set input pin. ";
+                    getUnknownPinError(sig, oss);
+                    throw matterror(oss.str(), _scan.getFile(), valuetk.at);
+                }
             }
         }
         // connect the gate
@@ -400,7 +410,6 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
         if (!success)
             // Todo: improve error message
             throw matterror("Could not make connection", _scan.getFile(), keytk.at);
-
     }
 }
 
