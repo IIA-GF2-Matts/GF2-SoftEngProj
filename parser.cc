@@ -59,9 +59,14 @@ void parser::parseFile(Token& tk) {
         catch (matterror& e) {
             errs.report(e);
 
-            // Todo: Can we recover from here?
-            // Keep reading until we see "dev" or "monitor" keywords?
-            break;
+            // Consume tokens until the next statement is reached
+            while (tk.type != TokType::DevKeyword && tk.type != TokType::MonitorKeyword) {
+                if (tk.type == TokType::EndOfFile) {
+                    stepAndPeek(tk);
+                    break;
+                }
+                stepAndPeek(tk);
+            }
         }
     }
 
@@ -122,10 +127,12 @@ void parser::parseDefineDevice(Token& tk) {
         }
         // make device (which adds it to the network)
         bool success;
-        // setting 0 as default varient for the time being
-        // TODO: this may need to be changed for switches, clocks
-        // Todo: if switch, varient -1
-        _devz->makedevice(tk.devtype, dv, 0, success);
+        if (tk.devtype == aswitch)
+            // -1 sets switch to floating
+            _devz->makedevice(tk.devtype, dv, -1, success);
+        else
+            // Todo: this may need to change for clocks, but works well for gates
+            _devz->makedevice(tk.devtype, dv, 0, success);
 
         // Debug
         /*
@@ -184,14 +191,11 @@ void parser::parseOptionSet(Token& tk, name dv) {
                     stepAndPeek(tk);
                     return;
                 }
-
                 stepAndPeek(tk);
             }
-
             stepAndPeek(tk);
         }
     }
-
     stepAndPeek(tk);
 }
 
@@ -267,7 +271,29 @@ void parser::parseOption(Token& tk, name dv) {
             throw matterror("Could not assign key to a bad device type", _scan.getFile(), key.at);
     }
 
-    // Todo: check if key has already been defined for particular device
+    // check if key has already been defined for particular device
+    switch(dvl->kind) {
+        // Todo: check errors
+        case aswitch:
+            if (dvl->swstate != floating)
+                throw matterror("Switch already has InitialValue defined, may not redefine.", _scan.getFile(), key.at);
+            break;
+        case aclock:
+            if (dvl->frequency != 0)
+                throw matterror("Clock already has Period defined, may not redefine.", _scan.getFile(), key.at);
+            break;
+        case andgate:
+        case nandgate:
+        case orgate:
+        case norgate:
+        case xorgate:
+        case dtype:
+        default:
+            if (_netz->findinput(dvl, keyname) != NULL)
+                throw matterror("Gate already has input pin defined, may not redefine.", _scan.getFile(), key.at);
+            break;
+    }
+
 
     stepAndPeek(tk);
 
