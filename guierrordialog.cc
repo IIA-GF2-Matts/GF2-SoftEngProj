@@ -37,6 +37,10 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
                 , wxEmptyString, wxDefaultPosition, wxDefaultSize
                 , wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
 
+    wxFont font1(10, wxFONTFAMILY_TELETYPE, 
+        wxFONTSTYLE_NORMAL, wxFONTSTYLE_NORMAL, 0, "Consolas");
+    errorList->SetFont(font1);
+
     std::ostream os(errorList);
     errs.print(os);
 
