@@ -54,7 +54,10 @@ bool MyApp::OnInit()
       umz.userinterface();
     }
 
-    delete(netz);
+    delete mmz;
+    delete dmz;
+    delete netz;
+    delete nmz;
 
 #endif /* USE_GUI */
 
