@@ -215,6 +215,16 @@ void parser::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
         oss << " Use Q or Qbar.";
 }
 
+template<typename T>
+void parser::getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss) {
+    // todo: note should be a separate note message
+    oss << "Cannot redefine " << *key << " for "
+        << *dvl->id << " (of type "
+        << *_devz->getname(dvl->kind)
+        << "). Note: previously defined as "
+        << prevval << " at position " << dvl->definedAt;
+}
+
 
 // option = key , ":" , value , ";" ;
 void parser::parseOption(Token& tk, name dv) {
@@ -274,11 +284,14 @@ void parser::parseOption(Token& tk, name dv) {
     switch(dvl->kind) {
         // Todo: check errors
         case aswitch:
-            if (dvl->swstate != floating)
-                throw matterror("Switch already has InitialValue defined, may not redefine.", _scan.getFile(), key.at);
+            if (dvl->swstate != floating) {
+                std::ostringstream oss;
+                getPredefinedError(dvl, keyname, dvl->swstate == high ? 1 : 0, oss);
+                throw matterror(oss.str(), _scan.getFile(), key.at);
+            }
             break;
         case aclock:
-            if (dvl->frequency != 0)
+            if (dvl->frequency != 0) 
                 throw matterror("Clock already has Period defined, may not redefine.", _scan.getFile(), key.at);
             break;
         case andgate:

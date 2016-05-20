@@ -78,6 +78,10 @@ private:
     // get the error message when a signal pin is unknown
     void getUnknownPinError(Signal& sig, std::ostringstream& oss) ;
 
+    // get the error message when a key has been previously defined
+    template<typename T>
+    void getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss);
+
 public:
     /// Construct a parser to work on the pointers to other classes
     parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms);
