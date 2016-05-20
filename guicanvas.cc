@@ -39,13 +39,12 @@ void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
   nmz = nms;
 }
 
-void MyGLCanvas::Render(wxString example_text, int cycles)
+void MyGLCanvas::Render(wxString example_text, int cycles) {
   // Todo: don't need example text as arg.
   // Draws canvas contents - the following example writes the string "example text" onto the canvas
   // and draws a signal trace. The trace is artificial if the simulator has not yet been run.
-  // When the simulator is run, the number of cycles is passed as a parameter and the first monitor
-  // trace is displayed.
-{
+  // When the simulator is run, the number of cycles is passed as a parameter
+
   float x, y;
   unsigned int i, j, k;
   asignal s;
@@ -81,11 +80,15 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
     num_spacing = 1 + cyclesdisplayed/20;
   }
 
-  // example_text.Printf("%d", mmz->moncount());
+
 
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw the first monitor signal, get trace from monitor class
 
-  float dx = (end_width - label_width) / cyclesdisplayed; // dx between points
+    float dx;
+    if (cyclesdisplayed == 0)
+      dx = 20;
+    else
+      dx = (end_width - label_width) / cyclesdisplayed; // dx between points
 
     for (j = 0; j<mmz->moncount(); j++) {
       // draw x axis
@@ -178,10 +181,10 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
   }
 
-  // // Example of how to use GLUT to draw text on the canvas
-  // glColor3f(1.0, 0.0, 0.0);
-  // glRasterPos2f(10, 100);
-  // for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
+  // Example of how to use GLUT to draw text on the canvas
+  glColor3f(1.0, 0.0, 0.0);
+  glRasterPos2f(10, 100);
+  for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
 
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
   glFlush();
@@ -232,7 +235,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   wxString text;
   int w, h;;
   static int last_x, last_y;
-  int selection_x[2];
 
   GetClientSize(&w, &h);
   if (event.ButtonDown()) {
@@ -255,7 +257,7 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     // last_x = event.m_x;
     // last_y = event.m_y;
     init = false;
-    text.Printf("Mouse dragged to %d %d, pan now %d %d", event.m_x, h-event.m_y, pan_x, pan_y);
+    text.Printf("Mouse dragged from %d to %d", selection_x[0], selection_x[1]);
   }
   if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
   if (event.GetWheelRotation() < 0) {

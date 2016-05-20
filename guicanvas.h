@@ -24,6 +24,7 @@ void setNetwork(monitor* mmz, names* nmz);
   bool init;                         // has the OpenGL context been initialised?
   int pan_x;                         // the current x pan
   int pan_y;                         // the current y pan
+  int selection_x[2];                // the currently selected range of values.
   double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   int cycle_no;
