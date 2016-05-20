@@ -237,6 +237,11 @@ void parser::parseOption(Token& tk, name dv) {
 
     stepAndPeek(tk);
     parseValue(tk, dvl, keytk);
+
+    if (tk.type != TokType::SemiColon) {
+        throw matterror("Missing a semicolon on the end.", _scan.getFile(), tk.at);
+    }
+    stepAndPeek(tk);
 }
 
 // key = identifier ;
@@ -397,11 +402,6 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
             throw matterror("Could not make connection", _scan.getFile(), keytk.at);
 
     }
-
-    if (tk.type != TokType::SemiColon) {
-        throw matterror("Missing a semicolon on the end.", _scan.getFile(), tk.at);
-    }
-    stepAndPeek(tk);
 }
 
 
