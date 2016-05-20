@@ -10,21 +10,20 @@
 
 
 bool isLegalGateInputNamestring(namestring s, int maxn) {
-    // Todo: Probably a cleaner way to do this
-    if (s.at(0) != 'I')
-        return false;
-    int val = 0;
-    if (s.length() == 2 && std::isdigit(s.at(1))) {
-        val = s.at(1) - '0';
-    } else if (s.length() == 3
-        && std::isdigit(s.at(1))
-        && std::isdigit(s.at(2))){
-        val = (s.at(1) - '0')*10
-            + (s.at(2) - '0');
-    } else {
-        return false;
+    if (s.length() < 2
+        || s[0] != 'I'
+        || !std::isdigit(s[1])
+        || (s[1] == '0')) return false;
+
+    int i = s[1]-'0';
+
+    if (s.length() > 2) {
+        if (s.length() > 3 || !std::isdigit(s[2])) return false;
+
+        i = i*10 + (s[2] - '0');
     }
-    return (val >= 1 && val <= maxn);
+
+    return (i > 0) && (i <= maxn);
 }
 
 parser::parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
