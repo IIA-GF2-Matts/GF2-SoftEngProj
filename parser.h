@@ -59,8 +59,13 @@ private:
     void parseOptionSet(Token& tk, name dv);
 
     /// option = key , ":" , value , ";" ;
-    /// value = signalname | number ;
     void parseOption(Token& tk, name dv);
+
+    /// key = identifier ;
+    void parseKey(Token& tk, devlink dvl, Token& keytk);
+
+    /// value = signalname | number ;
+    void parseValue(Token& tk, devlink dvl, Token& keytk);
 
     /// definemonitor = "monitor" , monitorset , ";" ;
     /// monitorset = monitor , { "," , monitor } ;
