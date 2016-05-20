@@ -85,6 +85,9 @@ class network {
   network (names* names_mod);
   /* Called on system initialisation.                                      */
 
+  ~network();
+    /* Frees memory allocated by network                                   */
+
  private:
   devlink devs;          // the list of devices
   devlink lastdev;       // last device in list of devices

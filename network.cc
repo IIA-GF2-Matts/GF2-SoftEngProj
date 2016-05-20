@@ -242,3 +242,45 @@ network::network (names* names_mod)
   devs = NULL;
   lastdev = NULL;
 }
+
+
+/***********************************************************************
+ *
+ * The network destructor.
+ * Frees memory allocated by the network
+ * This frees all devicerec, inputrec and outputrec in the lists
+ * Recursive methods are defined locally to delete the lists.
+ *
+ */
+
+void delInpList(inputrec* inpr) {
+  if (!inpr) return;
+
+  delInpList(inpr->next);
+  delete inpr;
+}
+void delOutpList(outputrec* outpr) {
+  if (!outpr) return;
+
+  delOutpList(outpr->next);
+  delete outpr;
+}
+
+void delDevList(devicerec* dr) {
+  if (!dr) return;
+
+  delDevList(dr->next);
+  dr->next = NULL;
+
+  delInpList(dr->ilist);
+  delOutpList(dr->olist);
+
+  delete dr;
+}
+
+network::~network ()
+{
+  delDevList(devs);
+}
+
+

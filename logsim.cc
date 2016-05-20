@@ -27,7 +27,7 @@ bool MyApp::OnInit()
     MyFrame *frame = new MyFrame(NULL, wxDefaultPosition,  wxSize(800, 600));
 
     frame->Show(true);
-    
+
     if (argc >= 2) {
       frame->openFile(argv[1]);
     }
@@ -53,6 +53,8 @@ bool MyApp::OnInit()
       userint umz(nmz, dmz, mmz);
       umz.userinterface();
     }
+
+    delete(netz);
 
 #endif /* USE_GUI */
 
