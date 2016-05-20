@@ -39,7 +39,7 @@ bool parser::readin() {
     Token tk = _scan.peek();
     parseFile(tk);
 
-    return true;
+    return errs.errors.size() == 0;
 }
 
 void parser::stepAndPeek(Token& tk) {
