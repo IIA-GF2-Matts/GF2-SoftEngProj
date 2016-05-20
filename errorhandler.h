@@ -63,7 +63,7 @@ public:
 };
 
 
-/// Formats a warning message 
+/// Formats a note
 class mattnote : public mattmessage {
 public:
     /// Create a new mattnote, and builds the message.
