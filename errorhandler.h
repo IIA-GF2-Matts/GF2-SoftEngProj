@@ -31,7 +31,7 @@ protected:
     std::string _srcLine;
     int _srcLineErrCol;
 
-    std::string getErrorLine();
+    std::string getErrorLine(int cmax);
 public:
     const SourcePos& pos() const;
     std::string getErrorMessage();

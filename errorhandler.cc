@@ -57,7 +57,9 @@ const SourcePos& mattmessage::pos() const {
 
 
 /// Reads the source file, and gets the line the error occured on.
-std::string mattmessage::getErrorLine() {
+std::string mattmessage::getErrorLine(int cmax) {
+
+    cmax -= 4;
 
     if (!_srcLine.empty()) {
         return _srcLine;
@@ -75,9 +77,9 @@ std::string mattmessage::getErrorLine() {
         int p = _pos.Abs - _pos.Column;
         int c = _pos.Column;
 
-        if (_pos.Column > 150) {
-            p = _pos.Abs - 150;
-            c = 150;
+        if (_pos.Column > cmax) {
+            p = _pos.Abs - cmax;
+            c = cmax;
         }
 
         ifs.clear();
@@ -90,14 +92,15 @@ std::string mattmessage::getErrorLine() {
 
         std::getline(ifs, _srcLine);
 
-        // if (_srcLine.length() > 150) {
-        //     int A = std::max(0, c-75);
-        //     int B = std::min(A+150, int(_srcLine.length()));
-        //     A = std::max(0, B-150);
+        if (_srcLine.length() > cmax) {
+            int A = std::max(0, c - cmax/2);
+            int B = std::min(A+cmax, int(_srcLine.length()));
+            A = std::max(0, B-cmax);
 
-        //     c = c-A;
-        //     _srcLine = _srcLine.substr(A, B-A);
-        // }
+            c = c-A;
+            _srcLine = "... " + _srcLine.substr(A, B-A);
+            c += 4;
+        }
         _srcLineErrCol = c;
     }
     catch (...) {
@@ -198,16 +201,16 @@ mattmessage::mattmessage(std::string message, std::string file, SourcePos pos, M
         oss << message;
     }
 
-    getErrorLine();
+    getErrorLine(cmax);
 
     if (!_srcLine.empty()) {
         oss << "\n" << _srcLine;
     }
 
     if (_srcLineErrCol >= 0) {
-        oss << "\n" << std::setfill('-') << std::setw(_srcLineErrCol) << "^";
+        oss << "\n" << std::setfill(' ') << std::setw(_srcLineErrCol) << "^";
         if (typ == MsgError)
-            oss << "ERROR";
+            oss << " ERROR";
     }
 
     _errorMessage = oss.str();
