@@ -2,6 +2,7 @@
 #define network_h
 
 #include "names.h"
+#include "sourcepos.h"
 
 /* Network specification */
 
@@ -11,18 +12,21 @@ typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 
 struct outputrec {
   name       id;
+  SourcePos  definedAt;
   asignal    sig;
   outputrec* next;
 };
 typedef outputrec* outplink;
 struct inputrec {
   name      id;
+  SourcePos  definedAt;
   outplink  connect;
   inputrec* next;
 };
 typedef inputrec* inplink;
 struct devicerec {
   name id;
+  SourcePos  definedAt;
   inplink ilist;
   outplink olist;
   devicerec* next;
@@ -54,15 +58,15 @@ class network {
     /* Returns link to output of device pointed to by dev with specified   */
     /* name.  Returns NULL if not found.                                    */
 
-  void adddevice (devicekind dkind, name did, devlink& dev);
+  void adddevice (devicekind dkind, name did, devlink& dev, SourcePos at = SourcePos());
     /* Adds a device to the device list with given name and returns a link */
     /* to it via 'dev'.                                                    */
 
-  void addinput (devlink dev, name iid);
+  void addinput (devlink dev, name iid, SourcePos at = SourcePos());
     /* Adds an input to the device pointed to by 'dev' with the specified  */
     /* name.                                                               */
 
-  void addoutput (devlink dev, name oid);
+  void addoutput (devlink dev, name oid, SourcePos at = SourcePos());
     /* Adds an output to the device pointed to by 'dev' with the specified */
     /* name.                                                               */
 

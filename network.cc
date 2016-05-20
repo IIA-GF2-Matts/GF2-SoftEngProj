@@ -1,5 +1,6 @@
 #include <iostream>
 #include "network.h"
+#include "sourcepos.h"
 
 using namespace std;
 
@@ -83,10 +84,11 @@ outplink network::findoutput (devlink dev, name id)
  * to it via 'dev'.
  *
  */
-void network::adddevice (devicekind dkind, name did, devlink& dev)
+void network::adddevice (devicekind dkind, name did, devlink& dev, SourcePos at)
 {
   dev = new devicerec;
   dev->id = did;
+  dev->definedAt = at;
   dev->kind = dkind;
   dev->ilist = NULL;
   dev->olist = NULL;
@@ -114,10 +116,11 @@ void network::adddevice (devicekind dkind, name did, devlink& dev)
  * name.
  *
  */
-void network::addinput (devlink dev, name iid)
+void network::addinput (devlink dev, name iid, SourcePos at)
 {
   inplink i = new inputrec;
   i->id = iid;
+  i->definedAt = at;
   i->connect = NULL;
   i->next = dev->ilist;
   dev->ilist = i;
@@ -130,10 +133,11 @@ void network::addinput (devlink dev, name iid)
  * name.
  *
  */
-void network::addoutput (devlink dev, name oid)
+void network::addoutput (devlink dev, name oid, SourcePos at)
 {
   outplink o = new outputrec;
   o->id = oid;
+  o->definedAt = at;
   o->sig = low;
   o->next = dev->olist;
   dev->olist = o;

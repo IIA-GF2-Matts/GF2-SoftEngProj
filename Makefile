@@ -79,7 +79,7 @@ iposstream.o: iposstream.h sourcepos.h
 scanner.o: scanner.h iposstream.h names.h cistring.h errorhandler.h sourcepos.h
 logsim.o: logsim.h names.h devices.h network.h monitor.h parser.h userint.h
 logsim.o: gui.h
-names.o: names.h cistring.h
+names.o: names.h cistring.h sourcepos.h
 network.o: network.h names.h
 parser.o: parser.h names.h network.h devices.h monitor.h
 monitor.o: monitor.h names.h network.h devices.h
