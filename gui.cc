@@ -6,6 +6,7 @@
 #include "parser.h"
 #include <iostream>
 #include <sstream>
+#include <wx/filedlg.h>
 
 using namespace std;
 
@@ -68,7 +69,13 @@ void MyFrame::OnExit(wxCommandEvent &event)
 void MyFrame::OnOpen(wxCommandEvent &event)
     // Event handler for the File->Open menu item
 {
-    openFile("test.matt");
+    wxFileDialog openFileDialog(this, _("Open Mattlab file"), "", "",
+                   "Mattlab files (*.matt)|*.matt", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+
+    if (openFileDialog.ShowModal() == wxID_CANCEL)
+        return;
+
+    openFile(openFileDialog.GetPath());
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
