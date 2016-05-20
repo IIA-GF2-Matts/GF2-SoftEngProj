@@ -2,11 +2,9 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 
 CXX = $(shell wx-config --version=3.0 --cxx) -DUSE_GUI -std=c++11
 
-SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc guierrorhandler.cc
+SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc guierrorhandler.cc
 
 L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o sourcepos.o guierrordialog.o
-
-G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o cistring.o sourcepos.o
 
 
 # implementation
@@ -16,16 +14,11 @@ G_OBJECTS = guitest.o names.o network.o monitor.o devices.o gui.o cistring.o sou
 .cc.o :
 	$(CXX) -c `wx-config --version=3.0 --cxxflags` -g -o $@ $<
 
-all:    logsim guitest
-
 logsim:	$(L_OBJECTS)
 	$(CXX) -o logsim $(L_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
-guitest: $(G_OBJECTS)
-	 $(CXX) -o guitest $(G_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
-
 clean:
-	rm -f *.o logsim guitest scanner_unittest
+	rm -f *.o logsim scanner_unittest
 
 depend:
 	makedepend $(SRC)
@@ -87,5 +80,4 @@ devices.o: devices.h names.h network.h
 userint.o: userint.h names.h network.h devices.h monitor.h
 gui.o: gui.h names.h devices.h network.h monitor.h guicanvas.cc guicanvas.h guierrordialog.h
 guicanvas.o: guicanvas.h names.h monitor.h
-guitest.o: guitest.h names.h devices.h network.h monitor.h gui.h
 guierrorhandler.o: guierrordialog.h errorhandler.h
