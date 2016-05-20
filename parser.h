@@ -2,6 +2,7 @@
 
 #include <string>
 #include <ostream>
+#include <sstream>
 
 #include "names.h"
 #include "scanner.h"
@@ -73,6 +74,9 @@ private:
 
     // checks whether device and pin are defined
     signal_legality isBadSignal(Signal& sig);
+
+    // get the error message when a signal pin is unknown
+    void getUnknownPinError(Signal& sig, std::ostringstream& oss) ;
 
 public:
     /// Construct a parser to work on the pointers to other classes

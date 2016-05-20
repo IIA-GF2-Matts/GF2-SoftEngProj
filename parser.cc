@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <sstream>
 
 #include "errorhandler.h"
 #include "scanner.h"
@@ -9,21 +10,20 @@
 
 
 bool isLegalGateInputNamestring(namestring s, int maxn) {
-    // Todo: Probably a cleaner way to do this
-    if (s.at(0) != 'I')
-        return false;
-    int val = 0;
-    if (s.length() == 2 && std::isdigit(s.at(1))) {
-        val = s.at(1) - '0';
-    } else if (s.length() == 3
-        && std::isdigit(s.at(1))
-        && std::isdigit(s.at(2))){
-        val = (s.at(1) - '0')*10
-            + (s.at(2) - '0');
-    } else {
-        return false;
+    if (s.length() < 2
+        || s[0] != 'I'
+        || !std::isdigit(s[1])
+        || (s[1] == '0')) return false;
+
+    int i = s[1]-'0';
+
+    if (s.length() > 2) {
+        if (s.length() > 3 || !std::isdigit(s[2])) return false;
+
+        i = i*10 + (s[2] - '0');
     }
-    return (val >= 1 && val <= maxn);
+
+    return (i > 0) && (i <= maxn);
 }
 
 parser::parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
@@ -195,6 +195,23 @@ void parser::parseOptionSet(Token& tk, name dv) {
     stepAndPeek(tk);
 }
 
+void parser::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
+    devicekind dkind = _netz->finddevice(sig.device)->kind;
+
+    oss << *sig.device << " (of type "
+        << *_devz->getname(dkind)
+        << ") ";
+
+    if (sig.pin == blankname) {
+        oss << "has no default output pin.";
+    } else {
+        oss << "has no output pin " << *sig.pin << ".";
+    }
+
+    if (dkind == dtype)
+        oss << " Use Q or Qbar.";
+}
+
 
 // option = key , ":" , value , ";" ;
 void parser::parseOption(Token& tk, name dv) {
@@ -293,23 +310,9 @@ void parser::parseOption(Token& tk, name dv) {
                 throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
             } else {
                 // ILLEGAL_PIN
-                // todo: make this a function to return message, then throw
-                devicekind dkind = _netz->finddevice(sig.device)->kind;
                 std::ostringstream oss;
-
-                    oss << *sig.device << " (of type "
-                        << *_devz->getname(dkind)
-                        << ") ";
-
-                if (sig.pin == blankname) {
-                    oss << "has no default output pin.";
-                } else {
-                    oss << "has no output pin " << *sig.pin << ".";
-                }
-
-                if (dkind == dtype)
-                    oss << " Use Q or Qbar.";
-
+                oss << "Unable to set input pin. ";
+                getUnknownPinError(sig, oss);
                 throw matterror(oss.str(), _scan.getFile(), value.at);
             }
         }
@@ -361,7 +364,10 @@ void parser::parseMonitor(Token& tk) {
             throw matterror("Devices must be defined before being monitored", _scan.getFile(), montk.at);
         } else {
             // ILLEGAL_PIN
-            throw matterror("Unable to monitor unknown pin", _scan.getFile(), montk.at);
+            std::ostringstream oss;
+            oss << "Unable to set monitor point. ";
+            getUnknownPinError(monsig, oss);
+            throw matterror(oss.str(), _scan.getFile(), montk.at);
         }
     }
 

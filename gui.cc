@@ -88,7 +88,7 @@ void MyFrame::OnSpin(wxSpinEvent &event)
   // Event handler for the spin control
 {
   wxString text;
-
+  // Todo: limit at max number of cycles.
   text.Printf("New spinctrl value %d", event.GetPosition());
   canvas->Render(text);
 }
