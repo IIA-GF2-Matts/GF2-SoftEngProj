@@ -59,9 +59,14 @@ void parser::parseFile(Token& tk) {
         catch (matterror& e) {
             errs.report(e);
 
-            // Todo: Can we recover from here?
-            // Keep reading until we see "dev" or "monitor" keywords?
-            break;
+            // Consume tokens until the next statement is reached
+            while (tk.type != TokType::DevKeyword && tk.type != TokType::MonitorKeyword) {
+                if (tk.type == TokType::EndOfFile) {
+                    stepAndPeek(tk);
+                    break;
+                }
+                stepAndPeek(tk);
+            }
         }
     }
 
@@ -186,14 +191,11 @@ void parser::parseOptionSet(Token& tk, name dv) {
                     stepAndPeek(tk);
                     return;
                 }
-
                 stepAndPeek(tk);
             }
-
             stepAndPeek(tk);
         }
     }
-
     stepAndPeek(tk);
 }
 
