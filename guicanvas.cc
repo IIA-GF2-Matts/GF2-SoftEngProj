@@ -1,5 +1,7 @@
 
 
+// Todo: generally tidy up code, it's a mess of initial stuff and many changes.
+
 #include "guicanvas.h"
 #include <GL/glut.h>
 #include "names.h"
@@ -33,6 +35,7 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
 }
 
 void MyGLCanvas::Render(wxString example_text, int cycles)
+  // Todo: don't need example text as arg.
   // Draws canvas contents - the following example writes the string "example text" onto the canvas
   // and draws a signal trace. The trace is artificial if the simulator has not yet been run.
   // When the simulator is run, the number of cycles is passed as a parameter and the first monitor
@@ -60,7 +63,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
 
   int w, h;
   GetClientSize(&w, &h);
-  float dy = 10.0;              // plot lines at +- dx
+  float dy = 12.0;              // plot lines at +- dx
   float plot_height = 4 * dy;   // height allocated 2x plot height
 
   float label_width = 100.0;    // x allowed for labels at start
@@ -98,6 +101,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles)
           number = to_string(i+ cycle_no-cyclesdisplayed);
           for (k=0; k<number.Len(); k++)
             glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, number[k]);
+            // Todo: printing strings should be separate function.
         }
 
       }
@@ -214,6 +218,7 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)
   // Event handler for when the canvas is resized
 {
   init = false;; // this will force the viewport and projection matrices to be reconfigured on the next paint
+  // Todo: Resizing squashes x axis.
 }
 
 void MyGLCanvas::OnMouse(wxMouseEvent& event)
@@ -222,19 +227,24 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   wxString text;
   int w, h;;
   static int last_x, last_y;
+  int selection_x[2];
 
   GetClientSize(&w, &h);
   if (event.ButtonDown()) {
     last_x = event.m_x;
-    last_y = event.m_y;
+    //last_y = event.m_y;
     text.Printf("Mouse button %d pressed at %d %d", event.GetButton(), event.m_x, h-event.m_y);
   }
   if (event.ButtonUp()) text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
   if (event.Dragging()) {
+    if (last_x > event.m_x)
+      click_x = {event.m_x, last_x};
+    else
+      click_x = {last_x, event.m_x};
     // pan_x += event.m_x - last_x;
     // pan_y -= event.m_y - last_y;
-    last_x = event.m_x;
-    last_y = event.m_y;
+    // last_x = event.m_x;
+    // last_y = event.m_y;
     init = false;
     text.Printf("Mouse dragged to %d %d, pan now %d %d", event.m_x, h-event.m_y, pan_x, pan_y);
   }
@@ -250,6 +260,7 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     init = false;
     text.Printf("Positive mouse wheel rotation, pan_y now %d", pan_y);
   }
+  // Todo: limit scrolling based on number of monitors.
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
 }
