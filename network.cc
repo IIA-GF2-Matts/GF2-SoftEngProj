@@ -14,6 +14,29 @@ devlink network::devicelist (void)
   return devs;
 }
 
+/***********************************************************************
+ *
+ * Finds the device that creates the output link ol.
+ *
+ */
+devlink network::findoutputdevice(const outplink ol)
+{
+  devlink d = devs;
+  outplink o;
+
+  while (d != NULL) {
+    o = d->olist;
+
+    while (o != NULL) {
+      if (o == ol) return d;
+      o = o->next;
+    }
+
+    d = d->next;
+  }
+
+  return NULL;
+}
 
 /***********************************************************************
  *
