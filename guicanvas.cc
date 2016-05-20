@@ -34,6 +34,11 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   cycle_no = 0;
 }
 
+void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
+  mmz = mons;
+  nmz = nms;
+}
+
 void MyGLCanvas::Render(wxString example_text, int cycles)
   // Todo: don't need example text as arg.
   // Draws canvas contents - the following example writes the string "example text" onto the canvas
@@ -237,10 +242,14 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   }
   if (event.ButtonUp()) text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
   if (event.Dragging()) {
-    if (last_x > event.m_x)
-      click_x = {event.m_x, last_x};
-    else
-      click_x = {last_x, event.m_x};
+    if (last_x > event.m_x) {
+      selection_x[0] = event.m_x;
+      selection_x[1] = last_x;
+    }
+    else {
+      selection_x[0] = last_x;
+      selection_x[1] = event.m_x;
+    }
     // pan_x += event.m_x - last_x;
     // pan_y -= event.m_y - last_y;
     // last_x = event.m_x;
