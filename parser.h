@@ -3,6 +3,7 @@
 #include <string>
 #include <ostream>
 #include <sstream>
+#include <set>
 
 #include "names.h"
 #include "scanner.h"
@@ -86,6 +87,9 @@ private:
     // get the error message when a key has been previously defined
     template<typename T>
     void getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss);
+
+    // get the error message when a suggested input is required
+    void getClosestMatchError(namestring nm, std::set<cistring> candidates, std::ostringstream& oss);
 
     // checks if keyname is a valid property key of a devlice
     bool isLegalProperty(devlink dl, name keyname);

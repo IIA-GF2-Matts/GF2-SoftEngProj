@@ -1,10 +1,13 @@
 
 #include <iostream>
 #include <sstream>
+#include <set>
+#include <iterator>
 
 #include "errorhandler.h"
 #include "scanner.h"
 #include "names.h"
+#include "autocorrect.h"
 
 #include "parser.h"
 
@@ -226,6 +229,24 @@ void parser::getPredefinedError(devlink dvl, name key, T prevval, std::ostringst
         << prevval << " at position " << dvl->definedAt;
 }
 
+void parser::getClosestMatchError(namestring nm, std::set<cistring> candidates, std::ostringstream& oss) {
+    std::set<cistring> matches;
+    int dist = closestMatches(nm, candidates, matches);
+
+    if (dist < 3 && matches.size() > 0) {
+        std::set<cistring>::iterator i;
+
+        oss << "Did you mean";
+        for (i = matches.begin(); i != std::prev(matches.end()); ++i) {
+            oss << " " << *i;
+        }
+        if (matches.size() > 1)
+            oss << " or";
+        oss << " " << *std::prev(matches.end()) << "?";
+    }
+}
+
+
 
 // option = key , ":" , value , ";" ;
 void parser::parseOption(Token& tk, name dv) {
@@ -287,9 +308,12 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
                 throw matterror("XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", _scan.getFile(), keytk.at);
             break;
         case dtype:
-            if (!(keytk.name == "DATA" || keytk.name == "CLK" || keytk.name == "SET" || keytk.name == "CLEAR"))
-                throw matterror("DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned", _scan.getFile(), keytk.at);
-                // Todo: closest word suggestion
+            if (!(keytk.name == "DATA" || keytk.name == "CLK" || keytk.name == "SET" || keytk.name == "CLEAR")) {
+                std::ostringstream oss;
+                oss << "DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. ";
+                getClosestMatchError(keytk.name, dtypeoutset, oss);
+                throw matterror(oss.str(), _scan.getFile(), keytk.at);
+            }
             break;
         case baddevice:
         default:
