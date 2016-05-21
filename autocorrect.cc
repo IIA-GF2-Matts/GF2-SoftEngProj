@@ -1,57 +1,52 @@
 #include <set>
+#include <set>
+#include <algorithm>
 #include "cistring.h"
 
+#include "autocorrect.h"
 
-int LevenshteinDistance(cistring s, cistring t) {
+
+template<typename T>
+int LevenshteinDistance(const T& s, const T& t, int sE, int tE) {
     // A naive implementation of Levenshtein Distance (Matt Judge)
     // See https://en.wikipedia.org/wiki/Levenshtein_distance
     int dist;
-    int len_s = s.length();
-    int len_t = t.length();
 
     // base case: empty strings
-    if (len_s == 0) return len_t;
-    if (len_t == 0) return len_s;
+    if (sE == 0) return tE;
+    if (tE == 0) return sE;
 
     // test if last characters of the strings match
-    if (s[len_s-1] == t[len_t-1])
-        dist = 0;
-    else
-        dist = 1;
+
+    dist = T::traits_type::ne(s[sE-1], t[tE-1]);
 
     // return minimum of
     // remove char from s
-    int a = LevenshteinDistance(s.substr(0, len_s - 1), t) + 1;
+    int a = LevenshteinDistance<T>(s, t, sE-1, tE) + 1;
     // remove char from t
-    int b = LevenshteinDistance(s, t.substr(0, len_t - 1)) + 1;
+    int b = LevenshteinDistance<T>(s, t, sE, tE-1) + 1;
     // remove char from both
-    int c = LevenshteinDistance(s.substr(0, len_s - 1), t.substr(0, len_t - 1)) + dist;
+    int c = LevenshteinDistance<T>(s, t, sE-1, tE - 1) + dist;
 
-    if (a < b)
-        if (c < a)
-            return c;
-        else
-            return a;
-    else
-        if (c < b)
-            return c;
-        return b;
+    // Return minumum of a, b, c
+    return std::min({a, b, c});
 }
 
-// Todo: ensure case insensitive
-int closestMatches(cistring s, const std::set<cistring> &candidates, std::set<cistring> &matches) {
+template<typename T>
+int closestMatchesT(T s, const std::set<T> &candidates, std::list<T> &matches) {
     // gets closest matches, returns distance
     int dist = 9999; // expecting 1 - 4
     int d;
 
-    for (std::set<cistring>::iterator i = candidates.begin(); i != candidates.end(); ++i) {
-        d = LevenshteinDistance(s, *i);
+    int sL = s.length();
+    for (const auto i : candidates) {
+        d = LevenshteinDistance<T>(s, i, sL, i.length());
         if (d < dist) {
             dist = d;
             matches.clear();
-            matches.insert(*i);
+            matches.push_back(i);
         } else if (d == dist) {
-            matches.insert(*i);            
+            matches.push_back(i);
         }
     }
     return dist;

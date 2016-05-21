@@ -15,7 +15,7 @@
 
 bool isLegalGateInputNamestring(namestring s, int maxn) {
     if (s.length() < 2
-        || std::toupper(s[0]) != 'I'
+        || namestring::traits_type::ne(s[0], 'I')
         || !std::isdigit(s[1])
         || (s[1] == '0')) return false;
 
@@ -234,14 +234,14 @@ void parser::getPredefinedError(devlink dvl, name key, T prevval, std::ostringst
 }
 
 void parser::getClosestMatchError(namestring nm, std::set<cistring> candidates, std::ostringstream& oss) {
-    std::set<cistring> matches;
+    std::list<cistring> matches;
     int dist = closestMatches(nm, candidates, matches);
 
     if (dist < 3 && matches.size() > 0) {
-        std::set<cistring>::iterator i;
+        auto i = matches.begin();
 
         oss << "Did you mean";
-        for (i = matches.begin(); i != std::prev(matches.end()); ++i) {
+        for (; i != std::prev(matches.end()); ++i) {
             oss << " " << *i;
         }
         if (matches.size() > 1)
