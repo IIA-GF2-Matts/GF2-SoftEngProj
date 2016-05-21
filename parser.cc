@@ -45,6 +45,10 @@ bool parser::readin() {
 
     _netz->checknetwork(errs);
 
+    std::cout << "File parsed with "
+            << errs.errCount() << " errors and "
+            << errs.warnCount() << " warnings." << std::endl;
+
     return errs.errCount() == 0;
 }
 
@@ -75,12 +79,6 @@ void parser::parseFile(Token& tk) {
             }
         }
     }
-
-    // TODO: Check for errors after parsing.
-
-    std::cout << "File parsed with "
-            << errs.errCount() << " errors and "
-            << errs.warnCount() << " warnings." << std::endl;
 }
 
 
