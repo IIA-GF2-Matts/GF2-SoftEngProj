@@ -1,6 +1,8 @@
 #include <iostream>
+#include <sstream>
 #include "network.h"
 #include "sourcepos.h"
+#include "errorhandler.h"
 
 using namespace std;
 
@@ -207,8 +209,17 @@ void network::checknetwork (bool& ok)
     if (d->kind == aswitch) {
       if (d->swstate == floating) {
         // Todo: Improve Error message
-        throw matterror("Unconnected input: " + nmz->namestr(d->id) + ".InitialValue",
-          "", d->definedAt);
+        std::ostringstream oss;
+        oss << "Unconnected input: " << nmz->namestr(d->id) << ".InitialValue";
+        std::cout << matterror(oss.str(), "", d->definedAt).what() << std::endl;
+      }
+    }
+    else if (d->kind == aclock) {
+      if (d->frequency == 0) {
+        // Todo: Improve Error message
+        std::ostringstream oss;
+        oss << "Unconnected input: " << nmz->namestr(d->id) << ".Period";
+        std::cout << matterror(oss.str(), "", d->definedAt).what() << std::endl;
       }
     }
     else {
@@ -220,7 +231,7 @@ void network::checknetwork (bool& ok)
           if (i->id != blankname)
             oss << "." << nmz->namestr(i->id);
 
-          throw matterror(oss.str(), "", d->definedAt);
+          std::cout << matterror(oss.str(), "", d->definedAt).what() << std::endl;
         }
       }
     }
