@@ -41,7 +41,7 @@ int LevenshteinDistance(cistring s, cistring t) {
 
 int closestMatches(cistring s, const std::set<cistring> &candidates, std::set<cistring> &matches) {
     // gets closest matches, returns distance
-    int dist = 9999;
+    int dist = 9999; // expecting 1 - 4
     int d;
 
     for (std::set<cistring>::iterator i = candidates.begin(); i != candidates.end(); ++i) {
