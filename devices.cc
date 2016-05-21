@@ -1,6 +1,7 @@
 #include "devices.h"
 #include <iostream>
 #include <string>
+#include "names.h"
 
 using namespace std;
 
@@ -31,24 +32,19 @@ void devices::showdevice (devlink d)
 {
   inplink  i;
   outplink o;
-  cout << "   Device: ";
-  nmz->writename (d->id);
+  cout << "   Device: " << nmz->namestr(d->id);
   cout << "  Kind: ";
   writedevice (d->kind);
   cout << endl;
   cout << "   Inputs:" << endl;
   for (i = d->ilist; i != NULL; i = i->next) {
-    cout << "      ";
-    nmz->writename (i->id);
-    cout << " ";
+    cout << "      " << nmz->namestr(i->id) << " ";
     outsig (i->connect->sig);
     cout << endl;
   }
   cout << "   Outputs:";
   for (o = d->olist; o != NULL; o = o->next) {
-    cout << "      ";
-    nmz->writename (o->id);
-    cout << " ";
+    cout << "      " << nmz->namestr(o->id) << " ";
     outsig (o->sig);
     cout << endl;
   }
@@ -460,7 +456,7 @@ name devices::getname (devicekind k) const
  */
 void devices::writedevice (devicekind k)
 {
-  nmz->writename (dtab[k]);
+  std::cout << nmz->namestr(dtab[k]);
 }
 
 

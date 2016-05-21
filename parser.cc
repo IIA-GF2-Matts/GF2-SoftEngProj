@@ -4,6 +4,7 @@
 
 #include "errorhandler.h"
 #include "scanner.h"
+#include "names.h"
 
 #include "parser.h"
 
@@ -135,8 +136,7 @@ void parser::parseDefineDevice(Token& tk) {
 
         // Debug
         /*
-        std::cout << "made device ";
-        _nms->writename(dv);
+        std::cout << "made device " << _nms-namestr(dv);
         std::cout << " regtype ";
         _devz->writedevice(_netz->finddevice(dv)->kind);
         //_devz->writedevice(_devz->devkind(dv));
@@ -327,7 +327,7 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
                 devlink dl = _netz->findoutputdevice(ol);
                 if (dl == NULL)
                     throw matterror("Should never reach here. Call Tim.", _scan.getFile(), keytk.at);
-                
+
                 prevval << *dl->id;
 
                 if (ol->id != blankname)
@@ -418,7 +418,7 @@ void parser::assignProperty(devlink dvl, Token keytk, Token valuetk) {
 
         asignal sig = valuetk.number ? high : low;
         _devz->setswitch(dvl->id, sig, success, keytk.at);
-        
+
         if (!success)
             throw matterror("Could not set switch initial value", _scan.getFile(), valuetk.at);
 
@@ -432,7 +432,7 @@ void parser::assignProperty(devlink dvl, Token keytk, Token valuetk) {
 
         if (!success)
             throw matterror("Could not set clock period", _scan.getFile(), valuetk.at);
-    } 
+    }
 }
 
 /*
@@ -448,7 +448,7 @@ void parser::assignProperty(devlink dvl, Token keytk, Token valuetk) {
         bool success = false;
         asignal sig = valuetk.number ? high : low;
         _devz->setswitch(dvl->id, sig, success, keytk.at);
-        
+
         if (!success)
             throw matterror("Could not set switch initial value", _scan.getFile(), valuetk.at);
 
