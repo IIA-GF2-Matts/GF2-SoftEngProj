@@ -18,6 +18,13 @@ enum MessageType {
     MsgInfo
 };
 
+enum ErrorType {
+    ErrGeneral,
+    ErrSyntax,
+    ErrSemantic,
+    ErrRuntime
+};
+
 /// Formats messages for the user from the parser/scanner.
 class mattmessage : public std::exception {
 protected:
@@ -27,6 +34,7 @@ protected:
     std::string _fname;
     SourcePos _pos;
     MessageType _type;
+    ErrorType _etype;
     std::string _srcLine;
     int _srcLineErrCol;
 
@@ -35,6 +43,7 @@ public:
     const SourcePos& pos() const;
     std::string getErrorMessage();
     MessageType getType() const;
+    ErrorType getErrType() const;
     bool is(MessageType t) const;
 
     /// Returns the complete error message for printing.
@@ -43,6 +52,7 @@ public:
     /// Create a new mattmessage, and builds the message.
     mattmessage(std::string message, SourcePos pos);
     mattmessage(std::string message, SourcePos pos, MessageType type);
+    mattmessage(std::string message, SourcePos pos, MessageType type, ErrorType etype);
 };
 
 
@@ -51,6 +61,30 @@ class matterror : public mattmessage {
 public:
     /// Create a new matterror, and builds the message.
     matterror(std::string message, SourcePos pos);
+};
+
+
+/// Specific exception type for Matt syntax errors
+class mattsyntaxerror : public mattmessage {
+public:
+    /// Create a new mattsyntaxerror, and builds the message.
+    mattsyntaxerror(std::string message, SourcePos pos);
+};
+
+
+/// Specific exception type for Matt semantic errors
+class mattsemanticerror : public mattmessage {
+public:
+    /// Create a new mattsemanticerror, and builds the message.
+    mattsemanticerror(std::string message, SourcePos pos);
+};
+
+
+/// Specific exception type for Matt runtime errors
+class mattruntimeerror : public mattmessage {
+public:
+    /// Create a new mattruntimeerror, and builds the message.
+    mattruntimeerror(std::string message, SourcePos pos);
 };
 
 

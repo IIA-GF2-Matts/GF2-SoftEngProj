@@ -139,14 +139,23 @@ mattmessage::mattmessage(std::string message, SourcePos pos)
 }
 
 
+/// Create a new mattmessage, and builds the message.
 mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ)
-    : _message(message), _pos(pos), _type(typ) {
+        : mattmessage(message, pos, typ, ErrGeneral) {
+}
+
+
+mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ, ErrorType etyp)
+    : _message(message), _pos(pos), _type(typ), _etype(etyp) {
     std::ostringstream oss;
 
     int cmax = 73;
 
     static const std::string mpTypStr[4] = {
         "Error", "Warning", "Note", "Info"
+    };
+    static const std::string mpETypStr[4] = {
+        "Error", "SyntaxError", "SemanticError", "RuntimeError"
     };
 
     auto cls = oss.tellp();
@@ -171,7 +180,13 @@ mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ)
 
     oss << "(" << pos.Line << ":" << pos.Column << "): ";
     int p = oss.tellp() - cls;
-    oss << mpTypStr[typ] << ": ";
+
+    if (typ == MsgError)
+        oss << mpETypStr[etyp];
+    else
+        oss << mpTypStr[typ];
+
+    oss << ": ";
     int x = oss.tellp() - cls;
 
     if ((message.length() + x > cmax)
@@ -225,6 +240,27 @@ mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ)
 
 matterror::matterror(std::string message, SourcePos pos)
         : mattmessage(message, pos, MsgError) {
+}
+
+
+// class mattsyntaxerror
+
+mattsyntaxerror::mattsyntaxerror(std::string message, SourcePos pos)
+        : mattmessage(message, pos, MsgError, ErrSyntax) {
+}
+
+
+// class mattsemanticerror
+
+mattsemanticerror::mattsemanticerror(std::string message, SourcePos pos)
+        : mattmessage(message, pos, MsgError, ErrSemantic) {
+}
+
+
+// class mattruntimeerror
+
+mattruntimeerror::mattruntimeerror(std::string message, SourcePos pos)
+        : mattmessage(message, pos, MsgError, ErrRuntime) {
 }
 
 
