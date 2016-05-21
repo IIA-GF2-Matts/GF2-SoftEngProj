@@ -1,6 +1,6 @@
 
-#ifndef names_h
-#define names_h
+#ifndef GF2_NAMES_H
+#define GF2_NAMES_H
 
 #include <set>
 
@@ -13,10 +13,16 @@ typedef std::set<namestring>::const_iterator name;
 extern const name blankname;       /* special name (defaults to end iterator)*/
 extern const namestring blanknamestr;
 
+/// Names Table Class
+/// Stores the names using the STL `std::set` container.
+/// The type stored is `cistring`, which is a case-insensitive variant on `std::string`.
+/// Name IDs are in fact `const_iterator`s to items in the set, it's worth noting that
+///   the standard enforces that changes to the set won't change an items iterator.
+/// `blankname` is a special case, stored as the `end()` iterator of the set. This
+///   cannot be dereferenced or used like the other iterators.
 class names{
-
+private:
   std::set<namestring> _nameSet;
-
 
 public:
   name lookup (namestring str);
@@ -41,4 +47,4 @@ public:
     /* are used.                                                           */
 };
 
-#endif /* names_h */
+#endif /* GF2_NAMES_H */
