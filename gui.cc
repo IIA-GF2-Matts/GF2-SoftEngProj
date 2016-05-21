@@ -175,7 +175,7 @@ void MyFrame::openFile(wxString file) {
         initNetwork();
     }
 
-    fscanner scan;
+    fscanner scan(nmz);
     scan.open(std::string(file.mb_str()));
 
     parser pmz(netz, dmz, mmz, scan, nmz);

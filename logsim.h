@@ -34,7 +34,7 @@ class MyApp {
   network *netz; // pointer to the network class
   devices *dmz;  // pointer to the devices class
   monitor *mmz;  // pointer to the monitor class
-  fscanner smz;  // The scanner class
+  fscanner *smz;  // The scanner class
   parser *pmz;   // pointer to the parser class
 };
 

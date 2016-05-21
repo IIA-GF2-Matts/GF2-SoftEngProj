@@ -31,8 +31,8 @@ Token::Token(TokType t)
     : at(), type(t) {
 }
 
-Token::Token(TokType t, namestring s)
-    : at(), type(t), name(s) {
+Token::Token(TokType t, name s)
+    : at(), type(t), id(s) {
 }
 
 Token::Token(TokType t, int num)
@@ -141,21 +141,22 @@ Token scanner::readNext() {
             }
             else if (std::isalpha(c)) {
                 ret.type = TokType::Identifier;
-                ret.name = readName(c);
+                ret.id = readName(c);
 
                 // Note: namestring is cistring, so comparison here is
                 // case-insensitive
-                if (ret.name == "dev") {
+                // Todo: Use name table comparison not strings.
+                if (*ret.id == "dev") {
                     ret.type = TokType::DevKeyword;
                 }
-                else if (ret.name == "monitor") {
+                else if (*ret.id == "monitor") {
                     ret.type = TokType::MonitorKeyword;
                 }
-                else if (ret.name == "as") {
+                else if (*ret.id == "as") {
                     ret.type = TokType::AsKeyword;
                 }
                 else { // Check for device types
-                    auto it = deviceTypes.find(ret.name);
+                    auto it = deviceTypes.find(*ret.id);
                     if (it != deviceTypes.end()) {
                 	   ret.type = TokType::DeviceType;
                        ret.devtype = it->second;
@@ -188,7 +189,7 @@ Token scanner::readNext() {
 }
 
 
-namestring scanner::readName(int c1) {
+name scanner::readName(int c1) {
     std::basic_ostringstream<char, ci_char_traits> oss;
     oss << char(c1);
 
@@ -196,7 +197,7 @@ namestring scanner::readName(int c1) {
         oss << char(_ips.get());
     }
 
-    return oss.str();
+    return _nmz->lookup(oss.str());
 }
 
 
@@ -221,8 +222,8 @@ int scanner::readNumber(int c1) {
 }
 
 
-scanner::scanner()
-        : _open(false) {
+scanner::scanner(names* nmz)
+        : _open(false), _nmz(nmz) {
 }
 
 
@@ -259,7 +260,7 @@ std::string scanner::getFile() const {
 
 // class fscanner
 
-fscanner::fscanner() : scanner() {
+fscanner::fscanner(names* nmz) : scanner(nmz) {
 }
 
 void fscanner::open(std::string fname) {
@@ -271,8 +272,8 @@ void fscanner::open(std::string fname) {
 
 // class strscanner
 
-strscanner::strscanner(std::string str)
-        : scanner(), _iss(std::ifstream::in | std::ifstream::binary) {
+strscanner::strscanner(names* nmz, std::string str)
+        : scanner(nmz), _iss(std::ifstream::in | std::ifstream::binary) {
 
     _iss.str(str);
     scanner::open(&_iss, "");

@@ -30,7 +30,7 @@ bool isLegalGateInputNamestring(namestring s, int maxn) {
     return (i > 0) && (i <= maxn);
 }
 
-parser::parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
+parser::parser(network* netz, devices* devz, monitor* mons, scanner* scan, names* nms)
     : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms) {
         //_devz->debug(true);
 }
@@ -40,17 +40,21 @@ parser::~parser() {
 
 
 bool parser::readin() {
-    Token tk = _scan.peek();
+    Token tk = _scan->peek();
     parseFile(tk);
 
     _netz->checknetwork(errs);
+
+    std::cout << "File parsed with "
+            << errs.errCount() << " errors and "
+            << errs.warnCount() << " warnings." << std::endl;
 
     return errs.errCount() == 0;
 }
 
 void parser::stepAndPeek(Token& tk) {
-    _scan.step();
-    tk = _scan.peek();
+    _scan->step();
+    tk = _scan->peek();
 }
 
 
@@ -75,12 +79,6 @@ void parser::parseFile(Token& tk) {
             }
         }
     }
-
-    // TODO: Check for errors after parsing.
-
-    std::cout << "File parsed with "
-            << errs.errCount() << " errors and "
-            << errs.warnCount() << " warnings." << std::endl;
 }
 
 
@@ -115,13 +113,12 @@ void parser::parseDefineDevice(Token& tk) {
     // device types are handled by the scanner and made DeviceTypes
 
     nameToken = tk;
-    name dv = _nms->lookup(nameToken.name);
 
     stepAndPeek(tk);
 
     if (tk.type == TokType::Equals) {
         // Semantic check: has devicename been defined before?
-        if (_netz->finddevice(dv) != NULL) {
+        if (_netz->finddevice(nameToken.id) != NULL) {
             throw mattsemanticerror("Device types may not be assigned to devices that already exist.", tk.at);
         }
 
@@ -132,23 +129,23 @@ void parser::parseDefineDevice(Token& tk) {
             oss << "Expected device type. ";
             // Todo: Alternative if number?
             if (tk.type == TokType::Identifier)
-                getClosestMatchError(tk.name, devicesset, oss);
+                getClosestMatchError(*tk.id, devicesset, oss);
             throw mattsyntaxerror(oss.str(), tk.at);
         }
         // make device (which adds it to the network)
         bool success;
         if (tk.devtype == aswitch)
             // -1 sets switch to floating
-            _devz->makedevice(tk.devtype, dv, -1, success, nameToken.at);
+            _devz->makedevice(tk.devtype, nameToken.id, -1, success, nameToken.at);
         else
-            _devz->makedevice(tk.devtype, dv, 0, success, nameToken.at);
+            _devz->makedevice(tk.devtype, nameToken.id, 0, success, nameToken.at);
 
         // Debug
         /*
-        std::cout << "made device " << _nms-namestr(dv);
+        std::cout << "made device " << _nms-namestr(nameToken.id);
         std::cout << " regtype ";
-        _devz->writedevice(_netz->finddevice(dv)->kind);
-        //_devz->writedevice(_devz->devkind(dv));
+        _devz->writedevice(_netz->finddevice(nameToken.id)->kind);
+        //_devz->writedevice(_devz->devkind(nameToken.id));
         cout << std::endl;
         */
         if (!success) {
@@ -159,7 +156,7 @@ void parser::parseDefineDevice(Token& tk) {
         stepAndPeek(tk);
     }
 
-    parseData(tk, dv);
+    parseData(tk, nameToken.id);
 }
 
 
@@ -208,16 +205,16 @@ void parser::parseOptionSet(Token& tk, name dv) {
 }
 
 void parser::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
-    devicekind dkind = _netz->finddevice(sig.device)->kind;
+    devicekind dkind = _netz->finddevice(sig.device.id)->kind;
 
-    oss << *sig.device << " (of type "
+    oss << *sig.device.id << " (of type "
         << *_devz->getname(dkind)
         << ") ";
 
-    if (sig.pin == blankname) {
+    if (sig.pin.id == blankname) {
         oss << "has no default output pin.";
     } else {
-        oss << "has no output pin " << *sig.pin << ".";
+        oss << "has no output pin " << *sig.pin.id << ".";
     }
 
     if (dkind == dtype)
@@ -279,43 +276,43 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
     }
 
     keytk = tk;
-    name keyname = _nms->lookup(keytk.name);
 
     switch(dvl->kind) {
         // Todo: quality check errors
         case aswitch:
-            if (keytk.name != "InitialValue")
+            if (*keytk.id != "InitialValue")
                 throw mattsemanticerror("Switches may only have an `InitialValue` attribute.", keytk.at);
             break;
         case aclock:
-            if (keytk.name != "Period")
+            if (*keytk.id != "Period")
                 throw mattsemanticerror("Clocks may only have a `Period` attribute.", keytk.at);
             break;
         case andgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(*keytk.id, 16))
                 throw mattsemanticerror("AND gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case nandgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(*keytk.id, 16))
                 throw mattsemanticerror("NAND gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case orgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(*keytk.id, 16))
                 throw mattsemanticerror("OR gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case norgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(*keytk.id, 16))
                 throw mattsemanticerror("NOR gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case xorgate:
-            if (!isLegalGateInputNamestring(keytk.name, 2))
+            if (!isLegalGateInputNamestring(*keytk.id, 2))
                 throw mattsemanticerror("XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", keytk.at);
             break;
         case dtype:
-            if (!(keytk.name == "DATA" || keytk.name == "CLK" || keytk.name == "SET" || keytk.name == "CLEAR")) {
+            // Todo: Name table comparison rather than string comparison
+            if (!(*keytk.id == "DATA" || *keytk.id == "CLK" || *keytk.id == "SET" || *keytk.id == "CLEAR")) {
                 std::ostringstream oss;
                 oss << "DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. ";
-                getClosestMatchError(keytk.name, dtypeoutset, oss);
+                getClosestMatchError(*keytk.id, dtypeoutset, oss);
                 throw mattsemanticerror(oss.str(), keytk.at);
             }
             break;
@@ -332,14 +329,14 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
         case aswitch:
             if (dvl->swstate != floating) {
                 std::ostringstream oss;
-                getPredefinedError(dvl, keyname, dvl->swstate == high ? 1 : 0, oss);
+                getPredefinedError(dvl, keytk.id, dvl->swstate == high ? 1 : 0, oss);
                 throw mattsemanticerror(oss.str(), keytk.at);
             }
             break;
         case aclock:
             if (dvl->frequency != 0) {
                 std::ostringstream oss;
-                getPredefinedError(dvl, keyname, dvl->frequency, oss);
+                getPredefinedError(dvl, keytk.id, dvl->frequency, oss);
                 throw mattsemanticerror(oss.str(), keytk.at);
             }
             break;
@@ -350,7 +347,7 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
         case xorgate:
         case dtype:
         default: {
-            inplink il = _netz->findinput(dvl, keyname);
+            inplink il = _netz->findinput(dvl, keytk.id);
             if (il != NULL && (il->connect != NULL)) {
                 std::ostringstream oss, prevval;
                 outplink ol = il->connect;
@@ -363,7 +360,7 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
 
                 if (ol->id != blankname)
                     prevval << *ol->id;
-                getPredefinedError(dvl, keyname, prevval.str(), oss);
+                getPredefinedError(dvl, keytk.id, prevval.str(), oss);
                 throw mattsemanticerror(oss.str(), keytk.at);
             }
             break;
@@ -382,13 +379,12 @@ bool parser::isLegalProperty(devlink dvl, name keyname) {
 // value = signalname | number ;
 void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
     Token valuetk = tk;
-    name keyname = _nms->lookup(keytk.name);
 
     if (valuetk.type == TokType::Identifier) {
         // a signal
         Signal sig = parseSignalName(tk);
 
-        if (isLegalProperty(dvl, keyname)) {
+        if (isLegalProperty(dvl, keytk.id)) {
             throw mattsemanticerror("Attempt to assign a signal to a property", valuetk.at);
         }
 
@@ -396,7 +392,7 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
     } else if (valuetk.type == TokType::Number) {
         stepAndPeek(tk);
 
-        if (isLegalProperty(dvl, keyname)) {
+        if (isLegalProperty(dvl, keytk.id)) {
             assignProperty(dvl, keytk, valuetk);
         }
         else {
@@ -404,7 +400,9 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
                 // Todo: improve error message
                 throw mattsyntaxerror("Invalid signal.", valuetk.at);
             Signal sig;
-            sig.device = _nms->lookup(valuetk.number  ? "1" : "0");
+            sig.device = valuetk;
+            sig.device.type = TokType::Identifier;
+            sig.device.id = _nms->lookup(valuetk.number  ? "1" : "0");
             assignPin(dvl, keytk, valuetk, sig);
         }
     } else {
@@ -413,7 +411,6 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
 }
 
 void parser::assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig) {
-    name keyname = _nms->lookup(keytk.name);
     // Ensure signal exists
     signal_legality badSignal = isBadSignal(sig);
     if (badSignal) {
@@ -430,11 +427,11 @@ void parser::assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig) {
 
     // connect the gate
     bool success = false;
-    if (!_netz->findinput(dvl, keyname))
-        _netz->addinput(dvl, keyname, keytk.at);
+    if (!_netz->findinput(dvl, keytk.id))
+        _netz->addinput(dvl, keytk.id, keytk.at);
 
     // todo: store token position?
-    _netz->makeconnection(dvl->id, keyname, sig.device, sig.pin, success);
+    _netz->makeconnection(dvl->id, keytk.id, sig.device.id, sig.pin.id, success);
     if (!success)
         // Todo: improve error message
         throw mattruntimeerror("Could not make connection", keytk.at);
@@ -518,17 +515,17 @@ void parser::parseMonitor(Token& tk) {
     }
 
     bool success = false;
-    _mons->makemonitor(monsig.device, monsig.pin, success, alisig.device, alisig.pin);
+    _mons->makemonitor(monsig.device.id, monsig.pin.id, success, alisig.device.id, alisig.pin.id);
     if (!success)
         // Todo: improve error message
         throw mattruntimeerror("Could not make monitor", tk.at);
 }
 
 parser::signal_legality parser::isBadSignal(Signal& sig) {
-    devlink dvlnk = _netz->finddevice(sig.device);
+    devlink dvlnk = _netz->finddevice(sig.device.id);
     if (dvlnk == NULL)
         return ILLEGAL_DEVICE;
-    if (_netz->findoutput(dvlnk, sig.pin) == NULL)
+    if (_netz->findoutput(dvlnk, sig.pin.id) == NULL)
         return ILLEGAL_PIN;
     return LEGAL_SIGNAL;
 }
@@ -537,15 +534,12 @@ parser::signal_legality parser::isBadSignal(Signal& sig) {
 Signal parser::parseSignalName(Token& tk) {
 
     Signal ret;
-    ret.device = blankname;
-    ret.pin = blankname;
 
     if (tk.type != TokType::Identifier) {
         throw mattsyntaxerror("Expected a signal name.", tk.at);
     }
 
-    // Todo: handle 0 or 1 connections
-    ret.device = _nms->lookup(tk.name);
+    ret.device = tk;
 
     stepAndPeek(tk);
 
@@ -556,7 +550,7 @@ Signal parser::parseSignalName(Token& tk) {
             throw mattsyntaxerror("Expected a pin name.", tk.at);
         }
 
-        ret.pin = _nms->lookup(tk.name);
+        ret.pin = tk;
         // Todo: ensure pin is acceptable identifier
         stepAndPeek(tk);
     }
