@@ -1,5 +1,5 @@
 #ifndef userint_h
-#define userint_h 
+#define userint_h
 
 #include "names.h"
 #include "network.h"
@@ -16,7 +16,7 @@ const int maxline = 80;     // Maximum length of the command line.
 
 class userint {
   names* nmz;              // Modules declared elsewhere
-  devices* dmz;            // and shared with other parts 
+  devices* dmz;            // and shared with other parts
   monitor* mmz;            // of the program.
 
   bool cmdok;              // Has the attempt to parse the
@@ -33,7 +33,6 @@ class userint {
   void skip (void);
   void rdcmd (char& cmd, charset valid);
   void rdnumber (int& n, int lo, int hi);
-  void rdstring (namestring& n);
   void rdname (name& n);
   void rdqualname (name& prefix, name& suffix);
   void setswcmd (void);
