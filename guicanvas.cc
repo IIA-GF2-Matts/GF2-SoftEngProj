@@ -153,25 +153,26 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   } else { // draw title screen
     // Todo: redesign title screen.
 
-    glBegin(GL_LINE_STRIP);
-    for (i=0; i<10; i++) {
-      if (i%2) y = h/2 + 40 - dy;
-      else y = h/2 + 40 + dy;
-      glVertex2f(20*i+label_width, y);
-      glVertex2f(20*i+20.0 + label_width, y);
-    }
-    glEnd();
+    // Example plot
+    // glBegin(GL_LINE_STRIP);
+    // for (i=0; i<10; i++) {
+    //   if (i%2) y = h/2 + 40 - dy;
+    //   else y = h/2 + 40 + dy;
+    //   glVertex2f(20*i+label_width, y);
+    //   glVertex2f(20*i+20.0 + label_width, y);
+    // }
+    // glEnd();
     mon_name_text = "Welcome to MattLab Logic Simulator";
     glColor3f(0.0, 1.0, 0.0);
-    drawText(mon_name_text, w/4, h/2, GLUT_BITMAP_HELVETICA_18);
+    drawText(mon_name_text, label_width/2, h-plot_height, GLUT_BITMAP_HELVETICA_18);
 
     string logo =
-      "    _[]_[]_[]_[]_[]_[]_[]_[]_  \n"
-      "   |                         | \n"
-      "    )     M A T T L A B      | \n"
-      "   |                         | \n"
-      "    `[]`[]`[]`[]`[]`[]`[]`[]`  ";
-    drawText(logo, w/4, h/2-40, GLUT_BITMAP_9_BY_15);
+      " _[]_[]_[]_[]_[]_[]_[]_[]_  \n"
+      "|                         | \n"
+      " )     M A T T L A B      | \n"
+      "|                         | \n"
+      " `[]`[]`[]`[]`[]`[]`[]`[]`  ";
+    drawText(logo, label_width/2, h-2*plot_height, GLUT_BITMAP_9_BY_15);
     // }
 
   }
