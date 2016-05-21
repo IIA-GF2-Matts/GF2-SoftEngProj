@@ -53,7 +53,7 @@ class Token
 public:
     SourcePos at; ///< The location of the start of the token in the character stream
     TokType type; ///< The type of the token
-    namestring name; ///< If type == TokType::Identifier, this is the string name
+    namestring id; ///< If type == TokType::Identifier, this is the string name
     int number; ///< If type == TokType::Number, this is the integer value.
     devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
 

@@ -115,7 +115,7 @@ void parser::parseDefineDevice(Token& tk) {
     // device types are handled by the scanner and made DeviceTypes
 
     nameToken = tk;
-    name dv = _nms->lookup(nameToken.name);
+    name dv = _nms->lookup(nameToken.id);
 
     stepAndPeek(tk);
 
@@ -132,7 +132,7 @@ void parser::parseDefineDevice(Token& tk) {
             oss << "Expected device type. ";
             // Todo: Alternative if number?
             if (tk.type == TokType::Identifier)
-                getClosestMatchError(tk.name, devicesset, oss);
+                getClosestMatchError(tk.id, devicesset, oss);
             throw mattsyntaxerror(oss.str(), tk.at);
         }
         // make device (which adds it to the network)
@@ -279,43 +279,43 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
     }
 
     keytk = tk;
-    name keyname = _nms->lookup(keytk.name);
+    name keyname = _nms->lookup(keytk.id);
 
     switch(dvl->kind) {
         // Todo: quality check errors
         case aswitch:
-            if (keytk.name != "InitialValue")
+            if (keytk.id != "InitialValue")
                 throw mattsemanticerror("Switches may only have an `InitialValue` attribute.", keytk.at);
             break;
         case aclock:
-            if (keytk.name != "Period")
+            if (keytk.id != "Period")
                 throw mattsemanticerror("Clocks may only have a `Period` attribute.", keytk.at);
             break;
         case andgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(keytk.id, 16))
                 throw mattsemanticerror("AND gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case nandgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(keytk.id, 16))
                 throw mattsemanticerror("NAND gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case orgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(keytk.id, 16))
                 throw mattsemanticerror("OR gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case norgate:
-            if (!isLegalGateInputNamestring(keytk.name, 16))
+            if (!isLegalGateInputNamestring(keytk.id, 16))
                 throw mattsemanticerror("NOR gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case xorgate:
-            if (!isLegalGateInputNamestring(keytk.name, 2))
+            if (!isLegalGateInputNamestring(keytk.id, 2))
                 throw mattsemanticerror("XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", keytk.at);
             break;
         case dtype:
-            if (!(keytk.name == "DATA" || keytk.name == "CLK" || keytk.name == "SET" || keytk.name == "CLEAR")) {
+            if (!(keytk.id == "DATA" || keytk.id == "CLK" || keytk.id == "SET" || keytk.id == "CLEAR")) {
                 std::ostringstream oss;
                 oss << "DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. ";
-                getClosestMatchError(keytk.name, dtypeoutset, oss);
+                getClosestMatchError(keytk.id, dtypeoutset, oss);
                 throw mattsemanticerror(oss.str(), keytk.at);
             }
             break;
@@ -382,7 +382,7 @@ bool parser::isLegalProperty(devlink dvl, name keyname) {
 // value = signalname | number ;
 void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
     Token valuetk = tk;
-    name keyname = _nms->lookup(keytk.name);
+    name keyname = _nms->lookup(keytk.id);
 
     if (valuetk.type == TokType::Identifier) {
         // a signal
@@ -413,7 +413,7 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
 }
 
 void parser::assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig) {
-    name keyname = _nms->lookup(keytk.name);
+    name keyname = _nms->lookup(keytk.id);
     // Ensure signal exists
     signal_legality badSignal = isBadSignal(sig);
     if (badSignal) {
@@ -545,7 +545,7 @@ Signal parser::parseSignalName(Token& tk) {
     }
 
     // Todo: handle 0 or 1 connections
-    ret.device = _nms->lookup(tk.name);
+    ret.device = _nms->lookup(tk.id);
 
     stepAndPeek(tk);
 
@@ -556,7 +556,7 @@ Signal parser::parseSignalName(Token& tk) {
             throw mattsyntaxerror("Expected a pin name.", tk.at);
         }
 
-        ret.pin = _nms->lookup(tk.name);
+        ret.pin = _nms->lookup(tk.id);
         // Todo: ensure pin is acceptable identifier
         stepAndPeek(tk);
     }

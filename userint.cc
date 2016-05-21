@@ -115,7 +115,7 @@ void userint::rdname (name& n)
       throw matterror("Expecting identifer.", SourcePos(1, cmdpos));
     }
 
-    n = nmz->cvtname(t.name);
+    n = nmz->cvtname(t.id);
     if (n == blankname)
       throw matterror("Unknown name.", SourcePos(1, cmdpos));
 
@@ -144,7 +144,7 @@ void userint::rdqualname (name& prefix, name& suffix)
       throw matterror("Expecting identifer.", SourcePos(1, cmdpos, cmdpos));
     }
 
-    prefix = nmz->cvtname(t.name);
+    prefix = nmz->cvtname(t.id);
     if (prefix == blankname)
       throw matterror("Unknown device.", SourcePos(1, cmdpos, cmdpos));
 
@@ -158,7 +158,7 @@ void userint::rdqualname (name& prefix, name& suffix)
         throw matterror("Expecting pin identifer.", SourcePos(1, cmdpos, cmdpos));
       }
 
-      suffix = nmz->cvtname(t.name);
+      suffix = nmz->cvtname(t.id);
       if (suffix == blankname)
         throw matterror("Unknown pin name.", SourcePos(1, cmdpos, cmdpos));
     }

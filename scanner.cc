@@ -32,7 +32,7 @@ Token::Token(TokType t)
 }
 
 Token::Token(TokType t, namestring s)
-    : at(), type(t), name(s) {
+    : at(), type(t), id(s) {
 }
 
 Token::Token(TokType t, int num)
@@ -141,21 +141,21 @@ Token scanner::readNext() {
             }
             else if (std::isalpha(c)) {
                 ret.type = TokType::Identifier;
-                ret.name = readName(c);
+                ret.id = readName(c);
 
                 // Note: namestring is cistring, so comparison here is
                 // case-insensitive
-                if (ret.name == "dev") {
+                if (ret.id == "dev") {
                     ret.type = TokType::DevKeyword;
                 }
-                else if (ret.name == "monitor") {
+                else if (ret.id == "monitor") {
                     ret.type = TokType::MonitorKeyword;
                 }
-                else if (ret.name == "as") {
+                else if (ret.id == "as") {
                     ret.type = TokType::AsKeyword;
                 }
                 else { // Check for device types
-                    auto it = deviceTypes.find(ret.name);
+                    auto it = deviceTypes.find(ret.id);
                     if (it != deviceTypes.end()) {
                 	   ret.type = TokType::DeviceType;
                        ret.devtype = it->second;
