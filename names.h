@@ -29,9 +29,6 @@ public:
     /* form.  If the name is not in the name table then 'blankname' is     */
     /* returned.                                                           */
 
-  void writename (name id);
-    /* Prints out the given name on the console                            */
-
   const namestring& namestr(name id) const;
     /* Returns the string representation of the name id                    */
 

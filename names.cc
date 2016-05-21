@@ -28,16 +28,6 @@ name names::cvtname (namestring str)
 	return _nameSet.find(str);
 }
 
-void names::writename (name id)
-{
-	if (id == blankname) {
-		std::cout << blanknamestr;
-	}
-	else {
-		std::cout << *id;
-	}
-}
-
 const namestring& names::namestr(name id) const {
 	return (id == blankname) ? blanknamestr : *id;
 }
