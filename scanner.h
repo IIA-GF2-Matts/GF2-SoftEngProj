@@ -53,14 +53,14 @@ class Token
 public:
     SourcePos at; ///< The location of the start of the token in the character stream
     TokType type; ///< The type of the token
-    namestring id; ///< If type == TokType::Identifier, this is the string name
+    name id; ///< If type == TokType::Identifier, this is the string name
     int number; ///< If type == TokType::Number, this is the integer value.
     devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
 
     Token();
     Token(SourcePos pos, TokType t);
     Token(TokType t);
-    Token(TokType t, namestring s);
+    Token(TokType t, name s);
     Token(TokType t, int n);
 };
 
@@ -74,6 +74,7 @@ protected:
     Token _next;
     std::string _file;
     bool _open;
+    names* _nmz;
 
     /// Read the next character from the input character stream
     int readChar();
@@ -82,13 +83,13 @@ protected:
     Token readNext();
 
     /// Consume characters while they match a name
-    namestring readName(int c1);
+    name readName(int c1);
 
     /// Consume characters while they match a number
     int readNumber(int c1);
 
 public:
-    scanner();
+    scanner(names* nmz);
     ~scanner();
 
     /// Open an input character stream with the given file name.
@@ -115,7 +116,7 @@ class fscanner : public scanner
 private:
     std::ifstream _ifs;
 public:
-    fscanner();
+    fscanner(names* nmz);
 
     void open(std::string fname);
 };
@@ -126,7 +127,7 @@ class strscanner : public scanner
 private:
     std::istringstream _iss;
 public:
-    strscanner(std::string str);
+    strscanner(names* nmz, std::string str);
 };
 
 #endif

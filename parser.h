@@ -30,7 +30,7 @@ private:
     network* _netz;
     devices* _devz;
     monitor* _mons;
-    scanner _scan;
+    scanner* _scan;
     names* _nms;
     errorcollector errs;
 
@@ -105,7 +105,7 @@ private:
 
 public:
     /// Construct a parser to work on the pointers to other classes
-    parser(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms);
+    parser(network* netz, devices* devz, monitor* mons, scanner* scan, names* nms);
     ~parser();
 
     /** Reads the definition of the logic system and builds the            */
