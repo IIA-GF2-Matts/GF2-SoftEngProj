@@ -83,7 +83,7 @@ Token scanner::readNext() {
                 c = readChar();
 
                 if (_ips.eof()) {
-                    throw matterror("Unterminated block comment.", p);
+                    throw mattsyntaxerror("Unterminated block comment.", p);
                 }
 
                 if (hadStar && c == '/') {
@@ -94,7 +94,7 @@ Token scanner::readNext() {
             }
 	    }
         else {
-        	throw matterror("Illegal character sequence '/' in file.", p);
+        	throw mattsyntaxerror("Illegal character sequence '/' in file.", p);
         }
 
         if (_ips.eof()) {
@@ -136,7 +136,7 @@ Token scanner::readNext() {
                 ret.number = readNumber(c);
 
                 if (ret.number < 0) {
-                    throw matterror("Number is too large to be represented in Mattlab.", ret.at);
+                    throw mattsyntaxerror("Number is too large to be represented in Mattlab.", ret.at);
                 }
             }
             else if (std::isalpha(c)) {
@@ -178,7 +178,7 @@ Token scanner::readNext() {
                         << " in file. ";
                 }
 
-                throw matterror(oss.str(), ret.at);
+                throw mattsyntaxerror(oss.str(), ret.at);
             }
 
             break;
