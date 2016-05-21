@@ -40,6 +40,8 @@ bool parser::readin() {
     Token tk = _scan.peek();
     parseFile(tk);
 
+    _netz->checknetwork(errs);
+
     return errs.errCount() == 0;
 }
 
