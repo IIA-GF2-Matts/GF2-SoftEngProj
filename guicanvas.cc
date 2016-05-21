@@ -6,7 +6,7 @@
 #include <GL/glut.h>
 #include "names.h"
 #include "monitor.h"
-
+#include <iostream>
 
 // MyGLCanvas ////////////////////////////////////////////////////////////////////////////////////
 
@@ -29,7 +29,6 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   init = false;
   pan_x = 0;
   pan_y = 0;
-  zoom = 1.0;
   cyclesdisplayed = -1;
   cycle_no = 0;
 }
@@ -40,7 +39,6 @@ void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
 }
 
 void MyGLCanvas::Render(wxString example_text, int cycles) {
-  // Todo: don't need example text as arg.
   // Draws canvas contents - the following example writes the string "example text" onto the canvas
   // and draws a signal trace. The trace is artificial if the simulator has not yet been run.
   // When the simulator is run, the number of cycles is passed as a parameter
@@ -48,14 +46,16 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   float x, y;
   unsigned int i, j, k;
   asignal s;
-  name mon_name;
-  name mon_name_2;
+  name mon_name_dev;
+  name mon_name_pin;
   wxString mon_name_text;
+  int zoomrange[2];
 
 
   if (cycles >= 0) {
     cyclesdisplayed = cycles;
     cycle_no += cycles;
+    zoomed = false;
   }
 
   SetCurrent(*context);
@@ -80,15 +80,27 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     num_spacing = 1 + cyclesdisplayed/20;
   }
 
-
-
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw the first monitor signal, get trace from monitor class
-
-    float dx;
+    // Todo: this doesn't fix floating point error when changing from 0 to 1 cycles. Or don't allow an input of 0.
     if (cyclesdisplayed == 0)
       dx = 20;
-    else
+    else //if (!zoomed)
       dx = (end_width - label_width) / cyclesdisplayed; // dx between points
+
+    // Find start and end points of zoom
+    if (zoomed) {
+      zoomrange[0] = (selection_x[0]-label_width) / dx;
+      if (zoomrange[0] < 0) zoomrange[0] = 0;
+      zoomrange[1] = (selection_x[1]-label_width) / dx + 1;
+      if (zoomrange[1] > cyclesdisplayed) zoomrange[1] = cyclesdisplayed;
+      // recalculate dx
+      dx = (end_width - label_width) / (zoomrange[1] - zoomrange[0]); 
+    }
+    else {
+      zoomrange[0] = 0;
+      zoomrange[1] = cyclesdisplayed;
+    }
+
 
     for (j = 0; j<mmz->moncount(); j++) {
       // draw x axis
@@ -98,18 +110,14 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       glVertex2f(label_width-5, y);
       glVertex2f(end_width, y);
       glEnd();
-      for (i=0; i<=cyclesdisplayed; i++) {
+      for (i=zoomrange[0]; i<=zoomrange[1]; i++) {
         x = dx*i + label_width;
         glBegin(GL_LINE_STRIP);
         glVertex2f(x, y-3);
         glVertex2f(x, y+3);
         glEnd();
         if (i%num_spacing == 0){
-          glRasterPos2f(x-4, y-12);
-          number = to_string(i+ cycle_no-cyclesdisplayed);
-          for (k=0; k<number.Len(); k++)
-            glutBitmapCharacter(GLUT_BITMAP_HELVETICA_10, number[k]);
-            // Todo: printing strings should be separate function.
+          drawText(to_string(i+cycle_no-cyclesdisplayed), x-4, y-12, GLUT_BITMAP_HELVETICA_10);
         }
 
       }
@@ -117,7 +125,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       // draw trace
       glColor3f(0.0, 1.0, 0.0);
       glBegin(GL_LINE_STRIP);
-      for (i=0; i<cyclesdisplayed; i++) {
+      for (i=zoomrange[0]; i<zoomrange[1]; i++) {
         if (mmz->getsignaltrace(j, i, s)) {
           if (s==low) y = h - ((j+1) * plot_height + dy);
           if (s==high) y = h - ((j+1) * plot_height - dy);
@@ -128,18 +136,14 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       glEnd();
       // draw text label
       glRasterPos2f(10, h - 5 - (j+1)*plot_height);
-      mmz->getmonname(j, mon_name, mon_name_2);
-      mon_name_text = mon_name ->c_str();
-      for (i = 0; i < mon_name_text.Len(); i++)
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mon_name_text[i]);
-
-      if (mon_name_2 != blankname) {
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, '.');
-
-        mon_name_text = mon_name_2->c_str();
-        for (i = 0; i < mon_name_text.Len(); i++)
-          glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, mon_name_text[i]);
+      mmz->getmonname(j, mon_name_dev, mon_name_pin);
+      mon_name_text = mon_name_dev ->c_str();
+      if (mon_name_pin != blankname) {
+        mon_name_text += ".";
+        mon_name_text += mon_name_pin ->c_str();
       }
+      drawText(mon_name_text, 10, h-5-(j+1)*plot_height, GLUT_BITMAP_HELVETICA_12);
+      
     }
 
     // draw verticle line
@@ -162,30 +166,22 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     glEnd();
     mon_name_text = "Welcome to MattLab Logic Simulator";
     glColor3f(0.0, 1.0, 0.0);
-    glRasterPos2f(label_width, h/2);
-    for (i = 0; i < mon_name_text.Len(); i++)
-      glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, mon_name_text[i]);
+    drawText(mon_name_text, w/4, h/2, GLUT_BITMAP_HELVETICA_18);
 
-    string logo[5] = {
-      "    _[]_[]_[]_[]_[]_[]_[]_[]_",
-      "   |                         |",
-      "    )     M A T T L A B      |",
-      "   |                         |",
-      "    `[]`[]`[]`[]`[]`[]`[]`[]` "
-    };
-    for (j=0; j<5; j++) {
-      glRasterPos2f(label_width, h/2 - 20*(j+2));
-      for (i=0; i<logo[j].length(); i++)
-        glutBitmapCharacter(GLUT_BITMAP_9_BY_15, logo[j][i]);
-    }
+    string logo =
+      "    _[]_[]_[]_[]_[]_[]_[]_[]_  \n"
+      "   |                         | \n"
+      "    )     M A T T L A B      | \n"
+      "   |                         | \n"
+      "    `[]`[]`[]`[]`[]`[]`[]`[]`  ";
+    drawText(logo, w/4, h/2-40, GLUT_BITMAP_9_BY_15);
+    // }
 
   }
 
-  // Example of how to use GLUT to draw text on the canvas
+  // Draw example text
   glColor3f(1.0, 0.0, 0.0);
-  glRasterPos2f(10, 100);
-  for (i = 0; i < example_text.Len(); i++) glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, example_text[i]);
-
+  drawText(example_text, 10, 100, GLUT_BITMAP_HELVETICA_12);
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
   glFlush();
   SwapBuffers();
@@ -242,8 +238,8 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     //last_y = event.m_y;
     text.Printf("Mouse button %d pressed at %d %d", event.GetButton(), event.m_x, h-event.m_y);
   }
-  if (event.ButtonUp()) text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
-  if (event.Dragging()) {
+  if (event.ButtonUp()) {
+    text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
     if (last_x > event.m_x) {
       selection_x[0] = event.m_x;
       selection_x[1] = last_x;
@@ -252,6 +248,12 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
       selection_x[0] = last_x;
       selection_x[1] = event.m_x;
     }
+    zoomed = true;
+
+  }
+  if (event.Dragging()) {
+    // Handle zoom by dragging.
+
     // pan_x += event.m_x - last_x;
     // pan_y -= event.m_y - last_y;
     // last_x = event.m_x;
@@ -274,4 +276,19 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   // Todo: limit scrolling based on number of monitors.
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
+}
+
+
+
+
+void MyGLCanvas::drawText(wxString text, int pos_x, int pos_y, void* font) {
+  glRasterPos2f(pos_x, pos_y);
+  for (int k=0; k<text.Len(); k++){
+    if (text[k] == '\n'){
+      pos_y -= 18;                  // set up for title screen logo
+      glRasterPos2f(pos_x, pos_y);
+    }
+    else
+      glutBitmapCharacter(font, text[k]);
+  }
 }

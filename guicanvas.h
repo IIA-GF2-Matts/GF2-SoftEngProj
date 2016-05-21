@@ -17,6 +17,8 @@ class MyGLCanvas: public wxGLCanvas
          const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
          const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
+
+  void drawText(wxString text, int pos_x, int pos_y, void* font);
   
 void setNetwork(monitor* mmz, names* nmz);
  private:
@@ -24,8 +26,10 @@ void setNetwork(monitor* mmz, names* nmz);
   bool init;                         // has the OpenGL context been initialised?
   int pan_x;                         // the current x pan
   int pan_y;                         // the current y pan
-  int selection_x[2];                // the currently selected range of values.
-  double zoom;                       // the current zoom
+  int selection_x[2];                // the currently selected range of values for zoom.
+  bool zoomed;                       // keeps track of whether canvas is zoomed.
+  float dx;
+//  double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   int cycle_no;
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
