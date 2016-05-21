@@ -202,7 +202,7 @@ void MyGLCanvas::InitGL()
   glOrtho(0, w, 0, h, -1, 1);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glTranslated(0.0, pan_y, 0.0);
+  glTranslated(pan_x, pan_y, 0.0);
   //glScaled(zoom, zoom, zoom);
 }
 
@@ -235,45 +235,48 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   GetClientSize(&w, &h);
   if (event.ButtonDown()) {
     last_x = event.m_x;
-    //last_y = event.m_y;
+    last_y = event.m_y;
     text.Printf("Mouse button %d pressed at %d %d", event.GetButton(), event.m_x, h-event.m_y);
   }
   if (event.ButtonUp()) {
     text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
-    if (last_x > event.m_x) {
-      selection_x[0] = event.m_x;
-      selection_x[1] = last_x;
-    }
-    else {
-      selection_x[0] = last_x;
-      selection_x[1] = event.m_x;
-    }
-    zoomed = true;
+    // if (last_x > event.m_x) {
+    //   selection_x[0] = event.m_x;
+    //   selection_x[1] = last_x;
+    // }
+    // else {
+    //   selection_x[0] = last_x;
+    //   selection_x[1] = event.m_x;
+    // }
+    // zoomed = true;
 
   }
   if (event.Dragging()) {
-    // Handle zoom by dragging.
 
-    // pan_x += event.m_x - last_x;
-    // pan_y -= event.m_y - last_y;
-    // last_x = event.m_x;
-    // last_y = event.m_y;
-    init = false;
-    text.Printf("Mouse dragged from %d to %d", selection_x[0], selection_x[1]);
-  }
-  if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
-  if (event.GetWheelRotation() < 0) {
-    pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
-    init = false;
-    text.Printf("Negative mouse wheel rotation, pan_y now %d", pan_y);
-  }
-  if (event.GetWheelRotation() > 0) {
-    pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
+    pan_x += event.m_x - last_x;
+    // Todo: implement limits on pan_x
+    pan_y -= event.m_y - last_y;
     if (pan_y < 0) pan_y = 0;
+    // Todo: implement max pan_y
+    last_x = event.m_x;
+    last_y = event.m_y;
     init = false;
-    text.Printf("Positive mouse wheel rotation, pan_y now %d", pan_y);
+    // text.Printf("Mouse dragged from %d to %d", selection_x[0], selection_x[1]);
   }
-  // Todo: limit scrolling based on number of monitors.
+
+  // Now panning by dragging again so this bit is redundant...
+  // if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
+  // if (event.GetWheelRotation() < 0) {
+  //   pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
+  //   init = false;
+  //   text.Printf("Negative mouse wheel rotation, pan_y now %d", pan_y);
+  // }
+  // if (event.GetWheelRotation() > 0) {
+  //   pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
+  //   if (pan_y < 0) pan_y = 0;
+  //   init = false;
+  //   text.Printf("Positive mouse wheel rotation, pan_y now %d", pan_y);
+  // }
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
 }
