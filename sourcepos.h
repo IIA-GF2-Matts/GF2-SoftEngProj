@@ -1,21 +1,31 @@
 
 #include <ostream>
-
+#include <string>
+#include <set>
 
 #ifndef GF2_SOURCEPOS_H
 #define GF2_SOURCEPOS_H
 
+
 // Represents a position within a file.
 struct SourcePos {
-	// std::string& File;
+private:
+    static std::set<std::string> fileNames;
+    std::set<std::string>::const_iterator getFile(std::string f);
+
+public:
+    std::set<std::string>::const_iterator File;
 	int Line;
 	int Column;
 	int Abs;
-	int LineStart;
+
+    const std::string& FileStr() const;
+    void setFile(std::string f);
 
 	SourcePos();
-	SourcePos( int, int, int );
-	SourcePos( int, int, int, int );
+    SourcePos(int line, int col);
+    SourcePos(int line, int col, int abs);
+	SourcePos( std::string file, int line, int col, int abs);
 
 	friend std::ostream& operator<<( std::ostream&, const SourcePos& );
 };

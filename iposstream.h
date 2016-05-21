@@ -15,6 +15,7 @@ class iposstream {
 public:
 	iposstream();
 	iposstream( std::istream* );
+	iposstream( std::istream*, std::string fname );
 	~iposstream();
 
 	int peek();
@@ -22,6 +23,7 @@ public:
 	bool eof() const;
 
 	void setStream(std::istream* );
+	void setStream(std::istream*, std::string fname );
 
 	SourcePos Pos;
 	int TabWidth;

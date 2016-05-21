@@ -28,15 +28,15 @@ Token::Token(SourcePos pos, TokType t)
 }
 
 Token::Token(TokType t)
-    : at(0, 0, 0), type(t) {
+    : at(), type(t) {
 }
 
 Token::Token(TokType t, namestring s)
-    : at(0, 0, 0), type(t), name(s) {
+    : at(), type(t), name(s) {
 }
 
 Token::Token(TokType t, int num)
-    : at(0, 0, 0), type(t), number(num) {
+    : at(), type(t), number(num) {
     if (t == TokType::DeviceType) {
         devtype = devicekind(num);
     }
@@ -227,7 +227,7 @@ scanner::scanner()
 
 
 void scanner::open(std::istream* is, std::string fname) {
-    _ips.setStream(is);
+    _ips.setStream(is, fname);
     _file = fname;
 
     _open = true;
