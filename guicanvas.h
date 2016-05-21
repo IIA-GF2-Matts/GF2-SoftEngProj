@@ -29,7 +29,7 @@ void setNetwork(monitor* mmz, names* nmz);
   int selection_x[2];                // the currently selected range of values for zoom.
   bool zoomed;                       // keeps track of whether canvas is zoomed.
   float dx;
-//  double zoom;                       // the current zoom
+  double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   int cycle_no;
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces

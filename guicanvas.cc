@@ -203,7 +203,7 @@ void MyGLCanvas::InitGL()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslated(pan_x, pan_y, 0.0);
-  //glScaled(zoom, zoom, zoom);
+  glScaled(zoom, zoom, zoom);
 }
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
@@ -264,9 +264,19 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     // text.Printf("Mouse dragged from %d to %d", selection_x[0], selection_x[1]);
   }
 
+  if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
+
+  if (event.GetWheelRotation() < 0) {
+    zoom = zoom * (1.0 - (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    init = false;
+    text.Printf("Negative mouse wheel rotation, zoom now %f", zoom);
+  }
+  if (event.GetWheelRotation() > 0) {
+    zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    init = false;
+    text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
+    
   // Now panning by dragging again so this bit is redundant...
-  // if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
-  // if (event.GetWheelRotation() < 0) {
   //   pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
   //   init = false;
   //   text.Printf("Negative mouse wheel rotation, pan_y now %d", pan_y);
