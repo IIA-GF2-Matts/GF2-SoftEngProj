@@ -26,14 +26,19 @@ void setNetwork(monitor* mmz, names* nmz);
   bool init;                         // has the OpenGL context been initialised?
   int pan_x;                         // the current x pan
   int pan_y;                         // the current y pan
-  int selection_x[2];                // the currently selected range of values for zoom.
-  bool zoomed;                       // keeps track of whether canvas is zoomed.
   float dx;
   double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   int cycle_no;
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
   names *nmz;                        // pointer to names class, used to extract signal names
+
+  int dy;                            // plot lines at +- dx
+  int plot_height;                   // height allocated 2x plot height
+
+  int label_width;                   // x allowed for labels at start
+  int end_gap;                       // dist between end and side
+
   void InitGL();                     // function to initialise OpenGL context
   void OnSize(wxSizeEvent& event);   // event handler for when canvas is resized
   void OnPaint(wxPaintEvent& event); // event handler for when canvas is exposed

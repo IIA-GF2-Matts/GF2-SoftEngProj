@@ -1,7 +1,4 @@
 
-
-// Todo: generally tidy up code, it's a mess of initial stuff and many changes.
-
 #include "guicanvas.h"
 #include <GL/glut.h>
 #include "names.h"
@@ -29,8 +26,15 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   init = false;
   pan_x = 0;
   pan_y = 0;
+  zoom = 1;
   cyclesdisplayed = -1;
   cycle_no = 0;
+
+  dy = 12.0;              // plot lines at +- dx
+  plot_height = 4 * dy;   // height allocated 2x plot height
+  label_width = 100.0;    // x allowed for labels at start
+  end_gap = 10;           // dist between end and side
+
 }
 
 void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
@@ -43,7 +47,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   // and draws a signal trace. The trace is artificial if the simulator has not yet been run.
   // When the simulator is run, the number of cycles is passed as a parameter
 
-  float x, y;
+  int x, y;
   unsigned int i, j, k;
   asignal s;
   name mon_name_dev;
@@ -55,7 +59,6 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   if (cycles >= 0) {
     cyclesdisplayed = cycles;
     cycle_no += cycles;
-    zoomed = false;
   }
 
   SetCurrent(*context);
@@ -67,11 +70,9 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
   int w, h;
   GetClientSize(&w, &h);
-  float dy = 12.0;              // plot lines at +- dx
-  float plot_height = 4 * dy;   // height allocated 2x plot height
+  int end_width = w - end_gap;
 
-  float label_width = 100.0;    // x allowed for labels at start
-  float end_width = w - 10;     // dist between end and side
+
   wxString number;
 
   // x axis number spacing
@@ -84,22 +85,17 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     // Todo: this doesn't fix floating point error when changing from 0 to 1 cycles. Or don't allow an input of 0.
     if (cyclesdisplayed == 0)
       dx = 20;
-    else //if (!zoomed)
+    else
       dx = (end_width - label_width) / cyclesdisplayed; // dx between points
 
-    // Find start and end points of zoom
-    if (zoomed) {
-      zoomrange[0] = (selection_x[0]-label_width) / dx;
-      if (zoomrange[0] < 0) zoomrange[0] = 0;
-      zoomrange[1] = (selection_x[1]-label_width) / dx + 1;
-      if (zoomrange[1] > cyclesdisplayed) zoomrange[1] = cyclesdisplayed;
-      // recalculate dx
-      dx = (end_width - label_width) / (zoomrange[1] - zoomrange[0]); 
-    }
-    else {
-      zoomrange[0] = 0;
-      zoomrange[1] = cyclesdisplayed;
-    }
+
+    zoomrange[1] = cyclesdisplayed;
+    // Todo: set zoomrange[1] so unshown points aren't displayed.
+
+    dx = dx * zoom;
+
+    zoomrange[0] = pan_x / dx;
+    example_text.Printf("pan_x is %d, zoom is %f", pan_x, zoom);
 
 
     for (j = 0; j<mmz->moncount(); j++) {
@@ -111,7 +107,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       glVertex2f(end_width, y);
       glEnd();
       for (i=zoomrange[0]; i<=zoomrange[1]; i++) {
-        x = dx*i + label_width;
+        x = dx*(i-zoomrange[0]) + label_width;
         glBegin(GL_LINE_STRIP);
         glVertex2f(x, y-3);
         glVertex2f(x, y+3);
@@ -129,8 +125,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
         if (mmz->getsignaltrace(j, i, s)) {
           if (s==low) y = h - ((j+1) * plot_height + dy);
           if (s==high) y = h - ((j+1) * plot_height - dy);
-          glVertex2f(dx*i + label_width, y);
-          glVertex2f(dx*(i+1) + label_width, y);
+          glVertex2f(dx*(i-zoomrange[0]) + label_width, y);
+          glVertex2f(dx*(i-zoomrange[0]+1) + label_width, y);
         }
       }
       glEnd();
@@ -155,6 +151,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
 
   } else { // draw title screen
+    // Todo: redesign title screen.
 
     glBegin(GL_LINE_STRIP);
     for (i=0; i<10; i++) {
@@ -202,8 +199,8 @@ void MyGLCanvas::InitGL()
   glOrtho(0, w, 0, h, -1, 1);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  glTranslated(pan_x, pan_y, 0.0);
-  glScaled(zoom, zoom, zoom);
+  glTranslated(0.0, pan_y, 0.0);
+  // glScaled(zoom, 1, 1);
 }
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
@@ -240,24 +237,25 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   }
   if (event.ButtonUp()) {
     text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
-    // if (last_x > event.m_x) {
-    //   selection_x[0] = event.m_x;
-    //   selection_x[1] = last_x;
-    // }
-    // else {
-    //   selection_x[0] = last_x;
-    //   selection_x[1] = event.m_x;
-    // }
-    // zoomed = true;
+
 
   }
   if (event.Dragging()) {
+    // x panning
+    pan_x += last_x - event.m_x;
+    // check for scrolling off left
+    if (pan_x < 0) pan_x = 0;
+    // check for scrolling off right
+    if (pan_x > (w-end_gap-label_width)*(zoom-1)) pan_x = (w-end_gap-label_width)*(zoom-1);
+    // Todo: Fix this equation for not quite reaching the last value when zoomed in.
+    
 
-    pan_x += event.m_x - last_x;
-    // Todo: implement limits on pan_x
+    // y panning
     pan_y -= event.m_y - last_y;
+    // check for scrolling off bottom
+    if (pan_y > (mmz->moncount()+1)*plot_height - h) pan_y = (mmz->moncount()+1)*plot_height - h;
+    // check for scrolling off top
     if (pan_y < 0) pan_y = 0;
-    // Todo: implement max pan_y
     last_x = event.m_x;
     last_y = event.m_y;
     init = false;
@@ -273,20 +271,11 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   }
   if (event.GetWheelRotation() > 0) {
     zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    if (zoom < 1) zoom = 1;
     init = false;
     text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
-    
-  // Now panning by dragging again so this bit is redundant...
-  //   pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
-  //   init = false;
-  //   text.Printf("Negative mouse wheel rotation, pan_y now %d", pan_y);
-  // }
-  // if (event.GetWheelRotation() > 0) {
-  //   pan_y -= 5*(double)event.GetWheelRotation()/(event.GetWheelDelta());
-  //   if (pan_y < 0) pan_y = 0;
-  //   init = false;
-  //   text.Printf("Positive mouse wheel rotation, pan_y now %d", pan_y);
-  // }
+  }
+  // Todo: scale pan_x with zoom
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
 }
