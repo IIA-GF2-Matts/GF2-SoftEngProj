@@ -210,7 +210,7 @@ void network::checknetwork (errorcollector& col)
         // Todo: Improve Error message
         std::ostringstream oss;
         oss << "Unconnected input: " << nmz->namestr(d->id) << ".InitialValue";
-        col.report(matterror(oss.str(), "", d->definedAt));
+        col.report(matterror(oss.str(), d->definedAt));
       }
     }
     else if (d->kind == aclock) {
@@ -218,7 +218,7 @@ void network::checknetwork (errorcollector& col)
         // Todo: Improve Error message
         std::ostringstream oss;
         oss << "Unconnected input: " << nmz->namestr(d->id) << ".Period";
-        col.report(matterror(oss.str(), "", d->definedAt));
+        col.report(matterror(oss.str(), d->definedAt));
       }
     }
     else {
@@ -230,7 +230,7 @@ void network::checknetwork (errorcollector& col)
           if (i->id != blankname)
             oss << "." << nmz->namestr(i->id);
 
-          col.report(matterror(oss.str(), "", d->definedAt));
+          col.report(matterror(oss.str(), d->definedAt));
         }
       }
     }

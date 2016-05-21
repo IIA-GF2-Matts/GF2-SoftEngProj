@@ -24,7 +24,6 @@ protected:
     std::string _errorMessage;
 
     std::string _message;
-    std::string _file;
     std::string _fname;
     SourcePos _pos;
     MessageType _type;
@@ -42,8 +41,8 @@ public:
     virtual const char* what() const throw ();
 
     /// Create a new mattmessage, and builds the message.
-    mattmessage(std::string message, std::string file, SourcePos pos);
-    mattmessage(std::string message, std::string file, SourcePos pos, MessageType type);
+    mattmessage(std::string message, SourcePos pos);
+    mattmessage(std::string message, SourcePos pos, MessageType type);
 };
 
 
@@ -51,15 +50,15 @@ public:
 class matterror : public mattmessage {
 public:
     /// Create a new matterror, and builds the message.
-    matterror(std::string message, std::string file, SourcePos pos);
+    matterror(std::string message, SourcePos pos);
 };
 
 
-/// Formats a warning message 
+/// Formats a warning message
 class mattwarning : public mattmessage {
 public:
     /// Create a new mattwarning, and builds the message.
-    mattwarning(std::string message, std::string file, SourcePos pos);
+    mattwarning(std::string message, SourcePos pos);
 };
 
 
@@ -67,7 +66,7 @@ public:
 class mattnote : public mattmessage {
 public:
     /// Create a new mattnote, and builds the message.
-    mattnote(std::string message, std::string file, SourcePos pos);
+    mattnote(std::string message, SourcePos pos);
 };
 
 

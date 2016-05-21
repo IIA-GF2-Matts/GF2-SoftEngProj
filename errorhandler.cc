@@ -66,13 +66,13 @@ std::string mattmessage::getErrorLine(int cmax) {
     }
 
 
-    if (_file.empty()) {
+    if (_pos.fileStr().empty()) {
         return "";
     }
 
     try {
         std::ifstream ifs;
-        ifs.open(_file, std::ifstream::in | std::ifstream::binary);
+        ifs.open(_pos.fileStr(), std::ifstream::in | std::ifstream::binary);
 
         int p = _pos.Abs - _pos.Column;
         int c = _pos.Column;
@@ -134,13 +134,13 @@ const char* mattmessage::what() const throw () {
 
 
 /// Create a new mattmessage, and builds the message.
-mattmessage::mattmessage(std::string message, std::string file, SourcePos pos)
-        : mattmessage(message, file, pos, MsgInfo) {
+mattmessage::mattmessage(std::string message, SourcePos pos)
+        : mattmessage(message, pos, MsgInfo) {
 }
 
 
-mattmessage::mattmessage(std::string message, std::string file, SourcePos pos, MessageType typ)
-    : _message(message), _file(file), _pos(pos), _type(typ), _fname(file) {
+mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ)
+    : _message(message), _pos(pos), _type(typ) {
     std::ostringstream oss;
 
     int cmax = 73;
@@ -151,6 +151,7 @@ mattmessage::mattmessage(std::string message, std::string file, SourcePos pos, M
 
     auto cls = oss.tellp();
 
+    const std::string& file = pos.fileStr();
     if (file != "") {
         auto rsl = file.rfind('/');
 
@@ -161,6 +162,9 @@ mattmessage::mattmessage(std::string message, std::string file, SourcePos pos, M
         }
 
         oss << _fname << " ";
+    }
+    else {
+        _fname = "";
     }
 
     _srcLineErrCol = -1;
@@ -219,21 +223,21 @@ mattmessage::mattmessage(std::string message, std::string file, SourcePos pos, M
 
 // class matterror
 
-matterror::matterror(std::string message, std::string file, SourcePos pos)
-        : mattmessage(message, file, pos, MsgError) {
+matterror::matterror(std::string message, SourcePos pos)
+        : mattmessage(message, pos, MsgError) {
 }
 
 
 // class mattwarning
 
-mattwarning::mattwarning(std::string message, std::string file, SourcePos pos)
-        : mattmessage(message, file, pos, MsgWarning) {
+mattwarning::mattwarning(std::string message, SourcePos pos)
+        : mattmessage(message, pos, MsgWarning) {
 }
 
 
 // class mattnote
 
-mattnote::mattnote(std::string message, std::string file, SourcePos pos)
-        : mattmessage(message, file, pos, MsgWarning) {
+mattnote::mattnote(std::string message, SourcePos pos)
+        : mattmessage(message, pos, MsgWarning) {
 }
 

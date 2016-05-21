@@ -112,12 +112,12 @@ void userint::rdname (name& n)
     Token t = scan.step();
 
     if (t.type != TokType::Identifier) {
-      throw matterror("Expecting identifer.", "", SourcePos(1, cmdpos, cmdpos));
+      throw matterror("Expecting identifer.", SourcePos(1, cmdpos));
     }
 
     n = nmz->cvtname(t.name);
     if (n == blankname)
-      throw matterror("Unknown name.", "", SourcePos(1, cmdpos, cmdpos));
+      throw matterror("Unknown name.", SourcePos(1, cmdpos));
 
     cmdpos += scan.peek().at.Abs;
   }
@@ -141,12 +141,12 @@ void userint::rdqualname (name& prefix, name& suffix)
     Token t = scan.step();
 
     if (t.type != TokType::Identifier) {
-      throw matterror("Expecting identifer.", "", SourcePos(1, cmdpos, cmdpos));
+      throw matterror("Expecting identifer.", SourcePos(1, cmdpos, cmdpos));
     }
 
     prefix = nmz->cvtname(t.name);
     if (prefix == blankname)
-      throw matterror("Unknown device.", "", SourcePos(1, cmdpos, cmdpos));
+      throw matterror("Unknown device.", SourcePos(1, cmdpos, cmdpos));
 
     t = scan.peek();
 
@@ -155,12 +155,12 @@ void userint::rdqualname (name& prefix, name& suffix)
       t = scan.step();
 
       if (t.type != TokType::Identifier) {
-        throw matterror("Expecting pin identifer.", "", SourcePos(1, cmdpos, cmdpos));
+        throw matterror("Expecting pin identifer.", SourcePos(1, cmdpos, cmdpos));
       }
 
       suffix = nmz->cvtname(t.name);
       if (suffix == blankname)
-        throw matterror("Unknown pin name.", "", SourcePos(1, cmdpos, cmdpos));
+        throw matterror("Unknown pin name.", SourcePos(1, cmdpos, cmdpos));
     }
 
     cmdpos += scan.peek().at.Abs;
