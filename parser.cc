@@ -207,16 +207,16 @@ void parser::parseOptionSet(Token& tk, name dv) {
 }
 
 void parser::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
-    devicekind dkind = _netz->finddevice(sig.device)->kind;
+    devicekind dkind = _netz->finddevice(sig.device.id)->kind;
 
-    oss << *sig.device << " (of type "
+    oss << *sig.device.id << " (of type "
         << *_devz->getname(dkind)
         << ") ";
 
-    if (sig.pin == blankname) {
+    if (sig.pin.id == blankname) {
         oss << "has no default output pin.";
     } else {
-        oss << "has no output pin " << *sig.pin << ".";
+        oss << "has no output pin " << *sig.pin.id << ".";
     }
 
     if (dkind == dtype)
@@ -402,7 +402,9 @@ void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
                 // Todo: improve error message
                 throw mattsyntaxerror("Invalid signal.", valuetk.at);
             Signal sig;
-            sig.device = _nms->lookup(valuetk.number  ? "1" : "0");
+            sig.device = valuetk;
+            sig.device.type = TokType::Identifier;
+            sig.device.id = _nms->lookup(valuetk.number  ? "1" : "0");
             assignPin(dvl, keytk, valuetk, sig);
         }
     } else {
@@ -431,7 +433,7 @@ void parser::assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig) {
         _netz->addinput(dvl, keytk.id, keytk.at);
 
     // todo: store token position?
-    _netz->makeconnection(dvl->id, keytk.id, sig.device, sig.pin, success);
+    _netz->makeconnection(dvl->id, keytk.id, sig.device.id, sig.pin.id, success);
     if (!success)
         // Todo: improve error message
         throw mattruntimeerror("Could not make connection", keytk.at);
@@ -515,17 +517,17 @@ void parser::parseMonitor(Token& tk) {
     }
 
     bool success = false;
-    _mons->makemonitor(monsig.device, monsig.pin, success, alisig.device, alisig.pin);
+    _mons->makemonitor(monsig.device.id, monsig.pin.id, success, alisig.device.id, alisig.pin.id);
     if (!success)
         // Todo: improve error message
         throw mattruntimeerror("Could not make monitor", tk.at);
 }
 
 parser::signal_legality parser::isBadSignal(Signal& sig) {
-    devlink dvlnk = _netz->finddevice(sig.device);
+    devlink dvlnk = _netz->finddevice(sig.device.id);
     if (dvlnk == NULL)
         return ILLEGAL_DEVICE;
-    if (_netz->findoutput(dvlnk, sig.pin) == NULL)
+    if (_netz->findoutput(dvlnk, sig.pin.id) == NULL)
         return ILLEGAL_PIN;
     return LEGAL_SIGNAL;
 }
@@ -534,15 +536,12 @@ parser::signal_legality parser::isBadSignal(Signal& sig) {
 Signal parser::parseSignalName(Token& tk) {
 
     Signal ret;
-    ret.device = blankname;
-    ret.pin = blankname;
 
     if (tk.type != TokType::Identifier) {
         throw mattsyntaxerror("Expected a signal name.", tk.at);
     }
 
-    // Todo: handle 0 or 1 connections
-    ret.device = tk.id;
+    ret.device = tk;
 
     stepAndPeek(tk);
 
@@ -553,7 +552,7 @@ Signal parser::parseSignalName(Token& tk) {
             throw mattsyntaxerror("Expected a pin name.", tk.at);
         }
 
-        ret.pin = tk.id;
+        ret.pin = tk;
         // Todo: ensure pin is acceptable identifier
         stepAndPeek(tk);
     }

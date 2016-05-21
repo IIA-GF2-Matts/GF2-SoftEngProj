@@ -18,8 +18,8 @@
 
 /// Signal struct, representing a DEVICE.PIN pair.
 struct Signal {
-    name device;
-    name pin;
+    Token device;
+    Token pin;
 };
 
 
