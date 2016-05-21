@@ -1,25 +1,28 @@
-#ifndef names_h
-#define names_h
 
-#include <string>
+#ifndef GF2_NAMES_H
+#define GF2_NAMES_H
+
 #include <set>
 
 #include "cistring.h"
-
-using namespace std;
 
 
 typedef cistring namestring;
 typedef std::set<namestring>::const_iterator name;
 
-const int maxnames  = 200;  /* max number of distinct names */
-const int maxlength = 8;    /* max chars in a name string   */
-const name blankname;       /* special name (defaults to end iterator)*/
+extern const name blankname;       /* special name (defaults to end iterator)*/
+extern const namestring blanknamestr;
 
+/// Names Table Class
+/// Stores the names using the STL `std::set` container.
+/// The type stored is `cistring`, which is a case-insensitive variant on `std::string`.
+/// Name IDs are in fact `const_iterator`s to items in the set, it's worth noting that
+///   the standard enforces that changes to the set won't change an items iterator.
+/// `blankname` is a special case, stored as the `end()` iterator of the set. This
+///   cannot be dereferenced or used like the other iterators.
 class names{
-
+private:
   std::set<namestring> _nameSet;
-
 
 public:
   name lookup (namestring str);
@@ -32,8 +35,8 @@ public:
     /* form.  If the name is not in the name table then 'blankname' is     */
     /* returned.                                                           */
 
-  void writename (name id);
-    /* Prints out the given name on the console                            */
+  const namestring& namestr(name id) const;
+    /* Returns the string representation of the name id                    */
 
   int namelength (name id);
     /* Returns length ie number of characters in given name                */
@@ -44,4 +47,4 @@ public:
     /* are used.                                                           */
 };
 
-#endif /* names_h */
+#endif /* GF2_NAMES_H */

@@ -3,6 +3,7 @@
 
 #include "names.h"
 #include "network.h"
+#include "sourcepos.h"
 
 class devices{
   names* nmz;      // the version of the names module we use.
@@ -17,10 +18,10 @@ class devices{
   bool        debugging;
 
   void showdevice (devlink d);
-  void makeswitch (name id, int setting, bool& ok);
-  void makeclock (name id, int frequency);
-  void makegate (devicekind dkind, name did, int ninputs, bool& ok);
-  void makedtype (name id);
+  void makeswitch (name id, int setting, bool& ok, SourcePos at = SourcePos());
+  void makeclock (name id, int frequency, SourcePos at = SourcePos());
+  void makegate (devicekind dkind, name did, int ninputs, bool& ok, SourcePos at = SourcePos());
+  void makedtype (name id, bool& ok, SourcePos at = SourcePos());
   void signalupdate (asignal target, asignal& sig);
   asignal inv (asignal s);
   void execswitch (devlink d);
@@ -32,13 +33,17 @@ class devices{
   void outsig (asignal s);
 
 public:
-  void makedevice (devicekind dkind, name did, int variant, bool& ok);
+  void makedevice (devicekind dkind, name did, int variant, bool& ok, SourcePos at = SourcePos());
     /* Adds a device to the network of the specified kind and name.  The   */
     /* variant is used with such things as gates where it specifies the    */
     /* number of inputs. 'ok' returns true if operation succeeds.          */
 
-  void setswitch (name sid, asignal level, bool& ok);
+  void setswitch (name sid, asignal level, bool& ok, SourcePos at = SourcePos());
     /* Sets the state of the named switch. 'ok' returns false if switch    */
+    /* not found.                                                          */
+
+  void setclock (name sid, int frequency, bool& ok, SourcePos at = SourcePos());
+    /* Sets the frequency of the named clock. 'ok' returns false if clock  */
     /* not found.                                                          */
 
   void executedevices (bool& ok);

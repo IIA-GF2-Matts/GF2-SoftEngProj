@@ -28,15 +28,15 @@ Token::Token(SourcePos pos, TokType t)
 }
 
 Token::Token(TokType t)
-    : at(0, 0, 0), type(t) {
+    : at(), type(t) {
 }
 
 Token::Token(TokType t, namestring s)
-    : at(0, 0, 0), type(t), name(s) {
+    : at(), type(t), name(s) {
 }
 
 Token::Token(TokType t, int num)
-    : at(0, 0, 0), type(t), number(num) {
+    : at(), type(t), number(num) {
     if (t == TokType::DeviceType) {
         devtype = devicekind(num);
     }
@@ -83,7 +83,7 @@ Token scanner::readNext() {
                 c = readChar();
 
                 if (_ips.eof()) {
-                    throw matterror("Unterminated block comment.", _file, p);
+                    throw mattsyntaxerror("Unterminated block comment.", p);
                 }
 
                 if (hadStar && c == '/') {
@@ -94,7 +94,7 @@ Token scanner::readNext() {
             }
 	    }
         else {
-        	throw matterror("Illegal character sequence '/' in file.", _file, p);
+        	throw mattsyntaxerror("Illegal character sequence '/' in file.", p);
         }
 
         if (_ips.eof()) {
@@ -136,7 +136,7 @@ Token scanner::readNext() {
                 ret.number = readNumber(c);
 
                 if (ret.number < 0) {
-                    throw matterror("Number is too large to be represented in Mattlab.", _file, ret.at);
+                    throw mattsyntaxerror("Number is too large to be represented in Mattlab.", ret.at);
                 }
             }
             else if (std::isalpha(c)) {
@@ -178,7 +178,7 @@ Token scanner::readNext() {
                         << " in file. ";
                 }
 
-                throw matterror(oss.str(), _file, ret.at);
+                throw mattsyntaxerror(oss.str(), ret.at);
             }
 
             break;
@@ -227,7 +227,7 @@ scanner::scanner()
 
 
 void scanner::open(std::istream* is, std::string fname) {
-    _ips.setStream(is);
+    _ips.setStream(is, fname);
     _file = fname;
 
     _open = true;

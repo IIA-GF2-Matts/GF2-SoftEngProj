@@ -7,7 +7,7 @@ TARGET = logsim.exe
 COMPILE_OPTIONS = -g -std=c++11 -Wall
 LINK_OPTIONS =
 
-SRCS = logsim.cc scanner.cc parser.cc devices.cc cistring.cc iposstream.cc monitor.cc names.cc network.cc userint.cc errorhandler.cc
+SRCS = logsim.cc scanner.cc parser.cc devices.cc cistring.cc iposstream.cc monitor.cc sourcepos.cc names.cc network.cc userint.cc errorhandler.cc autocorrect.cc 
 OBJS = $(SRCS:.cc=.o)
 
 $(TARGET): $(OBJS)

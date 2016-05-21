@@ -2,6 +2,9 @@
 #include "userint.h"
 #include <cctype>
 
+#include "scanner.h"
+#include "errorhandler.h"
+
 using namespace std;
 
 /* User interface specification */
@@ -14,7 +17,6 @@ using namespace std;
  */
 void userint::readline (void)
 {
-  char ch;
   do {
     cout << "# " << flush;
     cin.getline (cmdline, maxline);
@@ -99,42 +101,29 @@ void userint::rdnumber (int& n, int lo, int hi)
 
 /***********************************************************************
  *
- * Read the next token from the input text string.
- *
- */
-void userint::rdstring (namestring &n)
-{
-  int i = 0;
-  skip ();
-  cmdok = isalpha(curch);
-  if (cmdok) {
-    do {
-      if (i < maxlength) {
-	n += curch;
-	i++;
-      }
-      getch ();
-    } while (isdigit(curch) || isalpha(curch));
-  } else
-    cout << "Error: name wanted" << endl;
-}
-
-
-/***********************************************************************
- *
  * Read a name from the input text string.
  *
  */
 void userint::rdname (name& n)
 {
-  namestring ns;
-  rdstring (ns);
-  if (cmdok) {
-    n = nmz->cvtname (ns);
-    if (n == blankname) {
-      cout << "Error: unknown name" << endl;
-      cmdok = false;
+  try {
+    strscanner scan(&cmdline[cmdpos]);
+
+    Token t = scan.step();
+
+    if (t.type != TokType::Identifier) {
+      throw matterror("Expecting identifer.", SourcePos(1, cmdpos));
     }
+
+    n = nmz->cvtname(t.name);
+    if (n == blankname)
+      throw matterror("Unknown name.", SourcePos(1, cmdpos));
+
+    cmdpos += scan.peek().at.Abs;
+  }
+  catch (matterror& e) {
+    std::cout << e.what() << std::endl;
+    cmdok = false;
   }
 }
 
@@ -146,14 +135,39 @@ void userint::rdname (name& n)
  */
 void userint::rdqualname (name& prefix, name& suffix)
 {
-  rdname (prefix);
-  if (cmdok) {
-    skip ();
-    if (curch == '.') {
-      getch ();
-      rdname (suffix);
-    } else 
-      suffix = blankname;
+  try {
+    strscanner scan(&cmdline[cmdpos]);
+
+    Token t = scan.step();
+
+    if (t.type != TokType::Identifier) {
+      throw matterror("Expecting identifer.", SourcePos(1, cmdpos, cmdpos));
+    }
+
+    prefix = nmz->cvtname(t.name);
+    if (prefix == blankname)
+      throw matterror("Unknown device.", SourcePos(1, cmdpos, cmdpos));
+
+    t = scan.peek();
+
+    if (t.type == TokType::Dot) {
+      scan.step();
+      t = scan.step();
+
+      if (t.type != TokType::Identifier) {
+        throw matterror("Expecting pin identifer.", SourcePos(1, cmdpos, cmdpos));
+      }
+
+      suffix = nmz->cvtname(t.name);
+      if (suffix == blankname)
+        throw matterror("Unknown pin name.", SourcePos(1, cmdpos, cmdpos));
+    }
+
+    cmdpos += scan.peek().at.Abs;
+  }
+  catch (matterror& e) {
+    std::cout << e.what() << std::endl;
+    cmdok = false;
   }
 }
 
@@ -172,7 +186,7 @@ void userint::setswcmd (void)
   if (cmdok) {
     rdnumber (level, 0, 1);
     if (cmdok) {
-      if (level == 0) 
+      if (level == 0)
 	dmz->setswitch (swid, low, cmdok);
       else
 	dmz->setswitch (swid, high, cmdok);
@@ -217,7 +231,6 @@ void userint::runnetwork (int ncycles)
  */
 void userint::runcmd (void)
 {
-  int n;
   int ncycles;
   cyclescompleted = 0;
   rdnumber (ncycles, 1, maxcycles);
@@ -239,14 +252,16 @@ void userint::continuecmd (void)
 {
   int ncycles;
   rdnumber (ncycles, 1, maxcycles);
-  if (cmdok)
+  if (cmdok) {
     if (cyclescompleted > 0) {
       if ((ncycles + cyclescompleted) > maxcycles)
-	ncycles = maxcycles - cyclescompleted;
+        ncycles = maxcycles - cyclescompleted;
       cout << "Continuing for " << ncycles << " cycles" << endl;
       runnetwork (ncycles);
-    } else
+    } else {
       cout << "Error: nothing to continue!" << endl;
+    }
+  }
 }
 
 
@@ -347,7 +362,7 @@ void userint::userinterface (void)
     char poscm[] = {'s','r','c','d','z','m','h','q'};
     charset cmset(poscm, poscm + 8);
     rdcmd (cmd, cmset);
-    if (cmdok) 
+    if (cmdok)
       switch (cmd) {
       case 's': setswcmd ();    break;
       case 'r': runcmd ();      break;

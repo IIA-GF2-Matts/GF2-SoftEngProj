@@ -2,11 +2,15 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 
 CXX = $(shell wx-config --version=3.0 --cxx) -DUSE_GUI -std=c++11
 
-SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc guitest.cc iposstream.cc cistring.cc errorhandler.cc
+SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc guierrorhandler.cc autocorrect.cc
 
+<<<<<<< HEAD
 L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o
 
 G_OBJECTS = guitest.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o
+=======
+L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o sourcepos.o guierrordialog.o autocorrect.o
+>>>>>>> 1fc6df6cd21478b2873cd578fd010fe874da908e
 
 
 # implementation
@@ -16,16 +20,11 @@ G_OBJECTS = guitest.o names.o scanner.o network.o parser.o monitor.o devices.o u
 .cc.o :
 	$(CXX) -c `wx-config --version=3.0 --cxxflags` -g -o $@ $<
 
-all:    logsim guitest
-
 logsim:	$(L_OBJECTS)
 	$(CXX) -o logsim $(L_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
-guitest: $(G_OBJECTS)
-	 $(CXX) -o guitest $(G_OBJECTS) `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
-
 clean:
-	rm -f *.o logsim guitest scanner_unittest
+	rm -f *.o logsim scanner_unittest
 
 depend:
 	makedepend $(SRC)
@@ -75,15 +74,17 @@ scanner_unittest : scanner.o scanner_unittest.o gtest_main.a iposstream.o cistri
 
 # DO NOT DELETE
 
-scanner.o: scanner.h iposstream.h names.h cistring.h errorhandler.h
+iposstream.o: iposstream.h sourcepos.h 
+scanner.o: scanner.h iposstream.h names.h cistring.h errorhandler.h sourcepos.h
 logsim.o: logsim.h names.h devices.h network.h monitor.h parser.h userint.h
 logsim.o: gui.h
-names.o: names.h cistring.h
+names.o: names.h cistring.h sourcepos.h
 network.o: network.h names.h
 parser.o: parser.h names.h network.h devices.h monitor.h
 monitor.o: monitor.h names.h network.h devices.h
 devices.o: devices.h names.h network.h
 userint.o: userint.h names.h network.h devices.h monitor.h
-gui.o: gui.h names.h devices.h network.h monitor.h guicanvas.cc guicanvas.h
+gui.o: gui.h names.h devices.h network.h monitor.h guicanvas.cc guicanvas.h guierrordialog.h
 guicanvas.o: guicanvas.h names.h monitor.h
-guitest.o: guitest.h names.h devices.h network.h monitor.h gui.h
+guierrorhandler.o: guierrordialog.h errorhandler.h
+autocorrect.o: cistring.h

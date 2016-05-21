@@ -1,40 +1,26 @@
 
+#include <istream>
+
+#include "sourcepos.h"
 #include "iposstream.h"
 
-
-// struct SourcePos
-
-SourcePos::SourcePos()
-	: SourcePos( 0, 0, 0 ) {
-}
-
-SourcePos::SourcePos( int line, int col, int abs )
-	: SourcePos( line, col, abs, abs - col ) {
-}
-
-SourcePos::SourcePos( int line, int col, int abs, int lineStart )
-	: Line( line ),
-	  Column( col ),
-	  Abs( abs ),
-	  LineStart( lineStart ) {
-}
-
-std::ostream& operator<<( std::ostream& os, const SourcePos& sp ) {
-	return( os << sp.Line << ":" << sp.Column );
-}
 
 
 // class iposstream
 
 // Creates an uninitialised positional stream
 iposstream::iposstream()
-	: Pos( 0, 0, 0 ), TabWidth( 1 ), _open(false), next( 1, 1, 1 ) {
+	: Pos( ), TabWidth( 1 ), _open(false), next( "", 1, 1, 1 ) {
 }
 
 
 // Creates a positional stream based on an input stream.
 iposstream::iposstream( std::istream* base )
-	: Pos( 0, 0, 0 ), TabWidth( 1 ), _open(true), basestream( base ), next( 1, 1, 1 ) {
+	: Pos( ), TabWidth( 1 ), _open(true), basestream( base ), next( "", 1, 1, 1 ) {
+}
+
+iposstream::iposstream( std::istream* base, std::string fname )
+	: Pos( fname, 0, 0, 0 ), TabWidth( 1 ), _open(true), basestream( base ), next( fname, 1, 1, 1 ) {
 }
 
 iposstream::~iposstream() {
@@ -74,7 +60,7 @@ int iposstream::get() {
 	if ( ret == '\n' ) {
 		this->next.Line += 1;
 		this->next.Column = 1;
-		this->next.LineStart = this->next.Abs + 1;
+		// this->next.LineStart = this->next.Abs + 1;
 	}
 	// else if ( ret == '\t' ) { // Tab is not always counted as 1 character.
 	// 	this->next.Abs += this->TabWidth - 1;
@@ -97,4 +83,10 @@ bool iposstream::eof() const {
 void iposstream::setStream(std::istream* is) {
 	basestream = is;
 	_open = true;
+}
+
+void iposstream::setStream(std::istream* is, std::string fname) {
+	setStream(is);
+	Pos.setFile(fname);
+	next.setFile(fname);
 }

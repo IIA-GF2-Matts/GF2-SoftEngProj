@@ -3,6 +3,7 @@
 #include <string>
 #include <ostream>
 #include <sstream>
+#include <set>
 
 #include "names.h"
 #include "scanner.h"
@@ -59,8 +60,13 @@ private:
     void parseOptionSet(Token& tk, name dv);
 
     /// option = key , ":" , value , ";" ;
-    /// value = signalname | number ;
     void parseOption(Token& tk, name dv);
+
+    /// key = identifier ;
+    void parseKey(Token& tk, devlink dvl, Token& keytk);
+
+    /// value = signalname | number ;
+    void parseValue(Token& tk, devlink dvl, Token& keytk);
 
     /// definemonitor = "monitor" , monitorset , ";" ;
     /// monitorset = monitor , { "," , monitor } ;
@@ -77,6 +83,25 @@ private:
 
     // get the error message when a signal pin is unknown
     void getUnknownPinError(Signal& sig, std::ostringstream& oss) ;
+
+    // get the error message when a key has been previously defined
+    template<typename T>
+    void getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss);
+
+    // get the error message when a suggested input is required
+    void getClosestMatchError(namestring nm, std::set<cistring> candidates, std::ostringstream& oss);
+
+    // checks if keyname is a valid property key of a devlice
+    bool isLegalProperty(devlink dl, name keyname);
+
+    // links a device's input pin (specified by keytk) to a signal
+    void assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig);
+
+    // sets a device's properties to that specified by valuetk
+    // note, should check that the key is valid first
+    void assignProperty(devlink dvl, Token keytk, Token valuetk);
+
+
 
 public:
     /// Construct a parser to work on the pointers to other classes

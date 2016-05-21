@@ -1,6 +1,7 @@
 #include "devices.h"
 #include <iostream>
 #include <string>
+#include "names.h"
 
 using namespace std;
 
@@ -31,24 +32,19 @@ void devices::showdevice (devlink d)
 {
   inplink  i;
   outplink o;
-  cout << "   Device: ";
-  nmz->writename (d->id);
+  cout << "   Device: " << nmz->namestr(d->id);
   cout << "  Kind: ";
   writedevice (d->kind);
   cout << endl;
   cout << "   Inputs:" << endl;
   for (i = d->ilist; i != NULL; i = i->next) {
-    cout << "      ";
-    nmz->writename (i->id);
-    cout << " ";
+    cout << "      " << nmz->namestr(i->id) << " ";
     outsig (i->connect->sig);
     cout << endl;
   }
   cout << "   Outputs:";
   for (o = d->olist; o != NULL; o = o->next) {
-    cout << "      ";
-    nmz->writename (o->id);
-    cout << " ";
+    cout << "      " << nmz->namestr(o->id) << " ";
     outsig (o->sig);
     cout << endl;
   }
@@ -62,15 +58,17 @@ void devices::showdevice (devlink d)
  * not found.
  *
  */
-void devices::setswitch (name sid, asignal level, bool& ok)
+void devices::setswitch (name sid, asignal level, bool& ok, SourcePos at)
 {
   devlink d;
   d = netz->finddevice (sid);
   ok = (d != NULL);
   if (ok) {
     ok = (d->kind == aswitch);
-    if (ok)
+    if (ok) {
       d->swstate = level;
+      d->setAt = at;
+    }
   }
 }
 
@@ -81,18 +79,44 @@ void devices::setswitch (name sid, asignal level, bool& ok)
  * Called by makedevice.
  *
  */
-void devices::makeswitch (name id, int setting, bool& ok)
+void devices::makeswitch (name id, int setting, bool& ok, SourcePos at)
 {
   devlink d;
   ok = (setting <= 1);
   if (ok) {
     netz->adddevice (aswitch, id, d);
-    netz->addoutput (d, blankname);
-    if (setting == -1) {
-      d->swstate = floating;
+
+    ok = d != NULL;
+    if (ok) {
+      d->definedAt = at;
+      netz->addoutput (d, blankname);
+      if (setting == -1) {
+        d->swstate = floating;
+      }
+      else {
+        d->swstate = (setting == 0) ? low : high;
+      }
     }
-    else {
-      d->swstate = (setting == 0) ? low : high;
+  }
+}
+
+
+/***********************************************************************
+ *
+ * Sets the frequency of the named clock. 'ok' returns false if clock
+ * not found.
+ *
+ */
+void devices::setclock (name sid, int frequency, bool& ok, SourcePos at)
+{
+  devlink d;
+  d = netz->finddevice (sid);
+  ok = (d != NULL);
+  if (ok) {
+    ok = (d->kind == aclock);
+    if (ok) {
+      d->frequency = frequency;
+      d->setAt = at;
     }
   }
 }
@@ -104,11 +128,12 @@ void devices::makeswitch (name id, int setting, bool& ok)
  * Called by makedevice.
  *
  */
-void devices::makeclock (name id, int frequency)
+void devices::makeclock (name id, int frequency, SourcePos at)
 {
   devlink d;
   netz->adddevice (aclock, id, d);
   netz->addoutput (d, blankname);
+  d->definedAt = at;
   d->frequency = frequency;
   d->counter = 0;
 }
@@ -120,7 +145,7 @@ void devices::makeclock (name id, int frequency)
  * Called by makedevice.
  *
  */
-void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok)
+void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok, SourcePos at)
 {
   const int maxinputs = 16;
   devlink d;
@@ -129,14 +154,16 @@ void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok)
   ok = (ninputs <= maxinputs);
   if (ok) {
     netz->adddevice (dkind, did, d);
+    d->definedAt = at;
+
     netz->addoutput (d, blankname);
     for (n = 1; n <= ninputs; n++) {
       iname = "I";
       if (n < 10) {
-	iname += ((char) n) + '0';
+        iname += ((char) n) + '0';
       } else {
-	iname += ((char) (n / 10)) + '0';
-	iname += ((char) (n % 10)) + '0';
+        iname += ((char) (n / 10)) + '0';
+        iname += ((char) (n % 10)) + '0';
       }
       netz->addinput (d, nmz->lookup (iname));
     }
@@ -152,7 +179,7 @@ void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok)
  * Called by makedevice.
  *
  */
-void devices::makedtype (name id)
+void devices::makedtype (name id, bool& ok, SourcePos at)
 {
   devlink d;
   netz->adddevice (dtype, id, d);
@@ -163,11 +190,12 @@ void devices::makedtype (name id)
   netz->addoutput (d, qpin);
   netz->addoutput (d, qbarpin);
   d->memory = low;
+  d->definedAt = at;
 
   // Default SET and CLR to zero
   // Todo: Actually check ok.
-  bool ok;
   netz->makeconnection(id, setpin, zero, blankname, ok);
+  if (!ok) return;
   netz->makeconnection(id, clrpin, zero, blankname, ok);
 }
 
@@ -179,27 +207,27 @@ void devices::makedtype (name id)
  * number of inputs. 'ok' returns true if operation succeeds.
  *
  */
-void devices::makedevice (devicekind dkind, name did, int variant, bool& ok)
+void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, SourcePos at)
 {
   ok = true;
   switch (dkind) {
     case aswitch:
-      makeswitch (did, variant, ok);
+      makeswitch (did, variant, ok, at);
       break;
     case aclock:
-      makeclock (did, variant);
+      makeclock (did, variant, at);
       break;
     case andgate:
     case nandgate:
     case orgate:
     case norgate:
-      makegate (dkind, did, variant, ok);
+      makegate (dkind, did, variant, ok, at);
       break;
     case xorgate:
-      makegate (dkind, did, 2, ok);
+      makegate (dkind, did, 2, ok, at);
       break;
     case dtype:
-      makedtype(did);
+      makedtype(did, ok, at);
       break;
   }
 }
@@ -428,7 +456,7 @@ name devices::getname (devicekind k) const
  */
 void devices::writedevice (devicekind k)
 {
-  nmz->writename (dtab[k]);
+  std::cout << nmz->namestr(dtab[k]);
 }
 
 

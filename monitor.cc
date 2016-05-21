@@ -1,5 +1,6 @@
 #include <iostream>
 #include "monitor.h"
+#include "names.h"
 
 using namespace std;
 
@@ -154,15 +155,14 @@ void monitor::displaysignals (void)
   for (n = 0; n < moncount (); n++) {
     getmonname (n, dev, outp);
     namesize = nmz->namelength (dev);
-    nmz->writename (dev);
+    cout << nmz->namestr(dev);
     if (outp != blankname) {
-      cout << ".";
-      nmz->writename (outp);
-      namesize = namesize + nmz->namelength (outp) + 1;
+      cout << "." << nmz->namestr(outp);
+      namesize = namesize + nmz->namelength(outp) + 1;
     }
     if ((margin - namesize) > 0) {
       for (i = 0; i < (margin - namesize - 1); i++)
-	cout << " ";
+        cout << " ";
       cout << ":";
     }
     for (i = 0; i < cycles; i++)

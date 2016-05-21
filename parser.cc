@@ -1,9 +1,13 @@
 
 #include <iostream>
 #include <sstream>
+#include <set>
+#include <iterator>
 
 #include "errorhandler.h"
 #include "scanner.h"
+#include "names.h"
+#include "autocorrect.h"
 
 #include "parser.h"
 
@@ -11,7 +15,7 @@
 
 bool isLegalGateInputNamestring(namestring s, int maxn) {
     if (s.length() < 2
-        || s[0] != 'I'
+        || namestring::traits_type::ne(s[0], 'I')
         || !std::isdigit(s[1])
         || (s[1] == '0')) return false;
 
@@ -39,7 +43,9 @@ bool parser::readin() {
     Token tk = _scan.peek();
     parseFile(tk);
 
-    return errs.errors.size() == 0;
+    _netz->checknetwork(errs);
+
+    return errs.errCount() == 0;
 }
 
 void parser::stepAndPeek(Token& tk) {
@@ -59,17 +65,22 @@ void parser::parseFile(Token& tk) {
         catch (matterror& e) {
             errs.report(e);
 
-            // Todo: Can we recover from here?
-            // Keep reading until we see "dev" or "monitor" keywords?
-            break;
+            // Consume tokens until the next statement is reached
+            while (tk.type != TokType::DevKeyword && tk.type != TokType::MonitorKeyword) {
+                if (tk.type == TokType::EndOfFile) {
+                    stepAndPeek(tk);
+                    break;
+                }
+                stepAndPeek(tk);
+            }
         }
     }
 
     // TODO: Check for errors after parsing.
 
     std::cout << "File parsed with "
-            << errs.errors.size() << " errors and "
-            << errs.warnings.size() << " warnings." << std::endl;
+            << errs.errCount() << " errors and "
+            << errs.warnCount() << " warnings." << std::endl;
 }
 
 
@@ -88,7 +99,7 @@ void parser::parseStatement(Token& tk) {
             break;
         default:
             // Todo: Better message.
-            throw matterror("Unexpected token type. Expected a device or monitor defintion.", _scan.getFile(), tk.at);
+            throw mattsyntaxerror("Unexpected token type. Expected a device or monitor definition.", tk.at);
     }
 }
 
@@ -98,7 +109,7 @@ void parser::parseDefineDevice(Token& tk) {
     Token nameToken;
 
     if (tk.type != TokType::Identifier) {
-        throw matterror("Expected a device name.", _scan.getFile(), tk.at);
+        throw mattsyntaxerror("Expected a device name.", tk.at);
     }
     // dev, as, monitor are handled by the scanner and made *Keywords
     // device types are handled by the scanner and made DeviceTypes
@@ -111,33 +122,37 @@ void parser::parseDefineDevice(Token& tk) {
     if (tk.type == TokType::Equals) {
         // Semantic check: has devicename been defined before?
         if (_netz->finddevice(dv) != NULL) {
-            throw matterror("Device types may not be assigned to devices that already exist.", _scan.getFile(), tk.at);
+            throw mattsemanticerror("Device types may not be assigned to devices that already exist.", tk.at);
         }
 
         stepAndPeek(tk);
 
         if (tk.type != TokType::DeviceType) {
-            // Todo: Suggest types
-            throw matterror("Expected device type.", _scan.getFile(), tk.at);
+            std::ostringstream oss;
+            oss << "Expected device type. ";
+            // Todo: Alternative if number?
+            if (tk.type == TokType::Identifier)
+                getClosestMatchError(tk.name, devicesset, oss);
+            throw mattsyntaxerror(oss.str(), tk.at);
         }
         // make device (which adds it to the network)
         bool success;
-        // setting 0 as default varient for the time being
-        // TODO: this may need to be changed for switches, clocks
-        // Todo: if switch, varient -1
-        _devz->makedevice(tk.devtype, dv, 0, success);
+        if (tk.devtype == aswitch)
+            // -1 sets switch to floating
+            _devz->makedevice(tk.devtype, dv, -1, success, nameToken.at);
+        else
+            _devz->makedevice(tk.devtype, dv, 0, success, nameToken.at);
 
         // Debug
         /*
-        std::cout << "made device ";
-        _nms->writename(dv);
+        std::cout << "made device " << _nms-namestr(dv);
         std::cout << " regtype ";
         _devz->writedevice(_netz->finddevice(dv)->kind);
         //_devz->writedevice(_devz->devkind(dv));
         cout << std::endl;
         */
         if (!success) {
-            throw matterror("Unable to add device.", _scan.getFile(), tk.at);
+            throw mattruntimeerror("Unable to add device.", tk.at);
             // TODO: Better error message? Shouldn't ever reach here.
         }
 
@@ -160,7 +175,7 @@ void parser::parseData(Token& tk, name dv) {
     }
     else {
         // Todo: Better error message.
-        throw matterror("Unexpected token. Expecting ; or {.", _scan.getFile(), tk.at);
+        throw mattsyntaxerror("Unexpected token. Expecting ; or {.", tk.at);
     }
 }
 
@@ -169,7 +184,7 @@ void parser::parseData(Token& tk, name dv) {
 void parser::parseOptionSet(Token& tk, name dv) {
     while (tk.type != TokType::CloseBrace) {
         if (tk.type == TokType::EndOfFile) {
-            throw matterror("Unterminated braces.", _scan.getFile(), tk.at);
+            throw mattsyntaxerror("Unterminated braces.", tk.at);
         }
 
         try {
@@ -184,14 +199,11 @@ void parser::parseOptionSet(Token& tk, name dv) {
                     stepAndPeek(tk);
                     return;
                 }
-
                 stepAndPeek(tk);
             }
-
             stepAndPeek(tk);
         }
     }
-
     stepAndPeek(tk);
 }
 
@@ -212,125 +224,248 @@ void parser::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
         oss << " Use Q or Qbar.";
 }
 
+template<typename T>
+void parser::getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss) {
+    // todo: note should be a separate note message
+    oss << "Attempt to redefine " //<< *_devz->getname(dvl->kind)
+        << *dvl->id << "." << *key
+        << ". Note: previously defined as "
+        << prevval << " at position " << dvl->definedAt;
+}
+
+void parser::getClosestMatchError(namestring nm, std::set<cistring> candidates, std::ostringstream& oss) {
+    std::list<cistring> matches;
+    int dist = closestMatches(nm, candidates, matches);
+
+    if (dist < 3 && matches.size() > 0) {
+        auto i = matches.begin();
+
+        oss << "Did you mean";
+        for (; i != std::prev(matches.end()); ++i) {
+            oss << " " << *i;
+        }
+        if (matches.size() > 1)
+            oss << " or";
+        oss << " " << *std::prev(matches.end()) << "?";
+    }
+}
+
+
 
 // option = key , ":" , value , ";" ;
 void parser::parseOption(Token& tk, name dv) {
-    Token key, value;
     devlink dvl = _netz->finddevice(dv);
+    Token keytk, valuetk;
+    parseKey(tk, dvl, keytk);
 
-    if (tk.type != TokType::Identifier) {
-        throw matterror("Expected a key.", _scan.getFile(), tk.at);
+    if (tk.type != TokType::Colon) {
+        throw mattsyntaxerror("Expected colon.", tk.at);
     }
 
-    key = tk;
-    name keyname = _nms->lookup(key.name);
+    stepAndPeek(tk);
+    parseValue(tk, dvl, keytk);
+
+    if (tk.type != TokType::SemiColon) {
+        throw mattsyntaxerror("Missing a semicolon on the end.", tk.at);
+    }
+    stepAndPeek(tk);
+}
+
+// key = identifier ;
+void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
+
+    if (tk.type != TokType::Identifier) {
+        throw mattsyntaxerror("Expected a key.", tk.at);
+    }
+
+    keytk = tk;
+    name keyname = _nms->lookup(keytk.name);
 
     switch(dvl->kind) {
         // Todo: quality check errors
         case aswitch:
-            if (key.name != "InitialValue")
-                throw matterror("Switches may only have an `InitialValue` attribute.", _scan.getFile(), key.at);
+            if (keytk.name != "InitialValue")
+                throw mattsemanticerror("Switches may only have an `InitialValue` attribute.", keytk.at);
             break;
         case aclock:
-            if (key.name != "Period")
-                throw matterror("Clocks may only have a `Period` attribute.", _scan.getFile(), key.at);
+            if (keytk.name != "Period")
+                throw mattsemanticerror("Clocks may only have a `Period` attribute.", keytk.at);
             break;
         case andgate:
-            if (!isLegalGateInputNamestring(key.name, 16))
-                throw matterror("AND gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+            if (!isLegalGateInputNamestring(keytk.name, 16))
+                throw mattsemanticerror("AND gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case nandgate:
-            if (!isLegalGateInputNamestring(key.name, 16))
-                throw matterror("NAND gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+            if (!isLegalGateInputNamestring(keytk.name, 16))
+                throw mattsemanticerror("NAND gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case orgate:
-            if (!isLegalGateInputNamestring(key.name, 16))
-                throw matterror("OR gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+            if (!isLegalGateInputNamestring(keytk.name, 16))
+                throw mattsemanticerror("OR gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case norgate:
-            if (!isLegalGateInputNamestring(key.name, 16))
-                throw matterror("NOR gates may only have input pin attributes (up to 16), labelled I1 to I16", _scan.getFile(), key.at);
+            if (!isLegalGateInputNamestring(keytk.name, 16))
+                throw mattsemanticerror("NOR gates may only have input pin attributes (up to 16), labelled I1 to I16", keytk.at);
             break;
         case xorgate:
-            if (!isLegalGateInputNamestring(key.name, 2))
-                throw matterror("XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", _scan.getFile(), key.at);
+            if (!isLegalGateInputNamestring(keytk.name, 2))
+                throw mattsemanticerror("XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", keytk.at);
             break;
         case dtype:
-            if (!(key.name == "DATA" || key.name == "CLK" || key.name == "SET" || key.name == "CLEAR"))
-                throw matterror("DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned", _scan.getFile(), key.at);
-                // Todo: closest word suggestion
+            if (!(keytk.name == "DATA" || keytk.name == "CLK" || keytk.name == "SET" || keytk.name == "CLEAR")) {
+                std::ostringstream oss;
+                oss << "DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. ";
+                getClosestMatchError(keytk.name, dtypeoutset, oss);
+                throw mattsemanticerror(oss.str(), keytk.at);
+            }
             break;
         case baddevice:
         default:
             // Should never reach here
             // Todo: better error message?
-            throw matterror("Could not assign key to a bad device type", _scan.getFile(), key.at);
+            throw mattruntimeerror("Could not assign key to a bad device type", keytk.at);
     }
 
-    // Todo: check if key has already been defined for particular device
-
-    stepAndPeek(tk);
-
-    if (tk.type != TokType::Colon) {
-        throw matterror("Expected colon.", _scan.getFile(), tk.at);
-    }
-
-    stepAndPeek(tk);
-    value = tk;
-
-    if (dvl->kind == aswitch) {
-        // Switch
-        if (value.type != TokType::Number || (value.number != 0 && value.number != 1))
-            throw matterror("Switches must have initial values of either 0 or 1", _scan.getFile(), value.at);
-
-        asignal sig = value.number ? high : low;
-        bool success = false;
-
-        _devz->setswitch(dv, sig, success);
-        if (!success)
-            throw matterror("Could not set switch initial value", _scan.getFile(), value.at);
-
-        stepAndPeek(tk);
-
-    } else if (dvl->kind == aclock) {
-        // Clock
-        if (value.type != TokType::Number || value.number < 1 || value.number > 32767)
-            throw matterror("Clock periods must be integers between 1 and 32767", _scan.getFile(), value.at);
-        dvl->frequency = value.number;
-
-        stepAndPeek(tk);
-
-    } else {
-        // A gate
-        Signal sig = parseSignalName(tk);
-        // Ensure signal exists
-        signal_legality badSignal = isBadSignal(sig);
-        if (badSignal) {
-            if (badSignal == ILLEGAL_DEVICE) {
-                throw matterror("Devices must be defined before being referenced", _scan.getFile(), value.at);
-            } else {
-                // ILLEGAL_PIN
+    // check if key has already been defined for particular device
+    switch(dvl->kind) {
+        // Todo: check errors
+        case aswitch:
+            if (dvl->swstate != floating) {
                 std::ostringstream oss;
-                oss << "Unable to set input pin. ";
-                getUnknownPinError(sig, oss);
-                throw matterror(oss.str(), _scan.getFile(), value.at);
+                getPredefinedError(dvl, keyname, dvl->swstate == high ? 1 : 0, oss);
+                throw mattsemanticerror(oss.str(), keytk.at);
             }
+            break;
+        case aclock:
+            if (dvl->frequency != 0) {
+                std::ostringstream oss;
+                getPredefinedError(dvl, keyname, dvl->frequency, oss);
+                throw mattsemanticerror(oss.str(), keytk.at);
+            }
+            break;
+        case andgate:
+        case nandgate:
+        case orgate:
+        case norgate:
+        case xorgate:
+        case dtype:
+        default: {
+            inplink il = _netz->findinput(dvl, keyname);
+            if (il != NULL && (il->connect != NULL)) {
+                std::ostringstream oss, prevval;
+                outplink ol = il->connect;
+                devlink dl = _netz->findoutputdevice(ol);
+                if (dl == NULL)
+                    // Should never reach here
+                    throw mattruntimeerror("Device with requested output pin could not be found in the network. Connection not made.", keytk.at);
+
+                prevval << *dl->id;
+
+                if (ol->id != blankname)
+                    prevval << *ol->id;
+                getPredefinedError(dvl, keyname, prevval.str(), oss);
+                throw mattsemanticerror(oss.str(), keytk.at);
+            }
+            break;
         }
-        // connect the gate
-        _netz->addinput(dvl, keyname);
-        bool success = false;
-        _netz->makeconnection(dv, keyname, sig.device, sig.pin, success);
-        if (!success)
-            // Todo: improve error message
-            throw matterror("Could not make connection", _scan.getFile(), key.at);
-
-    }
-
-    if (tk.type != TokType::SemiColon) {
-        throw matterror("Missing a semicolon on the end.", _scan.getFile(), tk.at);
     }
     stepAndPeek(tk);
 }
+
+
+bool parser::isLegalProperty(devlink dvl, name keyname) {
+    return ( (dvl->kind == aclock && keyname == _nms->lookup("Period"))
+            || (dvl->kind == aswitch && keyname == _nms->lookup("InitialValue")));
+}
+
+
+// value = signalname | number ;
+void parser::parseValue(Token& tk, devlink dvl, Token& keytk) {
+    Token valuetk = tk;
+    name keyname = _nms->lookup(keytk.name);
+
+    if (valuetk.type == TokType::Identifier) {
+        // a signal
+        Signal sig = parseSignalName(tk);
+
+        if (isLegalProperty(dvl, keyname)) {
+            throw mattsemanticerror("Attempt to assign a signal to a property", valuetk.at);
+        }
+
+        assignPin(dvl, keytk, valuetk, sig);
+    } else if (valuetk.type == TokType::Number) {
+        stepAndPeek(tk);
+
+        if (isLegalProperty(dvl, keyname)) {
+            assignProperty(dvl, keytk, valuetk);
+        }
+        else {
+            if (valuetk.number != 0 && tk.number != 1)
+                // Todo: improve error message
+                throw mattsyntaxerror("Invalid signal.", valuetk.at);
+            Signal sig;
+            sig.device = _nms->lookup(valuetk.number  ? "1" : "0");
+            assignPin(dvl, keytk, valuetk, sig);
+        }
+    } else {
+        throw mattsyntaxerror("Expected an Identifier or Number", valuetk.at);
+    }
+}
+
+void parser::assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig) {
+    name keyname = _nms->lookup(keytk.name);
+    // Ensure signal exists
+    signal_legality badSignal = isBadSignal(sig);
+    if (badSignal) {
+        if (badSignal == ILLEGAL_DEVICE) {
+            throw mattsemanticerror("Devices must be defined before being referenced", valuetk.at);
+        } else {
+            // ILLEGAL_PIN
+            std::ostringstream oss;
+            oss << "Unable to set input pin. ";
+            getUnknownPinError(sig, oss);
+            throw mattsemanticerror(oss.str(), valuetk.at);
+        }
+    }
+
+    // connect the gate
+    bool success = false;
+    if (!_netz->findinput(dvl, keyname))
+        _netz->addinput(dvl, keyname, keytk.at);
+
+    // todo: store token position?
+    _netz->makeconnection(dvl->id, keyname, sig.device, sig.pin, success);
+    if (!success)
+        // Todo: improve error message
+        throw mattruntimeerror("Could not make connection", keytk.at);
+}
+
+void parser::assignProperty(devlink dvl, Token keytk, Token valuetk) {
+    bool success = false;
+    if (dvl->kind == aswitch) {
+        // Switch
+        if (valuetk.type != TokType::Number || (valuetk.number != 0 && valuetk.number != 1))
+            throw mattsemanticerror("Switches must have initial values of either 0 or 1", valuetk.at);
+
+        asignal sig = valuetk.number ? high : low;
+        _devz->setswitch(dvl->id, sig, success, keytk.at);
+
+        if (!success)
+            throw mattruntimeerror("Could not set switch initial value", valuetk.at);
+
+    } else if (dvl->kind == aclock) {
+        // Clock
+        if (valuetk.type != TokType::Number || valuetk.number < 1 || valuetk.number > 32767)
+            throw mattsemanticerror("Clock periods must be integers between 1 and 32767", valuetk.at);
+
+        // Todo: these might want to store a different token position
+        _devz->setclock(dvl->id, valuetk.number, success, keytk.at);
+
+        if (!success)
+            throw mattruntimeerror("Could not set clock period", valuetk.at);
+    }
+}
+
 
 
 // definemonitor = "monitor" , monitorset , ";" ;
@@ -343,7 +478,7 @@ void parser::parseDefineMonitor(Token& tk) {
             break;
         }
         else if (tk.type != TokType::Comma) {
-            throw matterror("Expected a comma in the monitor list.", _scan.getFile(), tk.at);
+            throw mattsyntaxerror("Expected a comma in the monitor list.", tk.at);
         }
         stepAndPeek(tk);
     }
@@ -361,13 +496,13 @@ void parser::parseMonitor(Token& tk) {
     signal_legality badSignal = isBadSignal(monsig);
     if (badSignal) {
         if (badSignal == ILLEGAL_DEVICE) {
-            throw matterror("Devices must be defined before being monitored", _scan.getFile(), montk.at);
+            throw mattsemanticerror("Devices must be defined before being monitored", montk.at);
         } else {
             // ILLEGAL_PIN
             std::ostringstream oss;
             oss << "Unable to set monitor point. ";
             getUnknownPinError(monsig, oss);
-            throw matterror(oss.str(), _scan.getFile(), montk.at);
+            throw mattruntimeerror(oss.str(), montk.at);
         }
     }
 
@@ -378,8 +513,7 @@ void parser::parseMonitor(Token& tk) {
 
         // Warn if signal exists
         if (!isBadSignal(alisig)) {
-            // mattwarning w("Alias signal name already exists.", _scan.getFile(), tkSig);
-            errs.report(mattwarning("Alias signal name already exists.", _scan.getFile(), tkSig.at));
+            errs.report(mattwarning("Alias signal name already exists.", tkSig.at));
         }
     }
 
@@ -387,7 +521,7 @@ void parser::parseMonitor(Token& tk) {
     _mons->makemonitor(monsig.device, monsig.pin, success, alisig.device, alisig.pin);
     if (!success)
         // Todo: improve error message
-        throw matterror("Could not make monitor", _scan.getFile(), tk.at);
+        throw mattruntimeerror("Could not make monitor", tk.at);
 }
 
 parser::signal_legality parser::isBadSignal(Signal& sig) {
@@ -407,7 +541,7 @@ Signal parser::parseSignalName(Token& tk) {
     ret.pin = blankname;
 
     if (tk.type != TokType::Identifier) {
-        throw matterror("Expected a signal name.", _scan.getFile(), tk.at);
+        throw mattsyntaxerror("Expected a signal name.", tk.at);
     }
 
     // Todo: handle 0 or 1 connections
@@ -419,7 +553,7 @@ Signal parser::parseSignalName(Token& tk) {
         stepAndPeek(tk);
 
         if (tk.type != TokType::Identifier) {
-            throw matterror("Expected a pin name.", _scan.getFile(), tk.at);
+            throw mattsyntaxerror("Expected a pin name.", tk.at);
         }
 
         ret.pin = _nms->lookup(tk.name);

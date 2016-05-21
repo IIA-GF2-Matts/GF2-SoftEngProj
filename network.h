@@ -2,6 +2,8 @@
 #define network_h
 
 #include "names.h"
+#include "sourcepos.h"
+#include "errorhandler.h"
 
 /* Network specification */
 
@@ -11,18 +13,21 @@ typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 
 struct outputrec {
   name       id;
+  SourcePos  definedAt;
   asignal    sig;
   outputrec* next;
 };
 typedef outputrec* outplink;
 struct inputrec {
   name      id;
+  SourcePos  definedAt;
   outplink  connect;
   inputrec* next;
 };
 typedef inputrec* inplink;
 struct devicerec {
   name id;
+  SourcePos  definedAt;
   inplink ilist;
   outplink olist;
   devicerec* next;
@@ -32,6 +37,7 @@ struct devicerec {
   int frequency;        // used when kind == aclock
   int counter;          // used when kind == aclock
   asignal memory;       // used when kind == dtype
+  SourcePos setAt;
 };
 typedef devicerec* devlink;
 
@@ -42,8 +48,11 @@ class network {
   devlink devicelist (void);
     /* Returns list of devices                                             */
 
+  devlink findoutputdevice(const outplink ol);
+    /* Finds the device that creates the output link ol                    */
+
   devlink finddevice (name id);
-   /* Returns link to device with specified name. Returns NULL if not       */
+   /* Returns link to device with specified name. Returns NULL if not      */
    /* found.                                                               */
 
   inplink findinput (devlink dev, name id);
@@ -54,15 +63,15 @@ class network {
     /* Returns link to output of device pointed to by dev with specified   */
     /* name.  Returns NULL if not found.                                    */
 
-  void adddevice (devicekind dkind, name did, devlink& dev);
+  void adddevice (devicekind dkind, name did, devlink& dev, SourcePos at = SourcePos());
     /* Adds a device to the device list with given name and returns a link */
     /* to it via 'dev'.                                                    */
 
-  void addinput (devlink dev, name iid);
+  void addinput (devlink dev, name iid, SourcePos at = SourcePos());
     /* Adds an input to the device pointed to by 'dev' with the specified  */
     /* name.                                                               */
 
-  void addoutput (devlink dev, name oid);
+  void addoutput (devlink dev, name oid, SourcePos at = SourcePos());
     /* Adds an output to the device pointed to by 'dev' with the specified */
     /* name.                                                               */
 
@@ -71,11 +80,14 @@ class network {
     /* 'outp' output of device 'odev'. 'ok' is set true if operation       */
     /* succeeds.                                                           */
 
-  void checknetwork (bool& ok);
+  void checknetwork (errorcollector& col);
     /* Checks that all inputs are connected to an output.                  */
 
   network (names* names_mod);
   /* Called on system initialisation.                                      */
+
+  ~network();
+    /* Frees memory allocated by network                                   */
 
  private:
   devlink devs;          // the list of devices

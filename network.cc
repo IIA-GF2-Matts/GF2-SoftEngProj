@@ -1,5 +1,8 @@
 #include <iostream>
+#include <sstream>
 #include "network.h"
+#include "sourcepos.h"
+#include "errorhandler.h"
 
 using namespace std;
 
@@ -13,6 +16,29 @@ devlink network::devicelist (void)
   return devs;
 }
 
+/***********************************************************************
+ *
+ * Finds the device that creates the output link ol.
+ *
+ */
+devlink network::findoutputdevice(const outplink ol)
+{
+  devlink d = devs;
+  outplink o;
+
+  while (d != NULL) {
+    o = d->olist;
+
+    while (o != NULL) {
+      if (o == ol) return d;
+      o = o->next;
+    }
+
+    d = d->next;
+  }
+
+  return NULL;
+}
 
 /***********************************************************************
  *
@@ -83,10 +109,11 @@ outplink network::findoutput (devlink dev, name id)
  * to it via 'dev'.
  *
  */
-void network::adddevice (devicekind dkind, name did, devlink& dev)
+void network::adddevice (devicekind dkind, name did, devlink& dev, SourcePos at)
 {
   dev = new devicerec;
   dev->id = did;
+  dev->definedAt = at;
   dev->kind = dkind;
   dev->ilist = NULL;
   dev->olist = NULL;
@@ -114,10 +141,11 @@ void network::adddevice (devicekind dkind, name did, devlink& dev)
  * name.
  *
  */
-void network::addinput (devlink dev, name iid)
+void network::addinput (devlink dev, name iid, SourcePos at)
 {
   inplink i = new inputrec;
   i->id = iid;
+  i->definedAt = at;
   i->connect = NULL;
   i->next = dev->ilist;
   dev->ilist = i;
@@ -130,10 +158,11 @@ void network::addinput (devlink dev, name iid)
  * name.
  *
  */
-void network::addoutput (devlink dev, name oid)
+void network::addoutput (devlink dev, name oid, SourcePos at)
 {
   outplink o = new outputrec;
   o->id = oid;
+  o->definedAt = at;
   o->sig = low;
   o->next = dev->olist;
   dev->olist = o;
@@ -170,30 +199,38 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
  * Checks that all inputs are connected to an output.
  *
  */
-void network::checknetwork (bool& ok)
+void network::checknetwork (errorcollector& col)
 {
   devlink d;
   inplink i;
-  ok = true;
+
   for (d = devs; d != NULL; d = d->next) {
     if (d->kind == aswitch) {
       if (d->swstate == floating) {
-        cout << "Unconnected Input : ";
-        nmz->writename(d->id);
-        cout << ".InitialValue" << endl;
+        // Todo: Improve Error message
+        std::ostringstream oss;
+        oss << "Unconnected input: " << nmz->namestr(d->id) << ".InitialValue";
+        col.report(matterror(oss.str(), d->definedAt));
+      }
+    }
+    else if (d->kind == aclock) {
+      if (d->frequency == 0) {
+        // Todo: Improve Error message
+        std::ostringstream oss;
+        oss << "Unconnected input: " << nmz->namestr(d->id) << ".Period";
+        col.report(matterror(oss.str(), d->definedAt));
       }
     }
     else {
       for (i = d->ilist; i != NULL; i = i->next) {
         if (i->connect == NULL) {
-          cout << "Unconnected Input : ";
-          nmz->writename (d->id);
-          if (i->id != blankname) {
-            cout << ".";
-            nmz->writename (i->id);
-          }
-          cout << endl;
-          ok = false;
+          // Todo: Improve Error message
+          std::ostringstream oss;
+          oss << "Unconnected input: " << nmz->namestr(d->id);
+          if (i->id != blankname)
+            oss << "." << nmz->namestr(i->id);
+
+          col.report(matterror(oss.str(), d->definedAt));
         }
       }
     }
@@ -215,3 +252,45 @@ network::network (names* names_mod)
   devs = NULL;
   lastdev = NULL;
 }
+
+
+/***********************************************************************
+ *
+ * The network destructor.
+ * Frees memory allocated by the network
+ * This frees all devicerec, inputrec and outputrec in the lists
+ * Recursive methods are defined locally to delete the lists.
+ *
+ */
+
+void delInpList(inputrec* inpr) {
+  if (!inpr) return;
+
+  delInpList(inpr->next);
+  delete inpr;
+}
+void delOutpList(outputrec* outpr) {
+  if (!outpr) return;
+
+  delOutpList(outpr->next);
+  delete outpr;
+}
+
+void delDevList(devicerec* dr) {
+  if (!dr) return;
+
+  delDevList(dr->next);
+  dr->next = NULL;
+
+  delInpList(dr->ilist);
+  delOutpList(dr->olist);
+
+  delete dr;
+}
+
+network::~network ()
+{
+  delDevList(devs);
+}
+
+
