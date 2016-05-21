@@ -193,7 +193,6 @@ void devices::makedtype (name id, bool& ok, SourcePos at)
   d->definedAt = at;
 
   // Default SET and CLR to zero
-  // Todo: Actually check ok.
   netz->makeconnection(id, setpin, zero, blankname, ok);
   if (!ok) return;
   netz->makeconnection(id, clrpin, zero, blankname, ok);
