@@ -105,9 +105,9 @@ class ScannerTest : public ::testing::Test {
                 << " got " << TokTypeText(tk.type);
 
             if (tk.type == Identifier) {
-                EXPECT_EQ(stream[tn].name, tk.name) << "Itentifier name different at position " << tn
-                << ", expected " << stream[tn].name
-                << " got " << tk.name;
+                EXPECT_EQ(stream[tn].id, tk.id) << "Itentifier name different at position " << tn
+                << ", expected " << stream[tn].id
+                << " got " << tk.id;
             }
             else if (tk.type == Number) {
                 EXPECT_EQ(stream[tn].number, tk.number) << "Itentifier number different at position " << tn

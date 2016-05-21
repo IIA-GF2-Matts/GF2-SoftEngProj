@@ -9,10 +9,10 @@
 #include "guierrordialog.h"
 #include "errorhandler.h"
 
-ErrorDialog::ErrorDialog(wxWindow* parent, 
-        wxWindowID id, 
+ErrorDialog::ErrorDialog(wxWindow* parent,
+        wxWindowID id,
         const errorcollector& errc)
-    : wxDialog(parent, id, "ERROR! YOU IDIOT!", 
+    : wxDialog(parent, id, "ERROR! YOU IDIOT!",
             wxDefaultPosition, wxSize(720, 400)), errs(errc) {
 
 
@@ -22,7 +22,6 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
     wxBoxSizer* topColSizer = new wxBoxSizer( wxHORIZONTAL );
     wxBoxSizer* rowsizer = new wxBoxSizer( wxVERTICAL );
 
-    // Todo: Choose between them
     wxBitmap bmp;
     if (errs.errCount())
         bmp = wxArtProvider::GetBitmap(wxART_ERROR, wxART_MESSAGE_BOX);
@@ -47,7 +46,7 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
                 , wxEmptyString, wxDefaultPosition, wxDefaultSize
                 , wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
 
-    wxFont font1(10, wxFONTFAMILY_TELETYPE, 
+    wxFont font1(10, wxFONTFAMILY_TELETYPE,
         wxFONTSTYLE_NORMAL, wxFONTSTYLE_NORMAL, 0, "Courier");
     errorList->SetFont(font1);
 
@@ -55,17 +54,17 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
     errs.print(os);
 
 
-    topColSizer->Add(errIcon, 0, 
+    topColSizer->Add(errIcon, 0,
             wxALIGN_TOP | wxALIGN_CENTER_HORIZONTAL | wxALL, 16);
 
     topColSizer->Add(rpanel, 1, wxALL | wxEXPAND, 4);
 
-    rowsizer->Add(errorMessage, 0, 
+    rowsizer->Add(errorMessage, 0,
             wxALL, 15);
 
     rowsizer->Add(errorList, 1, wxEXPAND | wxALL, 10);
 
-    rowsizer->Add(okButton, 0, 
+    rowsizer->Add(okButton, 0,
             wxALL | wxALIGN_RIGHT | wxALIGN_BOTTOM, 10);
 
 
@@ -73,7 +72,7 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
     rpanel->SetSizer(rowsizer);
 
     // Bind the widgets and event handlers.
-    Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ErrorDialog::onOk, 
+    Bind(wxEVT_COMMAND_BUTTON_CLICKED, &ErrorDialog::onOk,
             this, okButton->GetId());
 
     Center();

@@ -45,7 +45,8 @@ bool MyApp::OnInit()
     netz = new network(nmz);
     dmz = new devices(nmz, netz);
     mmz = new monitor(nmz, netz);
-    smz.open(argv[1]);
+    smz = new fscanner(nmz);
+    smz->open(argv[1]);
     parser* pmz = new parser(netz, dmz, mmz, smz, nmz);
 
     if (pmz->readin ()) { // check the logic file parsed correctly
@@ -54,6 +55,8 @@ bool MyApp::OnInit()
       umz.userinterface();
     }
 
+    delete pmz;
+    delete smz;
     delete mmz;
     delete dmz;
     delete netz;
