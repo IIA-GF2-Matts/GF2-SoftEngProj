@@ -12,7 +12,7 @@
 
 bool isLegalGateInputNamestring(namestring s, int maxn) {
     if (s.length() < 2
-        || s[0] != 'I'
+        || std::toupper(s[0]) != 'I'
         || !std::isdigit(s[1])
         || (s[1] == '0')) return false;
 
