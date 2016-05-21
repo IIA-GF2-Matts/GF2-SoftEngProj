@@ -202,25 +202,25 @@ void network::checknetwork (bool& ok)
   devlink d;
   inplink i;
   ok = true;
+
   for (d = devs; d != NULL; d = d->next) {
     if (d->kind == aswitch) {
       if (d->swstate == floating) {
-        cout << "Unconnected Input : ";
-        nmz->writename(d->id);
-        cout << ".InitialValue" << endl;
+        // Todo: Improve Error message
+        throw matterror("Unconnected input: " + nmz->namestr(d->id) + ".InitialValue",
+          "", d->definedAt);
       }
     }
     else {
       for (i = d->ilist; i != NULL; i = i->next) {
         if (i->connect == NULL) {
-          cout << "Unconnected Input : ";
-          nmz->writename (d->id);
-          if (i->id != blankname) {
-            cout << ".";
-            nmz->writename (i->id);
-          }
-          cout << endl;
-          ok = false;
+          // Todo: Improve Error message
+          std::ostringstream oss;
+          oss << "Unconnected input: " << nmz->namestr(d->id);
+          if (i->id != blankname)
+            oss << "." << nmz->namestr(i->id);
+
+          throw matterror(oss.str(), "", d->definedAt);
         }
       }
     }
