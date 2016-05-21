@@ -352,7 +352,8 @@ void parser::parseKey(Token& tk, devlink dvl, Token& keytk) {
                 outplink ol = il->connect;
                 devlink dl = _netz->findoutputdevice(ol);
                 if (dl == NULL)
-                    throw matterror("Should never reach here. Call Tim.", _scan.getFile(), keytk.at);
+                    // Should never reach here
+                    throw matterror("Device with requested output pin could not be found in the network. Connection not made.", _scan.getFile(), keytk.at);
 
                 prevval << *dl->id;
 
