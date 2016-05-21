@@ -207,28 +207,28 @@ void network::checknetwork (errorcollector& col)
   for (d = devs; d != NULL; d = d->next) {
     if (d->kind == aswitch) {
       if (d->swstate == floating) {
-        // Todo: Improve Error message
         std::ostringstream oss;
-        oss << "Unconnected input: " << nmz->namestr(d->id) << ".InitialValue";
+        oss << "Input " << nmz->namestr(d->id) << ".InitialValue "
+            << "has not been assigned a value.";
         col.report(mattsemanticerror(oss.str(), d->definedAt));
       }
     }
     else if (d->kind == aclock) {
       if (d->frequency == 0) {
-        // Todo: Improve Error message
         std::ostringstream oss;
-        oss << "Unconnected input: " << nmz->namestr(d->id) << ".Period";
+        oss << "Input " << nmz->namestr(d->id) << ".Period "
+            << "has not been assigned a value.";
         col.report(mattsemanticerror(oss.str(), d->definedAt));
       }
     }
     else {
       for (i = d->ilist; i != NULL; i = i->next) {
         if (i->connect == NULL) {
-          // Todo: Improve Error message
           std::ostringstream oss;
-          oss << "Unconnected input: " << nmz->namestr(d->id);
+          oss << "Input " << nmz->namestr(d->id);
           if (i->id != blankname)
             oss << "." << nmz->namestr(i->id);
+          oss << " has not been assigned a value.";
 
           col.report(mattsemanticerror(oss.str(), d->definedAt));
         }
