@@ -199,11 +199,10 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
  * Checks that all inputs are connected to an output.
  *
  */
-void network::checknetwork (bool& ok)
+void network::checknetwork (errorcollector& col)
 {
   devlink d;
   inplink i;
-  ok = true;
 
   for (d = devs; d != NULL; d = d->next) {
     if (d->kind == aswitch) {
@@ -211,7 +210,7 @@ void network::checknetwork (bool& ok)
         // Todo: Improve Error message
         std::ostringstream oss;
         oss << "Unconnected input: " << nmz->namestr(d->id) << ".InitialValue";
-        std::cout << matterror(oss.str(), "", d->definedAt).what() << std::endl;
+        col.report(matterror(oss.str(), "", d->definedAt));
       }
     }
     else if (d->kind == aclock) {
@@ -219,7 +218,7 @@ void network::checknetwork (bool& ok)
         // Todo: Improve Error message
         std::ostringstream oss;
         oss << "Unconnected input: " << nmz->namestr(d->id) << ".Period";
-        std::cout << matterror(oss.str(), "", d->definedAt).what() << std::endl;
+        col.report(matterror(oss.str(), "", d->definedAt));
       }
     }
     else {
@@ -231,7 +230,7 @@ void network::checknetwork (bool& ok)
           if (i->id != blankname)
             oss << "." << nmz->namestr(i->id);
 
-          std::cout << matterror(oss.str(), "", d->definedAt).what() << std::endl;
+          col.report(matterror(oss.str(), "", d->definedAt));
         }
       }
     }

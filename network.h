@@ -3,6 +3,7 @@
 
 #include "names.h"
 #include "sourcepos.h"
+#include "errorhandler.h"
 
 /* Network specification */
 
@@ -79,7 +80,7 @@ class network {
     /* 'outp' output of device 'odev'. 'ok' is set true if operation       */
     /* succeeds.                                                           */
 
-  void checknetwork (bool& ok);
+  void checknetwork (errorcollector& col);
     /* Checks that all inputs are connected to an output.                  */
 
   network (names* names_mod);
