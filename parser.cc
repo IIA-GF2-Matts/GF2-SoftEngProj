@@ -551,7 +551,6 @@ Signal parser::parseSignalName(Token& tk) {
         }
 
         ret.pin = tk;
-        // Todo: ensure pin is acceptable identifier
         stepAndPeek(tk);
     }
 
