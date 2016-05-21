@@ -87,8 +87,14 @@ private:
     template<typename T>
     void getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss);
 
+    // checks if keyname is a valid property key of a devlice
     bool isLegalProperty(devlink dl, name keyname);
+
+    // links a device's input pin (specified by keytk) to a signal
     void assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig);
+
+    // sets a device's properties to that specified by valuetk
+    // note, should check that the key is valid first
     void assignProperty(devlink dvl, Token keytk, Token valuetk);
 
 
