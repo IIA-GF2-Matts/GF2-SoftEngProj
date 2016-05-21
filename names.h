@@ -1,7 +1,7 @@
+
 #ifndef names_h
 #define names_h
 
-#include <string>
 #include <set>
 
 #include "cistring.h"
