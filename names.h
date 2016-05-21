@@ -10,7 +10,8 @@
 typedef cistring namestring;
 typedef std::set<namestring>::const_iterator name;
 
-const name blankname;       /* special name (defaults to end iterator)*/
+extern const name blankname;       /* special name (defaults to end iterator)*/
+extern const namestring blanknamestr;
 
 class names{
 
@@ -30,6 +31,9 @@ public:
 
   void writename (name id);
     /* Prints out the given name on the console                            */
+
+  const namestring& namestr(name id) const;
+    /* Returns the string representation of the name id                    */
 
   int namelength (name id);
     /* Returns length ie number of characters in given name                */

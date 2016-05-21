@@ -3,7 +3,9 @@
 #include <string>
 #include <cstdlib>
 
-using namespace std;
+
+const name blankname;
+const namestring blanknamestr = "(blank)";
 
 
 /* Name storage and retrieval routines */
@@ -29,17 +31,22 @@ name names::cvtname (namestring str)
 void names::writename (name id)
 {
 	if (id == blankname) {
-		std::cout << "(blank)";
+		std::cout << blanknamestr;
 	}
 	else {
 		std::cout << *id;
 	}
 }
 
+const namestring& names::namestr(name id) const {
+	return (id == blankname) ? blanknamestr : *id;
+}
+
+
 int names::namelength (name id)
 {
 	if (id == blankname)
 		return 0;
-	
+
 	return id->length();
 }
