@@ -38,7 +38,7 @@ int LevenshteinDistance(cistring s, cistring t) {
         return b;
 }
 
-
+// Todo: ensure case insensitive
 int closestMatches(cistring s, const std::set<cistring> &candidates, std::set<cistring> &matches) {
     // gets closest matches, returns distance
     int dist = 9999; // expecting 1 - 4

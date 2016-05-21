@@ -128,8 +128,12 @@ void parser::parseDefineDevice(Token& tk) {
         stepAndPeek(tk);
 
         if (tk.type != TokType::DeviceType) {
-            // Todo: Suggest types
-            throw matterror("Expected device type.", _scan.getFile(), tk.at);
+            std::ostringstream oss;
+            oss << "Expected device type. ";
+            // Todo: Alternative if number?
+            if (tk.type == TokType::Identifier)
+                getClosestMatchError(tk.name, devicesset, oss);
+            throw matterror(oss.str(), _scan.getFile(), tk.at);
         }
         // make device (which adds it to the network)
         bool success;
