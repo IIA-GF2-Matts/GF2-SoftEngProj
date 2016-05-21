@@ -30,7 +30,7 @@ SourcePos::SourcePos( std::string file, int line, int col, int abs )
 }
 
 
-const std::string& SourcePos::FileStr() const {
+const std::string& SourcePos::fileStr() const {
     return *File;
 }
 

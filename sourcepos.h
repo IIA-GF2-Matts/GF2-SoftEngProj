@@ -19,7 +19,7 @@ public:
 	int Column;
 	int Abs;
 
-    const std::string& FileStr() const;
+    const std::string& fileStr() const;
     void setFile(std::string f);
 
 	SourcePos();
