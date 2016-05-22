@@ -38,7 +38,6 @@ int errorcollector::infoCount() const {
 }
 
 void errorcollector::report(mattmessage e) {
-    std::cout << e.what() << std::endl;
     messages.push_back(e);
     _count[e.getType()]++;
 }

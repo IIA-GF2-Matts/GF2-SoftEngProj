@@ -65,8 +65,8 @@ void networkbuilder::getPredefinedError(devlink dvl, name key, T prevval, std::o
 
 
 
-networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, scanner* scan, names* nms)
-    : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms) {
+networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, names* nms)
+    : _netz(netz), _devz(devz), _mons(mons), _nms(nms) {
         //_devz->debug(true);
 }
 

@@ -14,7 +14,7 @@
 
 parser::parser(network* netz, devices* devz, monitor* mons, scanner* scan, names* nms)
     : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms)
-    , netbuild(netz, devz, mons, scan, nms) {
+    , netbuild(netz, devz, mons, nms) {
         //_devz->debug(true);
 }
 
@@ -27,6 +27,8 @@ bool parser::readin() {
     parseFile(tk);
 
     _netz->checknetwork(errs);
+
+    errs.print(std::cout);
 
     std::cout << "File parsed with "
             << errs.errCount() << " errors and "

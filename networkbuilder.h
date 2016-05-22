@@ -32,7 +32,7 @@ private:
     errorcollector errs;
 
 public:
-    networkbuilder(network* netz, devices* devz, monitor* mons, scanner* scan, names* nms);
+    networkbuilder(network* netz, devices* devz, monitor* mons, names* nms);
     ~networkbuilder();
 
 	void defineDevice(Token& devName, Token& type);
