@@ -2,11 +2,13 @@
 #include "parser.h"
 #include "gtest/gtest.h"
 
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include "errorhandler.h"
 #include "scanner.h"
 #include "names.h"
+#include "network.h"
 
 #include "networkbuilder.h"
 
@@ -53,13 +55,13 @@ Action getSetOptionAction(namestring devnm, namestring keynm, int valnum, namest
     };
 }
 Action getSetOptionAction(namestring devnm, namestring keynm, int valnum) {
-    return getSetOptionAction(devnm, keynm, valnum, "", "");
+    return getSetOptionAction(devnm, keynm, valnum, "(blank)", "(blank)");
 }
 Action getSetOptionAction(namestring devnm, namestring keynm, namestring valname) {
-    return getSetOptionAction(devnm, keynm, -1, valname, "");
+    return getSetOptionAction(devnm, keynm, -1, valname, "(blank)");
 }
 Action getSetOptionAction(namestring devnm, namestring keynm, int valnum, namestring valname) {
-    return getSetOptionAction(devnm, keynm, valnum, valname, "");
+    return getSetOptionAction(devnm, keynm, valnum, valname, "(blank)");
 }
 Action getSetOptionAction(namestring devnm, namestring keynm, namestring sigdevnm, namestring sigpinnm) {
     return getSetOptionAction(devnm, keynm, -1, sigdevnm, sigpinnm);
@@ -93,6 +95,8 @@ class ParserTest : public ::testing::Test {
 
 protected:
     static std::vector<Action> actionstaken;
+    static std::vector<Token>::iterator _iter;
+    static std::vector<Token> _tkstream;
 
     names *nmz;
     network *netz;
@@ -114,20 +118,31 @@ protected:
     }
 
     virtual void TearDown() {
-
     }
 
     void testparserTokenStream(std::vector<Token> tkstream, std::vector<Action> acstream) {
-
+        _tkstream = tkstream;
+        _iter = _tkstream.begin();
+        smz->step();
+        psr->readin();
+        EXPECT_EQ(acstream, actionstaken);
     }
 
 public:
     static void pushAction(Action ac) {
         actionstaken.push_back(ac);
     }
+    static Token getNextToken() {
+        Token ret = *_iter;
+        _iter++;
+        return ret;
+        //return *_iter++;
+    }
 };
 
 std::vector<Action> ParserTest::actionstaken;
+std::vector<Token>::iterator ParserTest::_iter;
+std::vector<Token> ParserTest::_tkstream;
 
 
 
@@ -140,21 +155,19 @@ networkbuilder::~networkbuilder() {
 }
 
 void networkbuilder::defineDevice(Token& devName, Token& type) {
-    Action ac = getDefineDeviceAction(*devName.id, type.devtype);
+    Action ac = getDefineDeviceAction(_nms->namestr(devName.id), type.devtype);
     ParserTest::pushAction(ac);
 }
 
 void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok) { 
-    Action ac = getSetOptionAction(*devName.id, *keyTok.id, valTok.number, *valTok.id);
+    Action ac = getSetOptionAction(_nms->namestr(devName.id), _nms->namestr(keyTok.id), valTok.number, _nms->namestr(valTok.id));
     ParserTest::pushAction(ac);
 }
 
 void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSig) { 
-    Action ac = getSetOptionAction(*devName.id, *keyTok.id, *valSig.device.id, *valSig.pin.id);
+    Action ac = getSetOptionAction(_nms->namestr(devName.id), _nms->namestr(keyTok.id), _nms->namestr(valSig.device.id), _nms->namestr(valSig.pin.id));
     ParserTest::pushAction(ac);
 }
-
-
 
 void networkbuilder::defineMonitor(Signal& monSig) {
     Signal aliSig;
@@ -162,9 +175,48 @@ void networkbuilder::defineMonitor(Signal& monSig) {
 }
 
 void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
-    Action ac = getDefineMonitorAction(*monSig.device.id, *monSig.pin.id, *aliSig.device.id, *aliSig.pin.id);
+    Action ac = getDefineMonitorAction(_nms->namestr(monSig.device.id), _nms->namestr(monSig.pin.id), _nms->namestr(aliSig.device.id), _nms->namestr(aliSig.pin.id));
     ParserTest::pushAction(ac);
 }
+
+// Todo: move token to another file
+Token::Token()
+    : type(TokType::EndOfFile) {}
+
+Token::Token(SourcePos pos, TokType t)
+    : at(pos), type(t) {}
+
+Token::Token(TokType t)
+    : at(), type(t) {}
+
+Token::Token(TokType t, name s)
+    : at(), type(t), id(s) {}
+
+Token::Token(TokType t, int num)
+    : at(), type(t), number(num) {
+    if (t == TokType::DeviceType) {
+        devtype = devicekind(num);
+    }
+}
+
+
+/// Dummy scanner to enter tokens to parser
+scanner::scanner(names* nmz) {}
+scanner::~scanner(){}
+void scanner::open(std::istream* is, std::string fname) {}
+std::string scanner::getFile() const {}
+Token scanner::step() {
+    Token ret = _next;
+    _next = readNext();
+    return ret;
+}
+Token scanner::peek() const {
+    return _next;
+}
+Token scanner::readNext() {
+    return ParserTest::getNextToken();
+}
+
 
 
 
@@ -184,6 +236,25 @@ TEST_F(ParserTest, ExampleParserTest){
         Token(EndOfFile)
     },{
         getDefineDeviceAction("CLK", aclock),
-        getSetOptionAction("CLK", "InitialPeriod", 5)
+        getSetOptionAction("CLK", "Period", 5)
+    });
+}
+
+
+TEST_F(ParserTest, ExampleParserTest2){
+    testparserTokenStream({
+        Token(DevKeyword),
+        Token(Identifier, nmz->lookup("G1")),
+        Token(Equals),
+        Token(DeviceType, nmz->lookup("AND")),
+        Token(Brace),
+        Token(Identifier, nmz->lookup("I1")),
+        Token(Colon),
+        Token(Identifier, nmz->lookup("G1")),
+        Token(CloseBrace),
+        Token(EndOfFile)
+    },{
+        getDefineDeviceAction("G1", andgate),
+        getSetOptionAction("G1", "I1", "G1", "(blank)")
     });
 }
