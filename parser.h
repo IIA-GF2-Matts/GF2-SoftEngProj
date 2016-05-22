@@ -1,5 +1,9 @@
 
 
+
+#ifndef GF2_PARSER_H
+#define GF2_PARSER_H
+
 #include <string>
 #include <ostream>
 #include <sstream>
@@ -13,14 +17,13 @@
 #include "errorhandler.h"
 
 
-#ifndef GF2_PARSER_H
-#define GF2_PARSER_H
-
 /// Signal struct, representing a DEVICE.PIN pair.
 struct Signal {
     Token device;
     Token pin;
 };
+
+#include "networkbuilder.h"
 
 
 /// Parser class. Constructs the device network from a token stream,
@@ -33,13 +36,8 @@ private:
     scanner* _scan;
     names* _nms;
     errorcollector errs;
+    networkbuilder netbuild;
 
-
-    typedef enum {
-        LEGAL_SIGNAL = 0,
-        ILLEGAL_DEVICE,
-        ILLEGAL_PIN
-    } signal_legality;
 
     /// Steps over the next token, and peeks the one after
     void stepAndPeek(Token& tk);
@@ -54,19 +52,16 @@ private:
     void parseDefineDevice(Token& tk);
 
     /// data = optionset | ";" ;
-    void parseData(Token& tk, name dv);
+    void parseData(Token& tk, Token& devName);
 
     /// optionset = "{" , { option } , "}" ;
-    void parseOptionSet(Token& tk, name dv);
+    void parseOptionSet(Token& tk, Token& devName);
 
     /// option = key , ":" , value , ";" ;
-    void parseOption(Token& tk, name dv);
-
-    /// key = identifier ;
-    void parseKey(Token& tk, devlink dvl, Token& keytk);
+    void parseOption(Token& tk, Token& devName);
 
     /// value = signalname | number ;
-    void parseValue(Token& tk, devlink dvl, Token& keytk);
+    void parseValue(Token& tk, Token& devName, Token& keytk);
 
     /// definemonitor = "monitor" , monitorset , ";" ;
     /// monitorset = monitor , { "," , monitor } ;
@@ -77,30 +72,6 @@ private:
 
     /// signalname = devicename , [ "." , pin ] ;
     Signal parseSignalName(Token& tk);
-
-    // checks whether device and pin are defined
-    signal_legality isBadSignal(Signal& sig);
-
-    // get the error message when a signal pin is unknown
-    void getUnknownPinError(Signal& sig, std::ostringstream& oss) ;
-
-    // get the error message when a key has been previously defined
-    template<typename T>
-    void getPredefinedError(devlink dvl, name key, T prevval, std::ostringstream& oss);
-
-    // get the error message when a suggested input is required
-    void getClosestMatchError(namestring nm, std::set<cistring> candidates, std::ostringstream& oss);
-
-    // checks if keyname is a valid property key of a devlice
-    bool isLegalProperty(devlink dl, name keyname);
-
-    // links a device's input pin (specified by keytk) to a signal
-    void assignPin(devlink dvl, Token keytk, Token valuetk, Signal sig);
-
-    // sets a device's properties to that specified by valuetk
-    // note, should check that the key is valid first
-    void assignProperty(devlink dvl, Token keytk, Token valuetk);
-
 
 
 public:

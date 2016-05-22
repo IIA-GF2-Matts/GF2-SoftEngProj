@@ -1,7 +1,8 @@
 #include <set>
-#include <set>
 #include <algorithm>
-#include "cistring.h"
+#include <list>
+#include <ostream>
+#include "names.h"
 
 #include "autocorrect.h"
 
@@ -50,4 +51,22 @@ int closestMatchesT(T s, const std::set<T> &candidates, std::list<T> &matches) {
         }
     }
     return dist;
+}
+
+
+void getClosestMatchError(namestring nm, std::set<namestring> candidates, std::ostream& oss) {
+    std::list<namestring> matches;
+    int dist = closestMatches(nm, candidates, matches);
+
+    if (dist < 3 && matches.size() > 0) {
+        auto i = matches.begin();
+
+        oss << "Did you mean";
+        for (; i != std::prev(matches.end()); ++i) {
+            oss << " " << *i;
+        }
+        if (matches.size() > 1)
+            oss << " or";
+        oss << " " << *std::prev(matches.end()) << "?";
+    }
 }
