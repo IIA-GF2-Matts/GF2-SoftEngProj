@@ -49,6 +49,8 @@ public:
     /// Returns the complete error message for printing.
     virtual const char* what() const throw ();
 
+    std::string formatMessage(int cmax);
+
     /// Create a new mattmessage, and builds the message.
     mattmessage(std::string message, SourcePos pos);
     mattmessage(std::string message, SourcePos pos, MessageType type);

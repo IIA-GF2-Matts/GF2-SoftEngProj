@@ -91,7 +91,7 @@ std::string mattmessage::getErrorLine(int cmax) {
 
         std::getline(ifs, _srcLine);
 
-        if (_srcLine.length() > cmax) {
+        if ((int)_srcLine.length() > cmax) {
             int A = std::max(0, c - cmax/2);
             int B = std::min(A+cmax, int(_srcLine.length()));
             A = std::max(0, B-cmax);
@@ -144,11 +144,8 @@ mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ)
 }
 
 
-mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ, ErrorType etyp)
-    : _message(message), _pos(pos), _type(typ), _etype(etyp) {
+std::string mattmessage::formatMessage(int cmax) {
     std::ostringstream oss;
-
-    int cmax = 73;
 
     static const std::string mpTypStr[4] = {
         "Error", "Warning", "Note", "Info"
@@ -159,64 +156,50 @@ mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ, Er
 
     auto cls = oss.tellp();
 
-    const std::string& file = pos.fileStr();
-    if (file != "") {
-        auto rsl = file.rfind('/');
-
-        if (rsl == std::string::npos)
-            _fname = file;
-        else {
-            _fname = file.substr(rsl+1);
-        }
-
+    if (!_fname.empty())
         oss << _fname << " ";
-    }
-    else {
-        _fname = "";
-    }
 
-    _srcLineErrCol = -1;
-
-    oss << "(" << pos.Line << ":" << pos.Column << "): ";
+    oss << "(" << _pos.Line << ":" << _pos.Column << "): ";
     int p = oss.tellp() - cls;
 
-    if (typ == MsgError)
-        oss << mpETypStr[etyp];
+    if (_type == MsgError)
+        oss << mpETypStr[_etype];
     else
-        oss << mpTypStr[typ];
+        oss << mpTypStr[_type];
 
     oss << ": ";
     int x = oss.tellp() - cls;
 
-    if ((message.length() + x > cmax)
+    if (((int)_message.length() + x > cmax)
             && (x < cmax-20)) {
         // We can use our funky word wrap
         int y = 0, z;
 
-        z = message.rfind(' ', cmax-x);
-        if (z == std::string::npos || z <= cmax/2) {
+        // Get last space character that could fit on this line.
+        z = _message.rfind(' ', cmax-x);
+        if ((z == -1) || (z <= (cmax-x)/2)) {
             z = cmax - x;
         }
 
-        oss << message.substr(y, z);
+        oss << _message.substr(y, z);
         y = z+1;
 
-        while (y < message.length()) {
-            z = message.rfind(' ', y+cmax-p);
+        while (y < (int)_message.length()) {
+            z = _message.rfind(' ', y+cmax-p);
 
-            if (z == std::string::npos || z <= y+cmax/2) {
+            if ((z == -1) || (z-y <= (cmax-p)/2)) {
                 z = y + cmax - p;
             }
 
             oss << "\n" << std::setfill(' ')
-                << std::setw(std::min(cmax, int(p+message.length()-y)))
-                << message.substr(y, z-y);
+                << std::setw(std::min(cmax, int(p+_message.length()-y)))
+                << _message.substr(y, z-y);
 
             y = z+1;
         }
     }
     else {
-        oss << message;
+        oss << _message;
     }
 
     getErrorLine(cmax);
@@ -227,11 +210,32 @@ mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ, Er
 
     if (_srcLineErrCol >= 0) {
         oss << "\n" << std::setfill(' ') << std::setw(_srcLineErrCol) << "^";
-        if (typ == MsgError)
+        if (_type == MsgError)
             oss << " ERROR";
     }
 
-    _errorMessage = oss.str();
+    return oss.str();
+}
+
+mattmessage::mattmessage(std::string message, SourcePos pos, MessageType typ, ErrorType etyp)
+    : _message(message), _pos(pos), _type(typ), _etype(etyp) {
+
+    const std::string& file = _pos.fileStr();
+    if (file != "") {
+        auto rsl = file.rfind('/');
+
+        if (rsl == std::string::npos)
+            _fname = file;
+        else {
+            _fname = file.substr(rsl+1);
+        }
+    }
+    else {
+        _fname = "";
+    }
+    _srcLineErrCol = -1;
+
+    _errorMessage = formatMessage(73); // 73
 }
 
 
