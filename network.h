@@ -1,6 +1,7 @@
 #ifndef network_h
 #define network_h
 
+#include <vector>
 #include "names.h"
 #include "sourcepos.h"
 #include "errorhandler.h"
@@ -50,6 +51,9 @@ class network {
 
   devlink findoutputdevice(const outplink ol);
     /* Finds the device that creates the output link ol                    */
+
+  std::vector<devlink> findswitches();
+  // find all the user defined switches in the network
 
   devlink finddevice (name id);
    /* Returns link to device with specified name. Returns NULL if not      */
