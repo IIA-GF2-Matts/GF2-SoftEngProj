@@ -23,10 +23,18 @@ parser::~parser() {
 
 
 bool parser::readin() {
-    Token tk = _scan->peek();
-    parseFile(tk);
 
-    _netz->checknetwork(errs);
+    Token tk;
+
+    try {
+        tk = _scan->peek();
+        parseFile(tk);
+
+       _netz->checknetwork(errs);
+    }
+    catch (matterror& e) {
+        errs.report(e);
+    }
 
     errs.print(std::cout);
 
