@@ -41,22 +41,28 @@ Action getDefineDeviceAction(namestring devnm, devicekind devknd) {
     };
 }
 
-Action getSetOptionAction(namestring devnm, namestring keynm, int valnum, namestring valname) {
+Action getSetOptionAction(namestring devnm, namestring keynm, int valnum, namestring valname, namestring sigpinname) {
     return {
         SetOption,
         devnm,
         keynm,
         valname,
-        "",
+        sigpinname,
         baddevice,
         valnum
     };
 }
 Action getSetOptionAction(namestring devnm, namestring keynm, int valnum) {
-    return getSetOptionAction(devnm, keynm, valnum, "");
+    return getSetOptionAction(devnm, keynm, valnum, "", "");
 }
 Action getSetOptionAction(namestring devnm, namestring keynm, namestring valname) {
-    return getSetOptionAction(devnm, keynm, -1, valname);
+    return getSetOptionAction(devnm, keynm, -1, valname, "");
+}
+Action getSetOptionAction(namestring devnm, namestring keynm, int valnum, namestring valname) {
+    return getSetOptionAction(devnm, keynm, valnum, valname, "");
+}
+Action getSetOptionAction(namestring devnm, namestring keynm, namestring sigdevnm, namestring sigpinnm) {
+    return getSetOptionAction(devnm, keynm, -1, sigdevnm, sigpinnm);
 }
 
 Action getDefineMonitorAction(namestring mondevnm, namestring monpinnm, namestring sigdevnm, namestring sigpinnm) {
@@ -103,7 +109,7 @@ protected:
         dmz = new devices(nmz, netz);
         mmz = new monitor(nmz, netz);
         smz = new scanner(nmz);
-        nwb = new networkbuilder(netz, dmz, mmz, *smz, nmz);
+        nwb = new networkbuilder(netz, dmz, mmz, smz, nmz);
         psr = new parser(netz, dmz, mmz, smz, nmz);
     }
 
@@ -127,7 +133,7 @@ std::vector<Action> ParserTest::actionstaken;
 
 /// Dummy network builder to accept parser output 
 
-networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, scanner& scan, names* nms)
+networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, scanner* scan, names* nms)
     : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms) {
 }
 networkbuilder::~networkbuilder() {
@@ -138,11 +144,17 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
     ParserTest::pushAction(ac);
 }
 
-
-void networkbuilder::setInput(Token& devName, Token& keyTok, Token& valTok) { 
+void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok) { 
     Action ac = getSetOptionAction(*devName.id, *keyTok.id, valTok.number, *valTok.id);
     ParserTest::pushAction(ac);
 }
+
+void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSig) { 
+    Action ac = getSetOptionAction(*devName.id, *keyTok.id, *valSig.device.id, *valSig.pin.id);
+    ParserTest::pushAction(ac);
+}
+
+
 
 void networkbuilder::defineMonitor(Signal& monSig) {
     Signal aliSig;
