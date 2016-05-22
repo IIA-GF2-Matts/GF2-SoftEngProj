@@ -75,15 +75,15 @@ gtest_main.a : gtest-all.o gtest_main.o
 scanner_unittest.o : scanner_unittest.cc scanner.h
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c scanner_unittest.cc
 
-scanner_unittest : scanner.o scanner_unittest.o gtest_main.a iposstream.o cistring.o names.o errorhandler.o
+scanner_unittest : gtest_main.a scanner_unittest.o scanner.o iposstream.o cistring.o names.o errorhandler.o network.o devices.o 
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
 
 
 parser_unittest.o : parser_unittest.cc parser.h
-	$(CLICXX) $(FLAGS) $(COMPILE_OPTIONS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c parser_unittest.cc
+	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c parser_unittest.cc
 
-parser_unittest : parser_unittest.o gtest_main.a parser.o errorhandler.o names.o autocorrect.o network.o devices.o monitor.o cistring.o iposstream.o sourcepos.o
-	$(CLICXX) $(FLAGS) $(COMPILE_OPTIONS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
+parser_unittest : gtest_main.a parser_unittest.o parser.o errorhandler.o names.o autocorrect.o network.o devices.o monitor.o cistring.o iposstream.o sourcepos.o
+	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
 
 
 

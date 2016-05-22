@@ -4,12 +4,12 @@
 
 #include <string>
 #include <sstream>
+#include <ostream>
 #include "errorhandler.h"
+#include "names.h"
+#include "network.h"
+#include "devices.h"
 
-//#define TOK(T) Token(T)
-//#define TOK(T, d) Token(T, d)
-
-//using namespace TokType;
 
 /*
 
@@ -51,7 +51,15 @@ std::map<TokType, const char*> _tokMap = {
 
 class ScannerTest : public ::testing::Test {
     protected:
-        virtual void SetUp() {
+
+    names* nmz;
+    devices *dmz;
+    network *netz;
+
+    virtual void SetUp() {
+        nmz = new names();
+        netz = new network(nmz);
+        dmz = new devices(nmz, netz);
     }
 
     virtual void TearDown() {
@@ -65,8 +73,7 @@ class ScannerTest : public ::testing::Test {
 
     void openAndloopThroughTokenStream(std::string s){
         std::istringstream iss(s);
-
-        scanner scan;
+        scanner scan(nmz);
         scan.open(&iss, "");
 
         while (scan.step().type != EndOfFile) {
@@ -80,8 +87,7 @@ class ScannerTest : public ::testing::Test {
     void testscannerToken(std::string s, TokType t) {
 
         std::istringstream iss(s);
-
-        scanner scan;
+        scanner scan(nmz);
         scan.open(&iss, "");
 
 
@@ -92,8 +98,7 @@ class ScannerTest : public ::testing::Test {
     }
 
     void testscannerTokenStream(std::string s, std::vector<Token> stream) {
-
-        strscanner scan(s);
+        strscanner scan(nmz, s);
 
         int tn = 0;
         Token tk;
@@ -117,6 +122,19 @@ class ScannerTest : public ::testing::Test {
 
             tn++;
         } while (tk.type != EndOfFile);
+    }
+
+    Token genToken(TokType tktype) {
+        return Token(tktype);
+    }
+    Token genToken(TokType tktype, int num) {
+        return Token(tktype, num);
+    }
+    Token genToken(TokType tktype, namestring str) {
+        if (tktype == DeviceType) 
+            return Token(DeviceType, dmz->devkind(nmz->lookup(str)));
+        else
+            return Token(tktype, nmz->lookup(str));
     }
 };
 
@@ -200,133 +218,133 @@ TEST_F(ScannerTest, BlockCommentToken){
 
 TEST_F(ScannerTest, DeviceDefinitionTokenStream){
     testscannerTokenStream("dev D1 = DTYPE { I1 : 0; }", {
-        Token(DevKeyword),
-        Token(Identifier, "D1"),
-        Token(Equals),
-        Token(DeviceType, "DTYPE"),
-        Token(Brace),
-        Token(Identifier, "I1"),
-        Token(Colon),
-        Token(Number, 0),
-        Token(SemiColon),
-        Token(CloseBrace),
-        Token(EndOfFile)
+        genToken(DevKeyword),
+        genToken(Identifier, "D1"),
+        genToken(Equals),
+        genToken(DeviceType, "DTYPE"),
+        genToken(Brace),
+        genToken(Identifier, "I1"),
+        genToken(Colon),
+        genToken(Number, 0),
+        genToken(SemiColon),
+        genToken(CloseBrace),
+        genToken(EndOfFile)
     });
 }
 
 TEST_F(ScannerTest, DeviceTypeDefinitionTokenStream){
     testscannerTokenStream("dev D1 = DTYPE;", {
-        Token(DevKeyword),
-        Token(Identifier, "D1"),
-        Token(Equals),
-        Token(DeviceType, "DTYPE"),
-        Token(SemiColon),
-        Token(EndOfFile)
+        genToken(DevKeyword),
+        genToken(Identifier, "D1"),
+        genToken(Equals),
+        genToken(DeviceType, "DTYPE"),
+        genToken(SemiColon),
+        genToken(EndOfFile)
     });
 }
 
 TEST_F(ScannerTest, DeviceOptionsDefinitionTokenStream){
     testscannerTokenStream("dev D1 {key:value}", {
-        Token(DevKeyword),
-        Token(Identifier, "D1"),
-        Token(Brace),
-        Token(Identifier, "key"),
-        Token(Colon),
-        Token(Identifier, "value"),
-        Token(CloseBrace),
-        Token(EndOfFile)
+        genToken(DevKeyword),
+        genToken(Identifier, "D1"),
+        genToken(Brace),
+        genToken(Identifier, "key"),
+        genToken(Colon),
+        genToken(Identifier, "value"),
+        genToken(CloseBrace),
+        genToken(EndOfFile)
     });
 }
 
 TEST_F(ScannerTest, PreceedingKeywordIdentifiersTokenStream){
     testscannerTokenStream("dev devdevdevid dev;", {
-        Token(DevKeyword),
-        Token(Identifier, "devdevdevid"),
-        Token(DevKeyword),
-        Token(SemiColon),
-        Token(EndOfFile)
+        genToken(DevKeyword),
+        genToken(Identifier, "devdevdevid"),
+        genToken(DevKeyword),
+        genToken(SemiColon),
+        genToken(EndOfFile)
     });
 }
 
 TEST_F(ScannerTest, IdentifiersDotTokenStream){
     testscannerTokenStream("G1.I1", {
-        Token(Identifier, "G1"),
-        Token(Dot),
-        Token(Identifier, "I1"),
-        Token(EndOfFile)
+        genToken(Identifier, "G1"),
+        genToken(Dot),
+        genToken(Identifier, "I1"),
+        genToken(EndOfFile)
     });
 
     testscannerTokenStream("dev_.I1", {
-        Token(Identifier, "dev_"),
-        Token(Dot),
-        Token(Identifier, "I1"),
-        Token(EndOfFile)
+        genToken(Identifier, "dev_"),
+        genToken(Dot),
+        genToken(Identifier, "I1"),
+        genToken(EndOfFile)
     });
 }
 
 
 TEST_F(ScannerTest, LineCommentNewlinesTokenStream){
     testscannerTokenStream("monitor//. as //asdf \r\n 3", {
-        Token(MonitorKeyword),
-        Token(Number, 3),
-        Token(EndOfFile)
+        genToken(MonitorKeyword),
+        genToken(Number, 3),
+        genToken(EndOfFile)
     });
 
     testscannerTokenStream("monitor//. as //asdf \n 3", {
-        Token(MonitorKeyword),
-        Token(Number, 3),
-        Token(EndOfFile)
+        genToken(MonitorKeyword),
+        genToken(Number, 3),
+        genToken(EndOfFile)
     });
 }
 
 TEST_F(ScannerTest, NestedLineCommentTokenStream){
     testscannerTokenStream("monitor//. as //asdf \n 3", {
-        Token(MonitorKeyword),
-        Token(Number, 3),
-        Token(EndOfFile)
+        genToken(MonitorKeyword),
+        genToken(Number, 3),
+        genToken(EndOfFile)
     });
 
 
     testscannerTokenStream("monitor///*. as /*/asdf \n 3", {
-        Token(MonitorKeyword),
-        Token(Number, 3),
-        Token(EndOfFile)
+        genToken(MonitorKeyword),
+        genToken(Number, 3),
+        genToken(EndOfFile)
     });
 
 
     testscannerTokenStream("monitor//*. as /*/asdf \n 3", {
-        Token(MonitorKeyword),
-        Token(Number, 3),
-        Token(EndOfFile)
+        genToken(MonitorKeyword),
+        genToken(Number, 3),
+        genToken(EndOfFile)
     });
 
 }
 
 TEST_F(ScannerTest, BlockCommentTokenStream){
     testscannerTokenStream("sadf/**/as", {
-        Token(Identifier, "sadf"),
-        Token(AsKeyword),
-        Token(EndOfFile)
+        genToken(Identifier, "sadf"),
+        genToken(AsKeyword),
+        genToken(EndOfFile)
     });
 
     testscannerTokenStream("sadf/*\n*/as", {
-        Token(Identifier, "sadf"),
-        Token(AsKeyword),
-        Token(EndOfFile)
+        genToken(Identifier, "sadf"),
+        genToken(AsKeyword),
+        genToken(EndOfFile)
     });
 
 
     testscannerTokenStream("sadf/*//*/as", {
-        Token(Identifier, "sadf"),
-        Token(AsKeyword),
-        Token(EndOfFile)
+        genToken(Identifier, "sadf"),
+        genToken(AsKeyword),
+        genToken(EndOfFile)
     });
 
 
     testscannerTokenStream("sadf/*/* /*/as", {
-        Token(Identifier, "sadf"),
-        Token(AsKeyword),
-        Token(EndOfFile)
+        genToken(Identifier, "sadf"),
+        genToken(AsKeyword),
+        genToken(EndOfFile)
     });
 
 
@@ -335,16 +353,16 @@ TEST_F(ScannerTest, BlockCommentTokenStream){
 
 TEST_F(ScannerTest, NumberTokenStream){
     testscannerTokenStream("1234.33", {
-        Token(Number, 1234),
-        Token(Dot),
-        Token(Number, 33),
-        Token(EndOfFile)
+        genToken(Number, 1234),
+        genToken(Dot),
+        genToken(Number, 33),
+        genToken(EndOfFile)
     });
 
 
     testscannerTokenStream("01", {
-        Token(Number, 1),
-        Token(EndOfFile)
+        genToken(Number, 1),
+        genToken(EndOfFile)
     });
 }
 
