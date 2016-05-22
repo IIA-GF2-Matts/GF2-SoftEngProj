@@ -64,6 +64,7 @@ protected:
     Token _next;
     std::string _file;
     bool _open;
+    bool _hasNext;
     names* _nmz;
 
     name kwordDev;
@@ -95,7 +96,7 @@ public:
     Token step();
 
     /// Returns the next token in the stream
-    Token peek() const;
+    Token peek();
 
     /// Returns the file name being scanned.
     std::string getFile() const;

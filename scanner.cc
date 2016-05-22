@@ -67,12 +67,14 @@ Token scanner::readNext() {
 
     int c = readChar();
 
+    // Remove leading whitespace
     while (!_ips.eof() && std::isspace(c)) {
         c = readChar();
     }
 
     if (_ips.eof()) {
         ret.at = _ips.Pos;
+        _hasNext = true;
         return ret;
     }
 
@@ -109,6 +111,7 @@ Token scanner::readNext() {
 
         if (_ips.eof()) {
             ret.at = _ips.Pos;
+            _hasNext = true;
             return ret;
         }
 
@@ -194,6 +197,7 @@ Token scanner::readNext() {
             break;
     }
 
+    _hasNext = true;
     return ret;
 }
 
@@ -232,7 +236,7 @@ int scanner::readNumber(int c1) {
 
 
 scanner::scanner(names* nmz)
-        : _open(false), _nmz(nmz) {
+        : _open(false), _hasNext(false), _nmz(nmz) {
 
     kwordDev = _nmz->lookup("dev");
     kwordMonitor = _nmz->lookup("monitor");
@@ -245,7 +249,7 @@ void scanner::open(std::istream* is, std::string fname) {
     _file = fname;
 
     _open = true;
-    _next = readNext();
+    _hasNext = false;
 }
 
 scanner::~scanner() {
@@ -253,15 +257,18 @@ scanner::~scanner() {
 
 
 Token scanner::step() {
-    Token ret = _next;
-
-    _next = scanner::readNext();
+    Token ret = peek();
+    _hasNext = false;
 
     return ret;
 }
 
 
-Token scanner::peek() const {
+Token scanner::peek() {
+    if (!_hasNext) {
+        _next = readNext();
+    }
+
     return _next;
 }
 
