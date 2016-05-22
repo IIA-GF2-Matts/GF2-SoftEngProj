@@ -56,11 +56,16 @@ void parser::parseFile(Token& tk) {
 
             // Consume tokens until the next statement is reached
             while (tk.type != TokType::DevKeyword && tk.type != TokType::MonitorKeyword) {
-                if (tk.type == TokType::EndOfFile) {
+                try {
+                    if (tk.type == TokType::EndOfFile) {
+                        stepAndPeek(tk);
+                        break;
+                    }
                     stepAndPeek(tk);
-                    break;
                 }
-                stepAndPeek(tk);
+                catch (mattsyntaxerror& e) {
+                    errs.report(e);
+                }
             }
         }
     }
