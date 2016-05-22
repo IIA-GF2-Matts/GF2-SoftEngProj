@@ -117,6 +117,7 @@ protected:
     monitor *mmz;
     scanner *smz;
     networkbuilder *nwb;
+    errorcollector errs;
     parser* psr;
 
     virtual void SetUp() {
@@ -126,7 +127,7 @@ protected:
         dmz = new devices(nmz, netz);
         mmz = new monitor(nmz, netz);
         smz = new scanner(nmz);
-        nwb = new networkbuilder(netz, dmz, mmz, smz, nmz);
+        nwb = new networkbuilder(netz, dmz, mmz, nmz, errs);
         psr = new parser(netz, dmz, mmz, smz, nmz);
     }
 
@@ -182,9 +183,8 @@ std::vector<Token> ParserTest::_tkstream;
 
 
 /// Dummy network builder to accept parser output 
-
-networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, scanner* scan, names* nms)
-    : _netz(netz), _devz(devz), _mons(mons), _scan(scan), _nms(nms) {
+networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc)
+    : _netz(netz), _devz(devz), _mons(mons), _nms(nms), _errs(errc) {
 }
 networkbuilder::~networkbuilder() {
 }
