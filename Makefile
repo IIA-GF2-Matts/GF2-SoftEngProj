@@ -2,9 +2,9 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 
 CXX = $(shell wx-config --version=3.0 --cxx) -DUSE_GUI -std=c++11
 
-SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc guierrorhandler.cc autocorrect.cc
+SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc userint.cc gui.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc guierrorhandler.cc autocorrect.cc networkbuilder.cc
 
-L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o sourcepos.o guierrordialog.o autocorrect.o
+L_OBJECTS = logsim.o names.o scanner.o network.o parser.o monitor.o devices.o userint.o gui.o iposstream.o cistring.o errorhandler.o sourcepos.o guierrordialog.o autocorrect.o networkbuilder.o
 
 
 # implementation
@@ -74,7 +74,7 @@ logsim.o: logsim.h names.h devices.h network.h monitor.h parser.h userint.h
 logsim.o: gui.h
 names.o: names.h cistring.h sourcepos.h
 network.o: network.h names.h
-parser.o: parser.h names.h network.h devices.h monitor.h
+parser.o: parser.h names.h network.h devices.h monitor.h networkbuilder.h
 monitor.o: monitor.h names.h network.h devices.h
 devices.o: devices.h names.h network.h
 userint.o: userint.h names.h network.h devices.h monitor.h
@@ -82,3 +82,4 @@ gui.o: gui.h names.h devices.h network.h monitor.h guicanvas.cc guicanvas.h guie
 guicanvas.o: guicanvas.h names.h monitor.h
 guierrorhandler.o: guierrordialog.h errorhandler.h
 autocorrect.o: cistring.h
+networkbuilder.o: networkbuilder.h names.h network.h devices.h monitor.h 
