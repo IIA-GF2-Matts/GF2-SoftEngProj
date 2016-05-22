@@ -228,6 +228,10 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
     case dtype:
       makedtype(did, ok, at);
       break;
+    case baddevice:
+    default:
+      ok = false;
+      break;
   }
 }
 
@@ -250,6 +254,9 @@ void devices::signalupdate (asignal target, asignal& sig)
     case rising:
     case high:
       sig = (target == low) ? falling : high;
+      break;
+    case floating:
+      sig = (target == high) ? rising : falling;
       break;
   }
   if (sig != oldsig)
@@ -425,6 +432,7 @@ void devices::executedevices (bool& ok)
         case nandgate: execgate (d, high, low);  break;
         case xorgate:  execxorgate (d);          break;
         case dtype:    execdtype (d);            break;
+        default:       ok = false;               break;
       }
       if (debugging)
 	showdevice (d);
