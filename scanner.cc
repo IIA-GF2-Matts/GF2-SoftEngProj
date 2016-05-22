@@ -7,7 +7,6 @@
 
 #include "names.h"
 #include "iposstream.h"
-#include "cistring.h"
 #include "errorhandler.h"
 #include "network.h"
 
