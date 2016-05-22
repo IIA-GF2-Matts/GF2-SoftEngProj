@@ -75,7 +75,7 @@ gtest_main.a : gtest-all.o gtest_main.o
 scanner_unittest.o : scanner_unittest.cc scanner.h
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c scanner_unittest.cc
 
-scanner_unittest : gtest_main.a scanner_unittest.o scanner.o iposstream.o cistring.o names.o errorhandler.o network.o devices.o 
+scanner_unittest : gtest_main.a scanner_unittest.o scanner.o iposstream.o cistring.o names.o errorhandler.o network.o devices.o sourcepos.o
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
 
 
