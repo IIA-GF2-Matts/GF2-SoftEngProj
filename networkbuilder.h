@@ -27,12 +27,11 @@ private:
     network* _netz;
     devices* _devz;
     monitor* _mons;
-    scanner* _scan;
     names* _nms;
-    errorcollector errs;
+    errorcollector& _errs;
 
 public:
-    networkbuilder(network* netz, devices* devz, monitor* mons, names* nms);
+    networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc);
     ~networkbuilder();
 
 	void defineDevice(Token& devName, Token& type);

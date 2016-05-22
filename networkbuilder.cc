@@ -65,8 +65,8 @@ void networkbuilder::getPredefinedError(devlink dvl, name key, T prevval, std::o
 
 
 
-networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, names* nms)
-    : _netz(netz), _devz(devz), _mons(mons), _nms(nms) {
+networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc)
+    : _netz(netz), _devz(devz), _mons(mons), _nms(nms), _errs(errc) {
         //_devz->debug(true);
 }
 
@@ -313,7 +313,7 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
     if (aliSig.device.type != TokType::EndOfFile) {
         // Warn if signal exists
         if (!isBadSignal(aliSig)) {
-            errs.report(mattwarning("Alias signal name already exists.", aliSig.device.at));
+            _errs.report(mattwarning("Alias signal name already exists.", aliSig.device.at));
         }
     }
 
