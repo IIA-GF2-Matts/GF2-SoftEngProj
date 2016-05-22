@@ -58,6 +58,28 @@ std::vector<devlink> network::findswitches() {
   return ret;
 }
 
+
+// find all the output signals
+std::vector<outputsignal> network::findoutputsignals(){
+  std::vector<outputsignal> ret;
+  devlink d = devs;
+  outplink o;
+
+  // loop through all devices
+  while (d != NULL) {
+    // get device's outputs
+    o = d->olist;
+    while (o != NULL) {
+      // add them to the collection
+      ret.push_back({d->id, o->id});
+      o = o->next;
+    }
+    d = d->next;
+  }
+  return ret;
+}
+
+
 /***********************************************************************
  *
  * Returns link to device with specified name. Returns NULL if not

@@ -12,6 +12,11 @@ typedef enum {falling, low, rising, high, floating} asignal;
 typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 	      norgate, xorgate, dtype, baddevice} devicekind;
 
+struct outputsignal {
+  name devicename;
+  name pinname;
+};
+
 struct outputrec {
   name       id;
   SourcePos  definedAt;
@@ -54,6 +59,9 @@ class network {
 
   std::vector<devlink> findswitches();
   // find all the user defined switches in the network
+
+  std::vector<outputsignal> findoutputsignals();
+  // find all the output signals 
 
   devlink finddevice (name id);
    /* Returns link to device with specified name. Returns NULL if not      */
