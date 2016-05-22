@@ -144,14 +144,13 @@ Token scanner::readNext() {
 
                 // Note: namestring is cistring, so comparison here is
                 // case-insensitive
-                // Todo: Use name table comparison not strings.
-                if (*ret.id == "dev") {
+                if (ret.id == kwordDev) {
                     ret.type = TokType::DevKeyword;
                 }
-                else if (*ret.id == "monitor") {
+                else if (ret.id == kwordMonitor) {
                     ret.type = TokType::MonitorKeyword;
                 }
-                else if (*ret.id == "as") {
+                else if (ret.id == kwordAs) {
                     ret.type = TokType::AsKeyword;
                 }
                 else { // Check for device types
@@ -223,6 +222,10 @@ int scanner::readNumber(int c1) {
 
 scanner::scanner(names* nmz)
         : _open(false), _nmz(nmz) {
+
+    kwordDev = _nmz->lookup("dev");
+    kwordMonitor = _nmz->lookup("monitor");
+    kwordAs = _nmz->lookup("as");
 }
 
 

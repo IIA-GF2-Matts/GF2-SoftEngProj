@@ -75,6 +75,10 @@ protected:
     bool _open;
     names* _nmz;
 
+    name kwordDev;
+    name kwordMonitor;
+    name kwordAs;
+
     /// Read the next character from the input character stream
     int readChar();
 
