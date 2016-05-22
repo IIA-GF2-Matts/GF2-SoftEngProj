@@ -13,6 +13,17 @@
 #include "scanner.h"
 
 
+const std::map<namestring, devicekind> deviceTypes = {
+    {"CLOCK", aclock},
+    {"SWITCH", aswitch},
+    {"AND", andgate},
+    {"NAND", nandgate},
+    {"OR", orgate},
+    {"NOR", norgate},
+    {"DTYPE", dtype},
+    {"XOR", xorgate}
+};
+
 
 // struct Token
 

@@ -33,16 +33,7 @@ enum TokType {
     DeviceType
 };
 
-const std::map<namestring, devicekind> deviceTypes = {
-    {"CLOCK", aclock},
-    {"SWITCH", aswitch},
-    {"AND", andgate},
-    {"NAND", nandgate},
-    {"OR", orgate},
-    {"NOR", norgate},
-    {"DTYPE", dtype},
-    {"XOR", xorgate}
-};
+extern const std::map<namestring, devicekind> deviceTypes;
 
 
 /// Token class. Represents a lexical element in the source.
