@@ -51,7 +51,7 @@ std::vector<devlink> network::findswitches() {
     // Todo: it might be cleaner to return all switches, and the 
     // caller filter the results, since the zero and one handles
     // in devices could then be checked directly
-    if (d->kind == aswitch && nmz->(d->id) != "0" && nmz->(d->id) != "1")
+    if (d->kind == aswitch && nmz->namestr(d->id) != "0" && nmz->namestr(d->id) != "1")
       ret.push_back(d);
     d = d->next;
   }
