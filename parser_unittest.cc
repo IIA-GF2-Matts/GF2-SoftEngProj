@@ -141,6 +141,15 @@ protected:
         EXPECT_EQ(acstream, actionstaken);
     }
 
+    void testparserTokenStreamError(std::vector<Token> tkstream, std::vector<Action> acstream) {
+        _tkstream = tkstream;
+        _iter = _tkstream.begin();
+        smz->step();
+        psr->readin();
+        // expect no actions to be taken on errorneous input
+        EXPECT_EQ(0, actionstaken.size());
+    }
+
 public:
     static void pushAction(Action ac) {
         actionstaken.push_back(ac);
@@ -341,5 +350,24 @@ TEST_F(ParserTest, MonitorOrGat){
         genToken(EndOfFile)
     },{
         getDefineMonitorAction("G1", "(blank)", "ali", "pin")
+    });
+}
+
+
+
+// testing catching errors
+
+TEST_F(ParserTest, ErrorneousDevDefine){
+    // devf G1 = XOR;
+    // note: using testparserTokenStreamError
+    testparserTokenStreamError({
+        genToken(Identifier, "devf"),
+        genToken(Identifier, "G1"),
+        genToken(Equals),
+        genToken(DeviceType, "XOR"),
+        genToken(SemiColon),
+        genToken(EndOfFile)
+    },{
+        getDefineDeviceAction("G1", xorgate)
     });
 }
