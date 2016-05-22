@@ -242,25 +242,29 @@ matterror::matterror(std::string message, SourcePos pos)
         : mattmessage(message, pos, MsgError) {
 }
 
+matterror::matterror(std::string message, SourcePos pos, ErrorType etype)
+        : mattmessage(message, pos, MsgError, etype) {
+}
+
 
 // class mattsyntaxerror
 
 mattsyntaxerror::mattsyntaxerror(std::string message, SourcePos pos)
-        : mattmessage(message, pos, MsgError, ErrSyntax) {
+        : matterror(message, pos, ErrSyntax) {
 }
 
 
 // class mattsemanticerror
 
 mattsemanticerror::mattsemanticerror(std::string message, SourcePos pos)
-        : mattmessage(message, pos, MsgError, ErrSemantic) {
+        : matterror(message, pos, ErrSemantic) {
 }
 
 
 // class mattruntimeerror
 
 mattruntimeerror::mattruntimeerror(std::string message, SourcePos pos)
-        : mattmessage(message, pos, MsgError, ErrRuntime) {
+        : matterror(message, pos, ErrRuntime) {
 }
 
 
