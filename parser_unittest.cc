@@ -151,6 +151,19 @@ public:
         return ret;
         //return *_iter++;
     }
+
+    Token genToken(TokType tktype) {
+        return Token(tktype);
+    }
+    Token genToken(TokType tktype, int num) {
+        return Token(tktype, num);
+    }
+    Token genToken(TokType tktype, namestring str) {
+        if (tktype == DeviceType) 
+            return Token(DeviceType, dmz->devkind(nmz->lookup(str)));
+        else
+            return Token(tktype, nmz->lookup(str));
+    }
 };
 
 std::vector<Action> ParserTest::actionstaken;
@@ -233,20 +246,60 @@ Token scanner::readNext() {
 
 
 
+
 // parser unit tests
 
-TEST_F(ParserTest, ExampleParserTest){
+/* token types are:
+    EndOfFile,
+    DevKeyword,
+    MonitorKeyword,
+    AsKeyword,
+    Equals,
+    Colon,
+    SemiColon,
+    Comma,
+    Brace,
+    CloseBrace,
+    Dot,
+    Number,
+    Identifier,
+    DeviceType
+*/
+// Device types are:
+//      aswitch, aclock, andgate, nandgate, orgate,
+//      norgate, xorgate, dtype
+
+
+// Action calls are
+//
+// getSetOptionAction("CLK", "Period", 5);
+//          device name, option to set, value
+//
+// getSetOptionAction("G1", "I1", "G1", "(blank)")
+//      device name, device pin, connection name, connection pin
+//
+// getDefineDeviceAction("CLK", aclock)
+//        device name, device type
+//
+// getDefineMonitorAction("G1", "(blank)", "AliasName", "AliasPin")
+//       device name, device pin, alias name, alias pin
+
+
+
+TEST_F(ParserTest, SetClockPeriod){
+    // dev CLK = CLOCK {Period : 5;}
     testparserTokenStream({
-        Token(DevKeyword),
-        Token(Identifier, nmz->lookup("CLK")),
-        Token(Equals),
-        Token(DeviceType, dmz->devkind(nmz->lookup("CLOCK"))),
-        Token(Brace),
-        Token(Identifier, nmz->lookup("Period")),
-        Token(Colon),
-        Token(Number, 5),
-        Token(CloseBrace),
-        Token(EndOfFile)
+        genToken(DevKeyword),
+        genToken(Identifier, "CLK"),
+        genToken(Equals),
+        genToken(DeviceType, "CLOCK"),
+        genToken(Brace),
+        genToken(Identifier, "Period"),
+        genToken(Colon),
+        genToken(Number, 5),
+        genToken(SemiColon),
+        genToken(CloseBrace),
+        genToken(EndOfFile)
     },{
         getDefineDeviceAction("CLK", aclock),
         getSetOptionAction("CLK", "Period", 5)
@@ -254,20 +307,39 @@ TEST_F(ParserTest, ExampleParserTest){
 }
 
 
-TEST_F(ParserTest, ExampleParserTest2){
+TEST_F(ParserTest, CreateAndGateLooped){
+    // dev G1 = AND {I1 : G1;}
     testparserTokenStream({
-        Token(DevKeyword),
-        Token(Identifier, nmz->lookup("G1")),
-        Token(Equals),
-        Token(DeviceType, dmz->devkind(nmz->lookup("AND"))),
-        Token(Brace),
-        Token(Identifier, nmz->lookup("I1")),
-        Token(Colon),
-        Token(Identifier, nmz->lookup("G1")),
-        Token(CloseBrace),
-        Token(EndOfFile)
+        genToken(DevKeyword),
+        genToken(Identifier, "G1"),
+        genToken(Equals),
+        genToken(DeviceType, "AND"),
+        genToken(Brace),
+        genToken(Identifier, "I1"),
+        genToken(Colon),
+        genToken(Identifier, "G1"),
+        genToken(SemiColon),
+        genToken(CloseBrace),
+        genToken(EndOfFile)
     },{
         getDefineDeviceAction("G1", andgate),
         getSetOptionAction("G1", "I1", "G1", "(blank)")
+    });
+}
+
+
+TEST_F(ParserTest, MonitorOrGat){
+    // monitor G1 as ali.pin
+    testparserTokenStream({
+        genToken(MonitorKeyword),
+        genToken(Identifier, "G1"),
+        genToken(AsKeyword),
+        genToken(Identifier, "ali"),
+        genToken(Dot),
+        genToken(Identifier, "pin"),
+        genToken(SemiColon),
+        genToken(EndOfFile)
+    },{
+        getDefineMonitorAction("G1", "(blank)", "ali", "pin")
     });
 }
