@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <ostream>
 #include <vector>
 #include "errorhandler.h"
 #include "scanner.h"
@@ -30,6 +31,18 @@ struct Action {
     devicekind devknd;
     int valnum;    
 };
+
+
+::std::ostream& operator<<(::std::ostream& oss, const Action& ac) {
+    return oss << "\t{ ac: " << ac.actype << ",\t"
+        << "devicename: " << ac.name1 << ",\n\t"
+        << "keyname/monpinname: " << ac.name2 << ",\t"
+        << "valname/sigdevnm: " << ac.name3 << ",\n\t"
+        << "sigpinname: " << ac.name4 << ",\t"
+        << "devknd: " << ac.devknd << ",\t"
+        << "valnum: " << ac.valnum << " };\n\t";
+}
+
 
 Action getDefineDeviceAction(namestring devnm, devicekind devknd) {
     return {
