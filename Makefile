@@ -64,6 +64,16 @@ scanner_unittest : scanner.o scanner_unittest.o gtest_main.a iposstream.o cistri
 	$(CXX) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
 
 
+parser_unittest.o : parser_unittest.cc parser.h
+	$(CXX) $(COMPILE_OPTIONS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c parser_unittest.cc
+
+parser_unittest : parser_unittest.o gtest_main.a parser.o errorhandler.o names.o autocorrect.o network.o devices.o monitor.o cistring.o iposstream.o sourcepos.o
+	$(CXX) $(COMPILE_OPTIONS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
+
+
+
+
+
 
 
 # DO NOT DELETE
