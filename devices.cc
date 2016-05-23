@@ -521,6 +521,9 @@ devices::devices (names* names_mod, network* net_mod)
   qpin    = nmz->lookup("Q");
   qbarpin = nmz->lookup("QBAR");
 
+  initvalnm = nmz->lookup("InitialValue");
+  periodnm = nmz->lookup("Period");
+
   // Note: Doesn't match name requirement for user.
   // so cannot be overwritten/reused in user code.
   zero    = nmz->lookup("0");

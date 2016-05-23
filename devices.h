@@ -12,9 +12,6 @@ class devices{
   typedef name devicetable[baddevice + 1];
   devicetable dtab;
   bool        steadystate;
-  name        clkpin, datapin, setpin;
-  name        clrpin, qpin, qbarpin;     /* Input and Output Pin names */
-  name        zero, one;
   bool        debugging;
 
   void showdevice (devlink d);
@@ -33,6 +30,11 @@ class devices{
   void outsig (asignal s);
 
 public:
+  name        clkpin, datapin, setpin;
+  name        clrpin, qpin, qbarpin;     /* Input and Output Pin names */
+  name        initvalnm, periodnm;
+  name        zero, one;
+
   void makedevice (devicekind dkind, name did, int variant, bool& ok, SourcePos at = SourcePos());
     /* Adds a device to the network of the specified kind and name.  The   */
     /* variant is used with such things as gates where it specifies the    */
