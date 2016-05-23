@@ -95,7 +95,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     dx = (float)(end_width - label_width) / cycles_on_screen; // dx between points
 
     int scaled_pan_x = pan_x * zoom +1;
-    // Todo: panning scaling with zoom is currently imperfect.
+    // Todo: panning scaling with zoom currently jumps around a bit.
 
     zoomrange[0] = scaled_pan_x / dx;
     // stop from panning over end of screen.
@@ -225,7 +225,6 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)
   // Event handler for when the canvas is resized
 {
   init = false;; // this will force the viewport and projection matrices to be reconfigured on the next paint
-  // Todo: Resizing squashes x axis.
 }
 
 void MyGLCanvas::OnMouse(wxMouseEvent& event)
