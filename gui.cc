@@ -57,7 +57,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     // button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
     topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
 
-    SetSizeHints(400, 400);
+    SetSizeHints(800, 500);
     SetSizer(topsizer);
 }
 
