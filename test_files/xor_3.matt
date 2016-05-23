@@ -1,0 +1,17 @@
+
+dev SW1 = SWITCH {
+    Initialvalue : 1;
+}
+dev SW2 = SWITCH {
+    initialvalue : 0;
+}
+dev SW3 = SWITCH {
+    initialvalue : 0;
+}
+
+
+dev G1 = XOR {
+    I1 : SW1;
+    I2 : SW2;
+    I3 : SW3;
+}

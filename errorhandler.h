@@ -49,6 +49,8 @@ public:
     /// Returns the complete error message for printing.
     virtual const char* what() const throw ();
 
+    std::string formatMessage(int cmax);
+
     /// Create a new mattmessage, and builds the message.
     mattmessage(std::string message, SourcePos pos);
     mattmessage(std::string message, SourcePos pos, MessageType type);
@@ -61,11 +63,12 @@ class matterror : public mattmessage {
 public:
     /// Create a new matterror, and builds the message.
     matterror(std::string message, SourcePos pos);
+    matterror(std::string message, SourcePos pos, ErrorType etype);
 };
 
 
 /// Specific exception type for Matt syntax errors
-class mattsyntaxerror : public mattmessage {
+class mattsyntaxerror : public matterror {
 public:
     /// Create a new mattsyntaxerror, and builds the message.
     mattsyntaxerror(std::string message, SourcePos pos);
@@ -73,7 +76,7 @@ public:
 
 
 /// Specific exception type for Matt semantic errors
-class mattsemanticerror : public mattmessage {
+class mattsemanticerror : public matterror {
 public:
     /// Create a new mattsemanticerror, and builds the message.
     mattsemanticerror(std::string message, SourcePos pos);
@@ -81,7 +84,7 @@ public:
 
 
 /// Specific exception type for Matt runtime errors
-class mattruntimeerror : public mattmessage {
+class mattruntimeerror : public matterror {
 public:
     /// Create a new mattruntimeerror, and builds the message.
     mattruntimeerror(std::string message, SourcePos pos);

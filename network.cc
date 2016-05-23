@@ -40,6 +40,46 @@ devlink network::findoutputdevice(const outplink ol)
   return NULL;
 }
 
+// find all the user defined switches in the network
+std::vector<devlink> network::findswitches() {
+  std::vector<devlink> ret;
+
+  devlink d = devs;
+
+  while (d != NULL) {
+    // ensures switches returned aren't special logic line switches
+    // Todo: it might be cleaner to return all switches, and the 
+    // caller filter the results, since the zero and one handles
+    // in devices could then be checked directly
+    if (d->kind == aswitch && nmz->namestr(d->id) != "0" && nmz->namestr(d->id) != "1")
+      ret.push_back(d);
+    d = d->next;
+  }
+  return ret;
+}
+
+
+// find all the output signals
+std::vector<outputsignal> network::findoutputsignals(){
+  std::vector<outputsignal> ret;
+  devlink d = devs;
+  outplink o;
+
+  // loop through all devices
+  while (d != NULL) {
+    // get device's outputs
+    o = d->olist;
+    while (o != NULL) {
+      // add them to the collection
+      ret.push_back({d->id, o->id});
+      o = o->next;
+    }
+    d = d->next;
+  }
+  return ret;
+}
+
+
 /***********************************************************************
  *
  * Returns link to device with specified name. Returns NULL if not

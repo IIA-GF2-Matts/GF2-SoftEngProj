@@ -7,7 +7,6 @@
 
 #include "iposstream.h" // SourcePos
 #include "names.h" // namestring
-#include "cistring.h"
 #include "network.h"
 
 
@@ -34,16 +33,7 @@ enum TokType {
     DeviceType
 };
 
-const std::map<namestring, devicekind> deviceTypes = {
-    {"CLOCK", aclock},
-    {"SWITCH", aswitch},
-    {"AND", andgate},
-    {"NAND", nandgate},
-    {"OR", orgate},
-    {"NOR", norgate},
-    {"DTYPE", dtype},
-    {"XOR", xorgate}
-};
+extern const std::map<namestring, devicekind> deviceTypes;
 
 
 /// Token class. Represents a lexical element in the source.
@@ -74,7 +64,12 @@ protected:
     Token _next;
     std::string _file;
     bool _open;
+    bool _hasNext;
     names* _nmz;
+
+    name kwordDev;
+    name kwordMonitor;
+    name kwordAs;
 
     /// Read the next character from the input character stream
     int readChar();
@@ -101,7 +96,7 @@ public:
     Token step();
 
     /// Returns the next token in the stream
-    Token peek() const;
+    Token peek();
 
     /// Returns the file name being scanned.
     std::string getFile() const;

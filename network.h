@@ -1,6 +1,7 @@
 #ifndef network_h
 #define network_h
 
+#include <vector>
 #include "names.h"
 #include "sourcepos.h"
 #include "errorhandler.h"
@@ -10,6 +11,11 @@
 typedef enum {falling, low, rising, high, floating} asignal;
 typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 	      norgate, xorgate, dtype, baddevice} devicekind;
+
+struct outputsignal {
+  name devicename;
+  name pinname;
+};
 
 struct outputrec {
   name       id;
@@ -50,6 +56,12 @@ class network {
 
   devlink findoutputdevice(const outplink ol);
     /* Finds the device that creates the output link ol                    */
+
+  std::vector<devlink> findswitches();
+  // find all the user defined switches in the network
+
+  std::vector<outputsignal> findoutputsignals();
+  // find all the output signals 
 
   devlink finddevice (name id);
    /* Returns link to device with specified name. Returns NULL if not      */

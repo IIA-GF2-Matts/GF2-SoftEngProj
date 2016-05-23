@@ -1,6 +1,6 @@
 #include <set>
 #include <list>
-#include "cistring.h"
+#include <ostream>
 #include "names.h"
 
 
@@ -32,3 +32,6 @@ int closestMatchesT(T s, const std::set<T> &candidates, std::list<T> &matches);
 
 
 constexpr auto closestMatches = &closestMatchesT<namestring>;
+
+
+void getClosestMatchError(namestring nm, std::set<namestring> candidates, std::ostream& oss);

@@ -1,0 +1,15 @@
+
+dev SW1 = SWITCH {
+    Initialvalue : 1;
+}
+dev CLK = CLOCK {
+    Period : 2;
+}
+
+
+dev G1 = XOR {
+    I1 : SW1;
+    I2 : CLK;
+}
+
+monitor G1;

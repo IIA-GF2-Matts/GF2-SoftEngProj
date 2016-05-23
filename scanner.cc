@@ -7,12 +7,22 @@
 
 #include "names.h"
 #include "iposstream.h"
-#include "cistring.h"
 #include "errorhandler.h"
 #include "network.h"
 
 #include "scanner.h"
 
+
+const std::map<namestring, devicekind> deviceTypes = {
+    {"CLOCK", aclock},
+    {"SWITCH", aswitch},
+    {"AND", andgate},
+    {"NAND", nandgate},
+    {"OR", orgate},
+    {"NOR", norgate},
+    {"DTYPE", dtype},
+    {"XOR", xorgate}
+};
 
 
 // struct Token
@@ -57,12 +67,14 @@ Token scanner::readNext() {
 
     int c = readChar();
 
+    // Remove leading whitespace
     while (!_ips.eof() && std::isspace(c)) {
         c = readChar();
     }
 
     if (_ips.eof()) {
         ret.at = _ips.Pos;
+        _hasNext = true;
         return ret;
     }
 
@@ -99,6 +111,7 @@ Token scanner::readNext() {
 
         if (_ips.eof()) {
             ret.at = _ips.Pos;
+            _hasNext = true;
             return ret;
         }
 
@@ -145,14 +158,13 @@ Token scanner::readNext() {
 
                 // Note: namestring is cistring, so comparison here is
                 // case-insensitive
-                // Todo: Use name table comparison not strings.
-                if (*ret.id == "dev") {
+                if (ret.id == kwordDev) {
                     ret.type = TokType::DevKeyword;
                 }
-                else if (*ret.id == "monitor") {
+                else if (ret.id == kwordMonitor) {
                     ret.type = TokType::MonitorKeyword;
                 }
-                else if (*ret.id == "as") {
+                else if (ret.id == kwordAs) {
                     ret.type = TokType::AsKeyword;
                 }
                 else { // Check for device types
@@ -185,6 +197,7 @@ Token scanner::readNext() {
             break;
     }
 
+    _hasNext = true;
     return ret;
 }
 
@@ -223,7 +236,11 @@ int scanner::readNumber(int c1) {
 
 
 scanner::scanner(names* nmz)
-        : _open(false), _nmz(nmz) {
+        : _open(false), _hasNext(false), _nmz(nmz) {
+
+    kwordDev = _nmz->lookup("dev");
+    kwordMonitor = _nmz->lookup("monitor");
+    kwordAs = _nmz->lookup("as");
 }
 
 
@@ -232,7 +249,7 @@ void scanner::open(std::istream* is, std::string fname) {
     _file = fname;
 
     _open = true;
-    _next = readNext();
+    _hasNext = false;
 }
 
 scanner::~scanner() {
@@ -240,15 +257,18 @@ scanner::~scanner() {
 
 
 Token scanner::step() {
-    Token ret = _next;
-
-    _next = scanner::readNext();
+    Token ret = peek();
+    _hasNext = false;
 
     return ret;
 }
 
 
-Token scanner::peek() const {
+Token scanner::peek() {
+    if (!_hasNext) {
+        _next = readNext();
+    }
+
     return _next;
 }
 

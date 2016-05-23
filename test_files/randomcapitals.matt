@@ -1,0 +1,47 @@
+dEv G1 = NaND;
+dEv G2 = NaNd;
+dEv G3 = NaND;
+dEv G4 = NaND;
+dEv g5 = NaND;
+dEv G6 = NaND;
+
+dEv CLK = CLOCK {
+    PEriod : 2;
+}
+
+DEv DaTa = CLOCK {
+    PErioD : 5;
+}
+
+dEv G1 {
+    I1 : G4;
+    I2 : G2;
+}
+
+dEV G2 {
+    I1 : G1;
+    I2 : cLK;
+}
+
+dEv G3 {
+    I1 : G2;
+    I2 : CLK;
+    I3 : G4;
+}
+
+dEv g4 {
+    I1 : g3;
+    I2 : DaTa;
+}
+
+DEv G5 {
+    I1 : G2;
+    I2 : G6;
+}
+
+dEV G6 {
+    I1 : G5;
+    I2 : G3;
+}
+
+moNitor G5 as Q, G6 as QBar;
