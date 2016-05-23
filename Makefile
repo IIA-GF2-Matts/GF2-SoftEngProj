@@ -7,9 +7,9 @@ FLAGS = -std=c++11 -g
 GUIFLAGS = -DUSE_GUI `wx-config --version=3.0 --cxxflags`
 GUILINKFLAGS = `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
-SRC = logsim.cc names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc autocorrect.cc networkbuilder.cc
-GUISRC = gui.cc guierrordialog.cc
-CLISRC = userint.cc
+SRC = names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc autocorrect.cc networkbuilder.cc
+GUISRC = gui.cc guierrordialog.cc mattlab.cc
+CLISRC = userint.cc clisim.cc
 
 G_OBJECTS = $(patsubst %.cc,gui_%.o,$(GUISRC) $(SRC))
 C_OBJECTS = $(SRC:.cc=.o) $(CLISRC:.cc=.o)
@@ -27,7 +27,7 @@ gui_%.o: %.cc
 
 mattlab: $(G_OBJECTS)
 	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
-	
+
 clisim: $(C_OBJECTS)
 	$(CXX) $(FLAGS) -o clisim $(C_OBJECTS)
 

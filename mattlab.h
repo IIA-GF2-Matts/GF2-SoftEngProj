@@ -1,8 +1,6 @@
 
 
-#ifdef USE_GUI
 #include <wx/wx.h>
-#endif
 
 #include "names.h"
 #include "devices.h"
@@ -14,22 +12,11 @@
 #define logsim_h
 
 
-
-#ifdef USE_GUI
 class MyApp : public wxApp {
-#else
-class MyApp {
-#endif
-
- public:
-
-#ifndef USE_GUI
-  int argc;
-  char const** argv;
-#endif
-
+public:
   bool OnInit(); // automatically called when the application starts
- private:
+
+private:
   names *nmz;    // pointer to the names class
   network *netz; // pointer to the network class
   devices *dmz;  // pointer to the devices class
@@ -37,5 +24,6 @@ class MyApp {
   fscanner *smz;  // The scanner class
   parser *pmz;   // pointer to the parser class
 };
+
 
 #endif /* logsim_h */
