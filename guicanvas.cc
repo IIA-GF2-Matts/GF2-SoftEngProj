@@ -43,7 +43,6 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   lines_RGB[0] = 0.4;     // Red
   lines_RGB[1] = 0.4;     // Green
   lines_RGB[2] = 0.4;     // Blue
-
   // background colour
   background_RGB[0] = 0.15; // Red
   background_RGB[1] = 0.15; // Green
@@ -89,7 +88,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   int end_width = w - end_gap;
 
 
-  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw the first monitor signal, get trace from monitor class
+  if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) {
     if ((int)(cyclesdisplayed/zoom) == 0)
       cycles_on_screen = 1;
     else
@@ -106,9 +105,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     zoomrange[1] = zoomrange[0] + cycles_on_screen;
 
     // x axis number spacing
-    int num_spacing = 1 + cycles_on_screen/20;
-    // Todo: increase number spacing as cycle_no increases/ width decreases
-    
+    int num_spacing = (1 + cycles_on_screen/20) * to_string(cycle_no).length()/2;
+
 
     // draw each plot
     for (j = 0; j<mmz->moncount(); j++) {
@@ -170,7 +168,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   for (i=zoomrange[0]; i<zoomrange[1]; i++) {
     if (mmz->getsignaltrace(plot_num, i, s)) {
       if (s==low) signal_y = y;
-      if (s==high) signal_y = y + dy;
+      if (s==high) signal_y = y + 2*dy;
       glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
       glVertex2f(dx*(i-zoomrange[0]+1) + label_width, signal_y);
     }
