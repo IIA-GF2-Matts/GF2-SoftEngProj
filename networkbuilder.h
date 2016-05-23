@@ -30,15 +30,6 @@ private:
     names* _nms;
     errorcollector& _errs;
 
-public:
-    networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc);
-    ~networkbuilder();
-
-	void defineDevice(Token& devName, Token& type);
-    void setInputValue(Token& devName, Token& keyTok, Token& valTok);
-    void setInputSignal(Token& devName, Token& keyTok, Signal& valSig);
-    void defineMonitor(Signal& monSig);
-    void defineMonitor(Signal& monSig, Signal& aliSig);
 
     // get the error message when a key has been previously defined
     template<typename T>
@@ -61,6 +52,20 @@ public:
     signal_legality isBadSignal(Signal& sig);
 
     bool checkKey(devlink dvl, Token& keyTok);
+
+    bool isLegalGateInputNamestring(name n, int maxn);
+
+
+public:
+    networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc);
+    ~networkbuilder();
+
+	void defineDevice(Token& devName, Token& type);
+    void setInputValue(Token& devName, Token& keyTok, Token& valTok);
+    void setInputSignal(Token& devName, Token& keyTok, Signal& valSig);
+    void defineMonitor(Signal& monSig);
+    void defineMonitor(Signal& monSig, Signal& aliSig);
+
 };
 
 

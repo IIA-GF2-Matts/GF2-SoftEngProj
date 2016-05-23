@@ -17,7 +17,8 @@
 
 
 
-bool isLegalGateInputNamestring(namestring s, int maxn) {
+bool networkbuilder::isLegalGateInputNamestring(name n, int maxn) {
+    namestring s = _nms->namestr(n);
     if (s.length() < 2
         || namestring::traits_type::ne(s[0], 'I')
         || !std::isdigit(s[1])
@@ -38,14 +39,14 @@ bool isLegalGateInputNamestring(namestring s, int maxn) {
 void networkbuilder::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
     devicekind dkind = _netz->finddevice(sig.device.id)->kind;
 
-    oss << *sig.device.id << " (of type "
-        << *_devz->getname(dkind)
+    oss << _nms->namestr(sig.device.id) << " (of type "
+        << _nms->namestr(_devz->getname(dkind))
         << ") ";
 
     if (sig.pin.id == blankname) {
         oss << "has no default output pin.";
     } else {
-        oss << "has no output pin " << *sig.pin.id << ".";
+        oss << "has no output pin " << _nms->namestr(sig.pin.id) << ".";
     }
 
     if (dkind == dtype)
@@ -57,7 +58,7 @@ void networkbuilder::getPredefinedError(devlink dvl, name key, T prevval, std::o
     // todo: note isn't displaying
 
     warnoss << "Attempt to redefine " //<< *_devz->getname(dvl->kind)
-        << *dvl->id << "." << *key;
+        << _nms->namestr(dvl->id) << "." << _nms->namestr(key);
     noteoss << "Previously defined as " << prevval << " here";
 }
 
@@ -108,22 +109,22 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
     switch(dvl->kind) {
         // Todo: quality check errors
         case aswitch:
-            if (*keyTok.id != "InitialValue") {
+            if (keyTok.id != _devz->initvalnm) {
                 _errs.report(mattsemanticerror(
-                    "Switches may only have an `InitialValue` attribute.", keyTok.at));
+                    "Switches may only have an InitialValue attribute.", keyTok.at));
                 return false;
             }
             break;
         case aclock:
-            if (*keyTok.id != "Period") {
+            if (keyTok.id != _devz->periodnm) {
                 _errs.report(mattsemanticerror(
-                    "Clocks may only have a `Period` attribute.", keyTok.at));
+                    "Clocks may only have a Period attribute.", keyTok.at));
                 return false;
             }
 
             break;
         case andgate:
-            if (!isLegalGateInputNamestring(*keyTok.id, 16)) {
+            if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
                     "AND gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
                 return false;
@@ -131,7 +132,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
 
             break;
         case nandgate:
-            if (!isLegalGateInputNamestring(*keyTok.id, 16)) {
+            if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
                     "NAND gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
                 return false;
@@ -139,7 +140,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
 
             break;
         case orgate:
-            if (!isLegalGateInputNamestring(*keyTok.id, 16)) {
+            if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
                     "OR gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
                 return false;
@@ -147,7 +148,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
 
             break;
         case norgate:
-            if (!isLegalGateInputNamestring(*keyTok.id, 16)) {
+            if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
                     "NOR gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
                 return false;
@@ -155,7 +156,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
 
             break;
         case xorgate:
-            if (!isLegalGateInputNamestring(*keyTok.id, 2)) {
+            if (!isLegalGateInputNamestring(keyTok.id, 2)) {
                 _errs.report(mattsemanticerror(
                     "XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", keyTok.at));
                 return false;
@@ -164,10 +165,11 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
             break;
         case dtype:
             // Todo: Name table comparison rather than string comparison
-            if (!(*keyTok.id == "DATA" || *keyTok.id == "CLK" || *keyTok.id == "SET" || *keyTok.id == "CLEAR")) {
+            if (!(keyTok.id == _devz->datapin || keyTok.id == _devz->clkpin
+                    || keyTok.id == _devz->setpin || keyTok.id == _devz->clrpin)) {
                 std::ostringstream oss;
                 oss << "DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. ";
-                getClosestMatchError(*keyTok.id, dtypeoutset, oss);
+                getClosestMatchError(_nms->namestr(keyTok.id), dtypeoutset, oss);
                 _errs.report(mattsemanticerror(oss.str(), keyTok.at));
                 return false;
             }
@@ -184,6 +186,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
     switch(dvl->kind) {
         // Todo: check errors
         case aswitch:
+            // initially set to floating
             if (dvl->swstate != floating) {
                 std::ostringstream warnoss, noteoss;
                 getPredefinedError(dvl, keyTok.id, dvl->swstate == high ? 1 : 0, warnoss, noteoss);
@@ -193,6 +196,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
             }
             break;
         case aclock:
+            // initially set to 0
             if (dvl->frequency != 0) {
                 std::ostringstream warnoss, noteoss;
                 getPredefinedError(dvl, keyTok.id, dvl->frequency, warnoss, noteoss);
@@ -208,10 +212,14 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case xorgate:
         case dtype:
         default: {
+            // get the input link
             inplink il = _netz->findinput(dvl, keyTok.id);
+            // xor predefines two inputs, so check a connection exists too
             if (il != NULL && (il->connect != NULL)) {
-                std::ostringstream warnoss, noteoss, prevval;
                 outplink ol = il->connect;
+
+                std::ostringstream warnoss, noteoss, prevval;
+
                 devlink dl = _netz->findoutputdevice(ol);
                 if (dl == NULL) {
                     // Should never reach here
@@ -225,7 +233,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                     prevval << *ol->id;
                 getPredefinedError(dvl, keyTok.id, prevval.str(), warnoss, noteoss);
                 _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
-                _errs.report(mattnote(noteoss.str(), dvl->definedAt));
+                _errs.report(mattnote(noteoss.str(), il->definedAt));
                 return false;
             }
             break;
@@ -273,9 +281,9 @@ void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSi
     if (isLegalProperty(dvl, keyTok.id)) {
         // attempting to assign a signal to a property (not an input pin)
         // todo: check this
-        if (_nms->namestr(keyTok.id) == "Period") {
+        if (keyTok.id == _devz->periodnm) {
             _errs.report(mattsemanticerror("Clock periods must be numeric (assigning an identifier was attempted)", valSig.device.at));
-        } else if (_nms->namestr(keyTok.id) == "InitialValue") {
+        } else if (keyTok.id == _devz->initvalnm) {
             _errs.report(mattsemanticerror("Initial values may only be 0 or 1, assigning a signal is not supported.", valSig.device.at));
         } else {
             _errs.report(mattsemanticerror("Attempt to assign an identifier to a property", valSig.device.at));
@@ -306,8 +314,12 @@ void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
 
     // connect the gate
     bool success = false;
-    if (!_netz->findinput(dvl, keytk.id))
+    inplink il = _netz->findinput(dvl, keytk.id);
+    // check if the input link already exists (e.g. xor)
+    if (!il)
         _netz->addinput(dvl, keytk.id, keytk.at);
+    else
+        il->definedAt = keytk.at;  // store this token position for xors
 
     // todo: store token position?
     _netz->makeconnection(dvl->id, keytk.id, sig.device.id, sig.pin.id, success);
@@ -407,6 +419,6 @@ signal_legality networkbuilder::isBadSignal(Signal& sig) {
 
 
 bool networkbuilder::isLegalProperty(devlink dvl, name keyname) {
-    return ( (dvl->kind == aclock && keyname == _nms->lookup("Period"))
-            || (dvl->kind == aswitch && keyname == _nms->lookup("InitialValue")));
+    return ( (dvl->kind == aclock && keyname == _devz->periodnm)
+            || (dvl->kind == aswitch && keyname == _devz->initvalnm));
 }
