@@ -142,15 +142,6 @@ protected:
         EXPECT_EQ(acstream, actionstaken);
     }
 
-    void testparserTokenStreamError(std::vector<Token> tkstream, std::vector<Action> acstream) {
-        _tkstream = tkstream;
-        _iter = _tkstream.begin();
-        smz->step();
-        psr->readin();
-        // expect no actions to be taken on errorneous input
-        EXPECT_EQ(0, actionstaken.size());
-    }
-
 public:
     static void pushAction(Action ac) {
         actionstaken.push_back(ac);
@@ -360,7 +351,7 @@ TEST_F(ParserTest, MonitorOrGat){
 TEST_F(ParserTest, ErrorneousDevDefine){
     // devf G1 = XOR;
     // note: using testparserTokenStreamError
-    testparserTokenStreamError({
+    testparserTokenStream({
         genToken(Identifier, "devf"),
         genToken(Identifier, "G1"),
         genToken(Equals),
@@ -368,7 +359,7 @@ TEST_F(ParserTest, ErrorneousDevDefine){
         genToken(SemiColon),
         genToken(EndOfFile)
     },{
-        getDefineDeviceAction("G1", xorgate)
+        // parser should take no action
     });
 }
 
@@ -385,6 +376,7 @@ TEST_F(ParserTest, DeviceTypeAsName){
         genToken(SemiColon),
         genToken(EndOfFile)
     }, {
+        // the scanner is responsible for checking such things
         getDefineDeviceAction("NAND", nandgate)
     });
 }
@@ -392,7 +384,7 @@ TEST_F(ParserTest, DeviceTypeAsName){
 // testing misspelt option
 TEST_F(ParserTest, MisspeltOption){
     // dev CLK = CLOCK {Perod : 4; }
-    testparserTokenStreamError({
+    testparserTokenStream({
         genToken(DevKeyword),
         genToken(Identifier, "CLK"),
         genToken(Equals),
@@ -405,7 +397,8 @@ TEST_F(ParserTest, MisspeltOption){
         genToken(CloseBrace),
         genToken(EndOfFile)
     }, {
+        // the typo of perod would be caught in network builder
         getDefineDeviceAction("CLK", aclock),
-        getSetOptionAction("CLK", "Period", 4)
+        getSetOptionAction("CLK", "Perod", 4)
     });
 }
