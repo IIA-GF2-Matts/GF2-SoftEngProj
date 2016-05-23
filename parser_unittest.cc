@@ -245,7 +245,7 @@ Token scanner::step() {
     _next = readNext();
     return ret;
 }
-Token scanner::peek() const {
+Token scanner::peek() {
     return _next;
 }
 Token scanner::readNext() {
