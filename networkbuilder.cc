@@ -164,7 +164,6 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
 
             break;
         case dtype:
-            // Todo: Name table comparison rather than string comparison
             if (!(keyTok.id == _devz->datapin || keyTok.id == _devz->clkpin
                     || keyTok.id == _devz->setpin || keyTok.id == _devz->clrpin)) {
                 std::ostringstream oss;
@@ -257,8 +256,7 @@ void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok)
     }
     else {
         if (valTok.number != 0 && valTok.number != 1) {
-            // Todo: improve error message
-            _errs.report(mattsyntaxerror("Invalid signal.", valTok.at));
+            _errs.report(mattsemanticerror("Invalid signal name: input pins should be assigned a valid signal name or a logical state (0 or 1)", valTok.at));
             return;
         }
         Signal sig;
@@ -280,7 +278,6 @@ void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSi
 
     if (isLegalProperty(dvl, keyTok.id)) {
         // attempting to assign a signal to a property (not an input pin)
-        // todo: check this
         if (keyTok.id == _devz->periodnm) {
             _errs.report(mattsemanticerror("Clock periods must be numeric (assigning an identifier was attempted)", valSig.device.at));
         } else if (keyTok.id == _devz->initvalnm) {
@@ -321,12 +318,10 @@ void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
     else
         il->definedAt = keytk.at;  // store this token position for xors
 
-    // todo: store token position?
     _netz->makeconnection(dvl->id, keytk.id, sig.device.id, sig.pin.id, success);
     if (!success) {
         // should never reach here
-        // Todo: improve error message
-        _errs.report(mattruntimeerror("Could not make connection", keytk.at));
+        _errs.report(mattruntimeerror("Could not make connection. One of the signals could not be found.", keytk.at));
         return;
     }
 }
@@ -355,7 +350,6 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
             return;
         }
 
-        // Todo: these might want to store a different token position
         _devz->setclock(dvl->id, valTok.number, success, keytk.at);
 
         if (!success) {
@@ -401,8 +395,7 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
     bool success = false;
     _mons->makemonitor(monSig.device.id, monSig.pin.id, success, aliSig.device.id, aliSig.pin.id);
     if (!success) {
-        // Todo: improve error message
-        _errs.report(mattruntimeerror("Could not make monitor", monSig.device.at));
+        _errs.report(mattruntimeerror("Could not make monitor. All available monitors are used, or the device output could not be found.", monSig.device.at));
         return;
     }
 }
