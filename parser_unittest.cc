@@ -371,3 +371,41 @@ TEST_F(ParserTest, ErrorneousDevDefine){
         getDefineDeviceAction("G1", xorgate)
     });
 }
+
+
+// testing device type as name
+
+TEST_F(ParserTest, DeviceTypeAsName){
+    // dev NAND = NAND;
+    testparserTokenStream({
+        genToken(DevKeyword),
+        genToken(Identifier, "NAND"),
+        genToken(Equals),
+        genToken(DeviceType, "NAND"),
+        genToken(SemiColon),
+        genToken(EndOfFile)
+    }, {
+        getDefineDeviceAction("NAND", nandgate)
+    });
+}
+
+// testing misspelt option
+TEST_F(ParserTest, MisspeltOption){
+    // dev CLK = CLOCK {Perod : 4; }
+    testparserTokenStreamError({
+        genToken(DevKeyword),
+        genToken(Identifier, "CLK"),
+        genToken(Equals),
+        genToken(DeviceType, "CLOCK"),
+        genToken(Brace),
+        genToken(Identifier, "Perod"),
+        genToken(Colon),
+        genToken(Number, 4),
+        genToken(SemiColon),
+        genToken(CloseBrace),
+        genToken(EndOfFile)
+    }, {
+        getDefineDeviceAction("CLK", aclock),
+        getSetOptionAction("CLK", "Period", 4)
+    });
+}
