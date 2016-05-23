@@ -4,6 +4,8 @@
 #include <wx/wx.h>
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
+#include <wx/checklst.h>
+#include <wx/arrstr.h>
 #include "names.h"
 #include "devices.h"
 #include "monitor.h"
@@ -31,6 +33,7 @@ class MyFrame: public wxFrame
  private:
   MyGLCanvas *canvas;                     // OpenGL drawing area widget to draw traces
   wxSpinCtrl *spin;                       // control widget to select the number of cycles
+  wxCheckListBox *switchlist;             // widget to turn swicthes on/off
   names *nmz;                             // pointer to names class
   devices *dmz;                           // pointer to devices class
   monitor *mmz;                           // pointer to monitor class
