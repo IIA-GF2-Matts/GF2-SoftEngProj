@@ -30,10 +30,24 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   cyclesdisplayed = -1;
   cycle_no = 0;
 
-  dy = 12.0;              // plot lines at +- dx
+  dy = 12;              // plot lines at +- dx
   plot_height = 4 * dy;   // height allocated 2x plot height
   label_width = 100.0;    // x allowed for labels at start
   end_gap = 10;           // dist between end and side
+
+  // trace colour
+  trace_RGB[0] = 0.0;     // Red
+  trace_RGB[1] = 1.0;     // Green
+  trace_RGB[2] = 0.0;     // Blue
+  // axis colour
+  lines_RGB[0] = 0.4;     // Red
+  lines_RGB[1] = 0.4;     // Green
+  lines_RGB[2] = 0.4;     // Blue
+
+  // background colour
+  background_RGB[0] = 0.15; // Red
+  background_RGB[1] = 0.15; // Green
+  background_RGB[2] = 0.15; // Blue
 
 }
 
@@ -48,7 +62,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   // When the simulator is run, the number of cycles is passed as a parameter
 
   int x, y;
-  unsigned int i, j, k;
+  unsigned int j, k;
   asignal s;
   name mon_name_dev;
   name mon_name_pin;
@@ -73,73 +87,29 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   int end_width = w - end_gap;
 
 
-  wxString number;
-
-  // x axis number spacing
-  int num_spacing;
-  if (cyclesdisplayed > 0) {
-    num_spacing = 1 + cyclesdisplayed/20;
-  }
-
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) { // draw the first monitor signal, get trace from monitor class
-    // Todo: this doesn't fix floating point error when changing from 0 to 1 cycles. Or don't allow an input of 0.
-    if (cyclesdisplayed == 0)
-      dx = 20;
+    if ((int)(cyclesdisplayed/zoom) == 0)
+      cycles_on_screen = 1;
     else
-      dx = (end_width - label_width) / cyclesdisplayed; // dx between points
+      cycles_on_screen = cyclesdisplayed / zoom;
+    dx = (end_width - label_width) / cycles_on_screen; // dx between points
 
+    int scaled_pan_x = pan_x * zoom +1;
+    // Todo: panning scaling with zoom is currently imperfect.
 
-    zoomrange[1] = cyclesdisplayed;
-    // Todo: set zoomrange[1] so unshown points aren't displayed.
+    zoomrange[0] = scaled_pan_x / dx;
+    // stop from panning over end of screen.
+    if (zoomrange[0] + cycles_on_screen > cyclesdisplayed)
+      zoomrange[0] = cyclesdisplayed - cycles_on_screen;
+    zoomrange[1] = zoomrange[0] + cycles_on_screen;
 
-    dx = dx * zoom;
+    // x axis number spacing
+    int num_spacing = 1 + cycles_on_screen/20;
+    
 
-    zoomrange[0] = pan_x / dx;
-    example_text.Printf("pan_x is %d, zoom is %f", pan_x, zoom);
-
-
+    // draw each plot
     for (j = 0; j<mmz->moncount(); j++) {
-      // draw x axis
-      glColor3f(0.4, 0.4, 0.4);
-      glBegin(GL_LINE_STRIP);
-      y = h - (j+1)*plot_height - dy;
-      glVertex2f(label_width-5, y);
-      glVertex2f(end_width, y);
-      glEnd();
-      for (i=zoomrange[0]; i<=zoomrange[1]; i++) {
-        x = dx*(i-zoomrange[0]) + label_width;
-        glBegin(GL_LINE_STRIP);
-        glVertex2f(x, y-3);
-        glVertex2f(x, y+3);
-        glEnd();
-        if (i%num_spacing == 0){
-          drawText(to_string(i+cycle_no-cyclesdisplayed), x-4, y-12, GLUT_BITMAP_HELVETICA_10);
-        }
-
-      }
-
-      // draw trace
-      glColor3f(0.0, 1.0, 0.0);
-      glBegin(GL_LINE_STRIP);
-      for (i=zoomrange[0]; i<zoomrange[1]; i++) {
-        if (mmz->getsignaltrace(j, i, s)) {
-          if (s==low) y = h - ((j+1) * plot_height + dy);
-          if (s==high) y = h - ((j+1) * plot_height - dy);
-          glVertex2f(dx*(i-zoomrange[0]) + label_width, y);
-          glVertex2f(dx*(i-zoomrange[0]+1) + label_width, y);
-        }
-      }
-      glEnd();
-      // draw text label
-      glRasterPos2f(10, h - 5 - (j+1)*plot_height);
-      mmz->getmonname(j, mon_name_dev, mon_name_pin);
-      mon_name_text = mon_name_dev ->c_str();
-      if (mon_name_pin != blankname) {
-        mon_name_text += ".";
-        mon_name_text += mon_name_pin ->c_str();
-      }
-      drawText(mon_name_text, 10, h-5-(j+1)*plot_height, GLUT_BITMAP_HELVETICA_12);
-      
+      drawPlot(s, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
     }
 
     // draw verticle line
@@ -151,30 +121,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
 
   } else { // draw title screen
-    // Todo: redesign title screen.
-
-    // Example plot
-    // glBegin(GL_LINE_STRIP);
-    // for (i=0; i<10; i++) {
-    //   if (i%2) y = h/2 + 40 - dy;
-    //   else y = h/2 + 40 + dy;
-    //   glVertex2f(20*i+label_width, y);
-    //   glVertex2f(20*i+20.0 + label_width, y);
-    // }
-    // glEnd();
-    mon_name_text = "Welcome to MattLab Logic Simulator";
-    glColor3f(0.0, 1.0, 0.0);
-    drawText(mon_name_text, label_width/2, h-plot_height, GLUT_BITMAP_HELVETICA_18);
-
-    string logo =
-      " _[]_[]_[]_[]_[]_[]_[]_[]_  \n"
-      "|                         | \n"
-      " )     M A T T L A B      | \n"
-      "|                         | \n"
-      " `[]`[]`[]`[]`[]`[]`[]`[]`  ";
-    drawText(logo, label_width/2, h-2*plot_height, GLUT_BITMAP_9_BY_15);
-    // }
-
+    titleScreen();
   }
 
   // Draw example text
@@ -185,6 +132,63 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   SwapBuffers();
 }
 
+
+void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing){
+  
+  int w, h;
+  GetClientSize(&w, &h);
+  int end_width = w - end_gap;
+  int x, y;
+  int i;
+  
+  // draw x axis
+  setLineColour(lines_RGB);
+  glBegin(GL_LINE_STRIP);
+  y = h - (plot_num+1)*plot_height - dy;
+  glVertex2f(label_width-5, y);
+  glVertex2f(end_width, y);
+  glEnd();
+  for (i=zoomrange[0]; i<=zoomrange[1]; i++) {
+    x = dx*(i-zoomrange[0]) + label_width;
+    glBegin(GL_LINE_STRIP);
+    glVertex2f(x, y-3);
+    glVertex2f(x, y+3);
+    glEnd();
+    if (i%num_spacing == 0){
+      drawText(to_string(i+cycle_no-cyclesdisplayed), x-4, y-12, GLUT_BITMAP_HELVETICA_10);
+    }
+
+  }
+  
+  // draw trace
+  int signal_y;
+  setLineColour(trace_RGB);
+  glBegin(GL_LINE_STRIP);
+  for (i=zoomrange[0]; i<zoomrange[1]; i++) {
+    if (mmz->getsignaltrace(plot_num, i, s)) {
+      if (s==low) signal_y = y;
+      if (s==high) signal_y = y + dy;
+      glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
+      glVertex2f(dx*(i-zoomrange[0]+1) + label_width, signal_y);
+    }
+  }
+  glEnd();
+  // draw text label
+  name mon_name_dev, mon_name_pin;
+  wxString mon_name_text;
+
+  glRasterPos2f(10, h - 5 - (plot_num+1)*plot_height);
+  mmz->getmonname(plot_num, mon_name_dev, mon_name_pin);
+  mon_name_text = mon_name_dev ->c_str();
+  if (mon_name_pin != blankname) {
+    mon_name_text += ".";
+    mon_name_text += mon_name_pin ->c_str();
+  }
+  drawText(mon_name_text, 10, h-5-(plot_num+1)*plot_height, GLUT_BITMAP_HELVETICA_12);
+  
+}
+
+
 void MyGLCanvas::InitGL()
   // Function to initialise the GL context
 {
@@ -193,7 +197,7 @@ void MyGLCanvas::InitGL()
   GetClientSize(&w, &h);
   SetCurrent(*context);
   glDrawBuffer(GL_BACK);
-  glClearColor(0.15, 0.15, 0.15, 0.0);
+  glClearColor(background_RGB[0], background_RGB[1], background_RGB[2], 0);
   glViewport(0, 0, (GLint) w, (GLint) h);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -247,9 +251,16 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     // check for scrolling off left
     if (pan_x < 0) pan_x = 0;
     // check for scrolling off right
-    if (pan_x > (w-end_gap-label_width)*(zoom-1)) pan_x = (w-end_gap-label_width)*(zoom-1);
-    // Todo: Fix this equation for not quite reaching the last value when zoomed in.
-    
+    int max_scaled_pan_x = (cyclesdisplayed - cycles_on_screen)*dx;
+    int max_pan = max_scaled_pan_x / zoom + dx;
+    // + dx ensures that it can reach last value in all situations.
+    // Extra check performed when calculating zoomrange in Render to ensure
+    // it cannot display past end of data. Less easy (I think) to implement
+    // here.
+    // Todo: if time combine these two separate checks into one.
+    if (pan_x > max_pan)       
+      pan_x = max_pan;
+    text.Printf("dx is %f, max_pan is %d, pan_x is %d", dx, max_pan, pan_x);
 
     // y panning
     pan_y -= event.m_y - last_y;
@@ -260,27 +271,44 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     last_x = event.m_x;
     last_y = event.m_y;
     init = false;
-    // text.Printf("Mouse dragged from %d to %d", selection_x[0], selection_x[1]);
   }
 
   if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
 
   if (event.GetWheelRotation() < 0) {
     zoom = zoom * (1.0 - (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
+    if (zoom > 100) zoom = 100; // Max zoom 
     init = false;
     text.Printf("Negative mouse wheel rotation, zoom now %f", zoom);
   }
   if (event.GetWheelRotation() > 0) {
     zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
-    if (zoom < 1) zoom = 1;
+    if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
     init = false;
     text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
   }
-  // Todo: scale pan_x with zoom
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
 }
 
+void MyGLCanvas::titleScreen(){
+  // Todo: redesign title screen: add getting started message etc.
+
+  int w, h;
+  GetClientSize(&w, &h);
+
+  wxString title_text = "Welcome to MattLab Logic Simulator";
+  setLineColour(trace_RGB);
+  drawText(title_text, label_width/2, h-plot_height, GLUT_BITMAP_HELVETICA_18);
+
+  wxString logo =
+    " _[]_[]_[]_[]_[]_[]_[]_[]_  \n"
+    "|                         | \n"
+    " )     M A T T L A B      | \n"
+    "|                         | \n"
+    " `[]`[]`[]`[]`[]`[]`[]`[]`  ";
+  drawText(logo, label_width/2, h-2*plot_height, GLUT_BITMAP_9_BY_15);
+}
 
 
 
@@ -294,4 +322,8 @@ void MyGLCanvas::drawText(wxString text, int pos_x, int pos_y, void* font) {
     else
       glutBitmapCharacter(font, text[k]);
   }
+}
+
+void MyGLCanvas::setLineColour(float RGB[3]) {
+  glColor3f(RGB[0], RGB[1], RGB[2]);
 }

@@ -17,8 +17,6 @@ class MyGLCanvas: public wxGLCanvas
          const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
          const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
-
-  void drawText(wxString text, int pos_x, int pos_y, void* font);
   
 void setNetwork(monitor* mmz, names* nmz);
  private:
@@ -29,15 +27,26 @@ void setNetwork(monitor* mmz, names* nmz);
   float dx;
   double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
+  int cycles_on_screen;              // number of cycles currently on screen with current zoom
   int cycle_no;
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
   names *nmz;                        // pointer to names class, used to extract signal names
+
+  float trace_RGB[3];                // RGB values for trace lines
+  float lines_RGB[3];                // RGB values for axis lines
+  float background_RGB[3];           // RGB values for background
 
   int dy;                            // plot lines at +- dx
   int plot_height;                   // height allocated 2x plot height
 
   int label_width;                   // x allowed for labels at start
   int end_gap;                       // dist between end and side
+
+  void drawText(wxString text, int pos_x, int pos_y, void* font);
+  void titleScreen();
+  void setLineColour(float RGB[3]);
+  void drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing);
+
 
   void InitGL();                     // function to initialise OpenGL context
   void OnSize(wxSizeEvent& event);   // event handler for when canvas is resized
