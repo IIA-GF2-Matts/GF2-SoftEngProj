@@ -73,6 +73,11 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     controls_sizer->Add(switchlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
     controls_sizer->Add(monitorlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
     controls_sizer->Add(button_sizer, 0, wxALL|wxALIGN_BOTTOM, 0);
+    // Todo: borders around separate control groups (e.g. around monitor controls, switch controls, other controls)?
+    // Todo: add monitor dialogue button.
+    // Todo: add text to monitor and switch controls.
+    // Todo: add colour changer?
+
 
     // button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
     topsizer->Add(controls_sizer, 0, wxALIGN_CENTER|wxEXPAND);
