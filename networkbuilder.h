@@ -30,19 +30,10 @@ private:
     names* _nms;
     errorcollector& _errs;
 
-public:
-    networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc);
-    ~networkbuilder();
-
-	void defineDevice(Token& devName, Token& type);
-    void setInputValue(Token& devName, Token& keyTok, Token& valTok);
-    void setInputSignal(Token& devName, Token& keyTok, Signal& valSig);
-    void defineMonitor(Signal& monSig);
-    void defineMonitor(Signal& monSig, Signal& aliSig);
 
     // get the error message when a key has been previously defined
     template<typename T>
-    void getPredefinedError(devlink dvl, name key, T prevval, std::ostream& oss);
+    void getPredefinedError(devlink dvl, name key, T prevval, std::ostream& warnoss, std::ostream& noteoss);
 
     // get the error message when a signal pin is unknown
     void getUnknownPinError(Signal& sig, std::ostringstream& oss);
@@ -60,7 +51,21 @@ public:
     // checks whether device and pin are defined
     signal_legality isBadSignal(Signal& sig);
 
-    void checkKey(devlink dvl, Token& keyTok);
+    bool checkKey(devlink dvl, Token& keyTok);
+
+    bool isLegalGateInputNamestring(name n, int maxn);
+
+
+public:
+    networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc);
+    ~networkbuilder();
+
+	void defineDevice(Token& devName, Token& type);
+    void setInputValue(Token& devName, Token& keyTok, Token& valTok);
+    void setInputSignal(Token& devName, Token& keyTok, Signal& valSig);
+    void defineMonitor(Signal& monSig);
+    void defineMonitor(Signal& monSig, Signal& aliSig);
+
 };
 
 
