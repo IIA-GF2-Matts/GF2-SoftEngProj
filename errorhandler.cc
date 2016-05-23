@@ -190,13 +190,15 @@ std::string mattmessage::formatMessage(int cmax) {
         }
 
         while (y < (int)_message.length()) {
-            z = _message.rfind(' ', y+cmax-p);
-
-            if ((z == -1) || (z-y <= (cmax-p)/2)) {
-                z = y + cmax - p;
-            }
-            else if (_message.length() - y <= cmax-p) {
+            if (_message.length() - y <= cmax-p) {
                 z = _message.length();
+            }
+            else {
+                z = _message.rfind(' ', std::min(y+cmax-p, (int)_message.length()-1));
+            }
+
+            if ((z == -1) || (z-y <= (cmax-p-20))) {
+                z = std::min(y + cmax - p, (int)_message.length());
             }
 
             oss << "\n" << std::setfill(' ')
