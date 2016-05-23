@@ -61,6 +61,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   // and draws a signal trace. The trace is artificial if the simulator has not yet been run.
   // When the simulator is run, the number of cycles is passed as a parameter
 
+  // Todo: remove example text after debugging is finished.
+
   int x, y;
   unsigned int j, k;
   asignal s;
