@@ -42,7 +42,7 @@ public:
 
     // get the error message when a key has been previously defined
     template<typename T>
-    void getPredefinedError(devlink dvl, name key, T prevval, std::ostream& oss);
+    void getPredefinedError(devlink dvl, name key, T prevval, std::ostream& warnoss, std::ostream& noteoss);
 
     // get the error message when a signal pin is unknown
     void getUnknownPinError(Signal& sig, std::ostringstream& oss);
@@ -60,7 +60,7 @@ public:
     // checks whether device and pin are defined
     signal_legality isBadSignal(Signal& sig);
 
-    void checkKey(devlink dvl, Token& keyTok);
+    bool checkKey(devlink dvl, Token& keyTok);
 };
 
 

@@ -281,6 +281,6 @@ mattwarning::mattwarning(std::string message, SourcePos pos)
 // class mattnote
 
 mattnote::mattnote(std::string message, SourcePos pos)
-        : mattmessage(message, pos, MsgWarning) {
+        : mattmessage(message, pos, MsgNote) {
 }
 
