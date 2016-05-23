@@ -49,19 +49,33 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
     wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
-    button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxRIGHT|wxALL, 10);
+    button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxBOTTOM|wxALL, 10);
     button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP|wxLEFT|wxRIGHT, 10);
     spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
     button_sizer->Add(spin, 0 , wxALL, 10);
 
     // Switches
-    wxArrayString listItems;
-    listItems.Add("Item1");
-    switchlist = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, listItems);
-    button_sizer->Add(switchlist, 0, wxALL, 10);
+    wxBoxSizer *controls_sizer = new wxBoxSizer(wxVERTICAL);
+    wxArrayString switchItems;
+    switchItems.Add("Switch1");
+    switchlist = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, switchItems);
+
+
+    // Monitors
+    wxArrayString monitorItems;
+    monitorItems.Add("Monitor1");
+    monitorItems.Add("Monitor2");
+    wxArrayInt monitorOrder;
+    monitorOrder.Add(1);
+    monitorOrder.Add(0);
+    monitorlist = new wxRearrangeCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, monitorOrder, monitorItems);
+
+    controls_sizer->Add(switchlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
+    controls_sizer->Add(monitorlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
+    controls_sizer->Add(button_sizer, 0, wxALL|wxALIGN_BOTTOM, 0);
 
     // button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
-    topsizer->Add(button_sizer, 0, wxALIGN_CENTER);
+    topsizer->Add(controls_sizer, 0, wxALIGN_CENTER|wxEXPAND);
 
     SetSizeHints(800, 500);
     SetSizer(topsizer);
