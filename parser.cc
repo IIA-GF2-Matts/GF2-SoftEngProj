@@ -94,8 +94,7 @@ void parser::parseStatement(Token& tk) {
 
             break;
         default:
-            // Todo: Better message.
-            throw mattsyntaxerror("Unexpected token type. Expected a device or monitor definition.", tk.at);
+            throw mattsyntaxerror("Unexpected token type. Expected a device or monitor definition (beginning with dev or monitor keywords).", tk.at);
     }
 }
 
@@ -120,10 +119,15 @@ void parser::parseDefineDevice(Token& tk) {
 
         if (tk.type != TokType::DeviceType) {
             std::ostringstream oss;
-            oss << "Expected device type. ";
-            // Todo: Alternative if number?
-            if (tk.type == TokType::Identifier)
+            oss << "Expected device type";
+            if (tk.type == TokType::Identifier) {
+                // get the closest match input and display a suggestion
+                oss << ". ";
                 getClosestMatchError(*tk.id, devicesset, oss);
+            } else {
+                // user got it hopelessly wrong
+                oss << " such as CLOCK, SWITCH, NAND or others (see documentation).";
+            }
             throw mattsyntaxerror(oss.str(), tk.at);
         }
 
@@ -147,8 +151,7 @@ void parser::parseData(Token& tk, Token& devName) {
         parseOptionSet(tk, devName);
     }
     else {
-        // Todo: Better error message.
-        throw mattsyntaxerror("Unexpected token. Expecting ; or {.", tk.at);
+        throw mattsyntaxerror("Unexpected token. Expecting ; (if the end of the statement), or { (if beginning an option block).", tk.at);
     }
 }
 
