@@ -123,7 +123,7 @@ void parser::parseDefineDevice(Token& tk) {
             if (tk.type == TokType::Identifier) {
                 // get the closest match input and display a suggestion
                 oss << ". ";
-                getClosestMatchError(*tk.id, devicesset, oss);
+                getClosestMatchError(_nms->namestr(tk.id), devicesset, oss);
             } else {
                 // user got it hopelessly wrong
                 oss << " such as CLOCK, SWITCH, NAND or others (see documentation).";
