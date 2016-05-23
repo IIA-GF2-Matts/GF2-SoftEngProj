@@ -92,7 +92,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       cycles_on_screen = 1;
     else
       cycles_on_screen = cyclesdisplayed / zoom;
-    dx = (end_width - label_width) / cycles_on_screen; // dx between points
+    dx = (float)(end_width - label_width) / cycles_on_screen; // dx between points
 
     int scaled_pan_x = pan_x * zoom +1;
     // Todo: panning scaling with zoom is currently imperfect.
@@ -105,6 +105,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
     // x axis number spacing
     int num_spacing = 1 + cycles_on_screen/20;
+    // Todo: increase number spacing as cycle_no increases/ width decreases
     
 
     // draw each plot
