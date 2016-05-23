@@ -170,6 +170,7 @@ std::string mattmessage::formatMessage(int cmax) {
     oss << ": ";
     int x = oss.tellp() - cls;
 
+    // Check if line would fit into max width
     if (((int)_message.length() + x > cmax)
             && (x < cmax-20)) {
         // We can use our funky word wrap
@@ -184,18 +185,29 @@ std::string mattmessage::formatMessage(int cmax) {
         oss << _message.substr(y, z);
         y = z+1;
 
+        while (std::isspace(_message[y])) {
+            y++;
+        }
+
         while (y < (int)_message.length()) {
             z = _message.rfind(' ', y+cmax-p);
 
             if ((z == -1) || (z-y <= (cmax-p)/2)) {
                 z = y + cmax - p;
             }
+            else if (_message.length() - y <= cmax-p) {
+                z = _message.length();
+            }
 
             oss << "\n" << std::setfill(' ')
-                << std::setw(std::min(cmax, int(p+_message.length()-y)))
+                << std::setw(std::min(cmax, int(p+z-y)))
                 << _message.substr(y, z-y);
 
             y = z+1;
+
+            while (std::isspace(_message[y])) {
+                y++;
+            }
         }
     }
     else {
