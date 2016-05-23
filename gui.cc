@@ -93,6 +93,8 @@ void MyFrame::OnButton(wxCommandEvent &event)
 {
     int n, ncycles;
 
+    // Todo: segfaults here if no file loaded.
+
     cyclescompleted = 0;
     mmz->resetmonitor ();
     runnetwork(spin->GetValue());
