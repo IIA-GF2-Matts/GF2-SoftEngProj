@@ -74,7 +74,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     SetMenuBar(menuBar);
 
     wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
-    canvas = new MyGLCanvas(this, wxID_ANY, NULL, NULL);
+    canvas = new MyGLCanvas(this, order, wxID_ANY, NULL, NULL);
     topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
     wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);

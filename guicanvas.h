@@ -13,7 +13,7 @@
 class MyGLCanvas: public wxGLCanvas
 {
  public:
-  MyGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
+  MyGLCanvas(wxWindow *parent, std::vector<int> &order, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
          const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
          const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(int cycles = -1); // function to draw canvas contents
