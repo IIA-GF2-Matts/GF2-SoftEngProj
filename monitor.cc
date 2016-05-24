@@ -121,15 +121,15 @@ asignal monitor::getmonsignal(const moninfo& mon) const {
  * Returns name of n'th monitor.
  *
  */
-void monitor::getmonname (int n, name& dev, name& outp)
+void monitor::getmonname (int n, name& dev, name& outp, bool alias)
 {
-  getmonname(mtab[n], dev, outp);
+  getmonname(mtab[n], dev, outp, alias);
 }
 
-void monitor::getmonname (moninfo& mon, name& dev, name& outp)
+void monitor::getmonname (moninfo& mon, name& dev, name& outp, bool alias)
 {
   // Check for alias
-  if (mon.aliasDev != blankname) {
+  if (alias && mon.aliasDev != blankname) {
     dev = mon.aliasDev;
     outp = mon.aliasPin;
   }

@@ -58,8 +58,8 @@ class monitor {
     /* Access recorded signal trace, returns false if invalid monitor      */
     /* or cycle                                                            */
 
-  void getmonname (int n, name& dev, name& outp);
-  void getmonname (moninfo& mon, name& dev, name& outp);
+  void getmonname (int n, name& dev, name& outp, bool alias = true);
+  void getmonname (moninfo& mon, name& dev, name& outp, bool alias = true);
     /* Returns name of n'th monitor.                                       */
 
   void resetmonitor (void);
