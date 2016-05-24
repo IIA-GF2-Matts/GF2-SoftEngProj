@@ -395,12 +395,29 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
         }
     }
 
+    if (-1 == _mons->findmonitor(monSig.device.id, monSig.pin.id)) {
+        // signal is already being monitored - warn
+        _errs.report(mattwarning("Signal is already being monitored", monSig.device.at));
+    }
+
     // Check Alias
+    // check if token is defined (eof is default)
     if (aliSig.device.type != TokType::EndOfFile) {
+        if (aliSig.device.id == monSig.device.id
+            && aliSig.pin.id == monSig.pin.id) {
+            // monitoring a signal as itself
+            std::ostringstream oss;
+            oss << "The 'as "
+                << _nms->namestr(aliSig.device.id);
+            if (aliSig.pin.id != blankname)
+                oss << "." << _nms->namestr(aliSig.pin.id);
+            oss << "' is not required in this case";
+            _errs.report(mattnote(oss.str(), aliSig.device.at));
+
         // Warn if signal exists
-        if (!isBadSignal(aliSig)) {
-            _errs.report(mattwarning("Alias signal name already exists.", aliSig.device.at));
-            return;
+        } else if (!isBadSignal(aliSig)) {
+            _errs.report(mattwarning(
+                "Alias signal name already exists as a device output in the network", aliSig.device.at));
         }
     }
 
