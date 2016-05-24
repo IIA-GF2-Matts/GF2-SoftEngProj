@@ -24,7 +24,7 @@ void setNetwork(monitor* mmz, names* nmz);
   bool init;                         // has the OpenGL context been initialised?
   int pan_x;                         // the current x pan
   int pan_y;                         // the current y pan
-  float dx;
+  float dx;                          // x spacing
   double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   int cycles_on_screen;              // number of cycles currently on screen with current zoom
@@ -41,6 +41,7 @@ void setNetwork(monitor* mmz, names* nmz);
 
   int label_width;                   // x allowed for labels at start
   int end_gap;                       // dist between end and side
+  bool on_title;                     // stores whether system state is on title screen
 
   void drawText(wxString text, int pos_x, int pos_y, void* font);
   void titleScreen();

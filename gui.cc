@@ -63,6 +63,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     button_sizer->Add(runbutton, 0, wxBOTTOM|wxALL, 10);
     button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP|wxLEFT|wxRIGHT, 10);
     spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
+    spin->SetRange(1, 100);
     button_sizer->Add(spin, 0 , wxALL, 10);
 
     // Switches

@@ -89,6 +89,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
 
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) {
+    on_title = false;
     if ((int)(cyclesdisplayed/zoom) == 0)
       cycles_on_screen = 1;
     else
@@ -249,31 +250,33 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 
   }
   if (event.Dragging()) {
-    // x panning
-    pan_x += last_x - event.m_x;
-    // check for scrolling off left
-    if (pan_x < 0) pan_x = 0;
-    // check for scrolling off right
-    int max_scaled_pan_x = (cyclesdisplayed - cycles_on_screen)*dx;
-    int max_pan = max_scaled_pan_x / zoom + dx;
-    // + dx ensures that it can reach last value in all situations.
-    // Extra check performed when calculating zoomrange in Render to ensure
-    // it cannot display past end of data. Less easy (I think) to implement
-    // here.
-    // Todo: if time combine these two separate checks into one.
-    if (pan_x > max_pan)       
-      pan_x = max_pan;
-    text.Printf("dx is %f, max_pan is %d, pan_x is %d", dx, max_pan, pan_x);
+    if (!on_title){
+      // x panning
+      pan_x += last_x - event.m_x;
+      // check for scrolling off left
+      if (pan_x < 0) pan_x = 0;
+      // check for scrolling off right
+      int max_scaled_pan_x = (cyclesdisplayed - cycles_on_screen)*dx;
+      int max_pan = max_scaled_pan_x / zoom + dx;
+      // + dx ensures that it can reach last value in all situations.
+      // Extra check performed when calculating zoomrange in Render to ensure
+      // it cannot display past end of data. Less easy (I think) to implement
+      // here.
+      // Todo: if time combine these two separate checks into one.
+      if (pan_x > max_pan)       
+        pan_x = max_pan;
+      text.Printf("dx is %f, max_pan is %d, pan_x is %d", dx, max_pan, pan_x);
 
-    // y panning
-    pan_y -= event.m_y - last_y;
-    // check for scrolling off bottom
-    if (pan_y > (mmz->moncount()+1)*plot_height - h) pan_y = (mmz->moncount()+1)*plot_height - h;
-    // check for scrolling off top
-    if (pan_y < 0) pan_y = 0;
-    last_x = event.m_x;
-    last_y = event.m_y;
-    init = false;
+      // y panning
+      pan_y -= event.m_y - last_y;
+      // check for scrolling off bottom
+      if (pan_y > (mmz->moncount()+1)*plot_height - h) pan_y = (mmz->moncount()+1)*plot_height - h;
+      // check for scrolling off top
+      if (pan_y < 0) pan_y = 0;
+      last_x = event.m_x;
+      last_y = event.m_y;
+      init = false;
+    }
   }
 
   if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
@@ -296,7 +299,7 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 
 void MyGLCanvas::titleScreen(){
   // Todo: redesign title screen: add getting started message etc.
-
+  on_title = true;
   int w, h;
   GetClientSize(&w, &h);
 
