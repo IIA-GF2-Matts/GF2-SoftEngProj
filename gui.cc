@@ -35,6 +35,12 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(GREEN_ID, MyFrame::OnColourGreen)
     EVT_MENU(BW_ID, MyFrame::OnColourBW)
     EVT_MENU(PINK_ID, MyFrame::OnColourPink)
+
+    // monitor manipulation
+    EVT_BUTTON(wxID_ADD, MyFrame::OnAddMonitor)
+    EVT_BUTTON(wxID_UP, MyFrame::OnMonitorUp)
+    EVT_BUTTON(wxID_DOWN, MyFrame::OnMonitorDown)
+    
     
     EVT_CHECKLISTBOX(MY_SWITCH_LIST_ID, MyFrame::OnSwitchListEvent)
 END_EVENT_TABLE()
@@ -209,6 +215,15 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
 
 
 }
+
+void MyFrame::OnMonitorUp(wxCommandEvent &event) {
+
+}
+
+void MyFrame::OnMonitorDown(wxCommandEvent &event) {
+
+}
+
 
 void MyFrame::OnAbout(wxCommandEvent &event)
     // Event handler for the about menu item

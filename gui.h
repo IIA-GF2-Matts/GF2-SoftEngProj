@@ -67,7 +67,6 @@ class MyFrame: public wxFrame
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
   void OnOpen(wxCommandEvent& event);     // Event handler for file->Open
-  void OnAddMonitor(wxCommandEvent& event);     // Event handler for Add monitor button
   void OnButton(wxCommandEvent& event);   // event handler for push button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
@@ -77,6 +76,10 @@ class MyFrame: public wxFrame
   void OnZoomReset(wxCommandEvent& event);     // event handler for resetting zooming
 
   void OnSwitchListEvent(wxCommandEvent& event);     // event handler for (un)checking switch list items
+  void OnAddMonitor(wxCommandEvent& event);     // Event handler for Add monitor button
+  void OnMonitorUp(wxCommandEvent& event);
+  void OnMonitorDown(wxCommandEvent& event);
+ 
 
   void colourChange(int index);
   void OnColourBlue(wxCommandEvent& event);
