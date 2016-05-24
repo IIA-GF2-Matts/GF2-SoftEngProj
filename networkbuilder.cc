@@ -233,7 +233,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                     return false;
                 }
 
-                prevval << *dl->id;
+                prevval << *dl->id << ".";
 
                 if (ol->id != blankname)
                     prevval << *ol->id;
