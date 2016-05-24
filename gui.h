@@ -26,7 +26,8 @@ enum {
   MY_ZOOM_RESET_ID,
   BLUE_ID,
   GREEN_ID,
-  BW_ID
+  BW_ID,
+  PINK_ID
 }; // widget identifiers
 
 
@@ -68,6 +69,7 @@ class MyFrame: public wxFrame
   void OnColourBlue(wxCommandEvent& event);
   void OnColourGreen(wxCommandEvent& event);
   void OnColourBW(wxCommandEvent& event);
+  void OnColourPink(wxCommandEvent& event);
 
   void initNetwork();                     // Initialises network elements
   void delNetwork();                      // Clears network elements

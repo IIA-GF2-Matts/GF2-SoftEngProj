@@ -341,20 +341,23 @@ void MyGLCanvas::setLineColour(float RGB[3]) {
 }
 
 void MyGLCanvas::colourSelector(int colourInd) {
-  float traceColours[3][3] = {
+  float traceColours[4][3] = {
     {0.32, 0.55, 0.87},       // Cool blue
     {0.00, 0.90, 0.00},       // Retro Green
-    {0.00, 0.00, 0.00}        // Simple B+W
+    {0.00, 0.00, 0.00},       // Simple B+W
+    {1.00, 1.00, 0.00}        // Candy Pink
   };
-  float axisColours[3][3] = {
+  float axisColours[4][3] = {
     {0.58, 0.59, 0.60},       // Cool blue
     {0.40, 0.40, 0.40},       // Retro Green
-    {0.50, 0.50, 0.50}        // Simple B+W
+    {0.50, 0.50, 0.50},       // Simple B+W
+    {1.00, 1.00, 1.00}        // Candy Pink
   };
-  float backColours[3][3] = {
+  float backColours[4][3] = {
     {0.21, 0.21, 0.21},       // Cool blue
     {0.15, 0.15, 0.15},       // Retro Green
-    {1.00, 1.00, 1.00}        // Simple B+W
+    {1.00, 1.00, 1.00},       // Simple B+W
+    {1.00, 0.20, 0.56}        // Candy Pink
   };
   int i;
   for (i=0; i<3; i++) trace_RGB[i] = traceColours[colourInd][i];
