@@ -193,7 +193,6 @@ void monitor::displaysignals (void)
       cout << ":";
     }
 
-    std::cout << mon.sig.size() << std::endl;
     for (auto i : mon.sig) {
       switch (i) {
         case high:    cout << "-"; break;
