@@ -41,6 +41,9 @@ class monitor {
   int moncount (void);
     /* Returns number of signals currently monitored.                      */
 
+  int cycles() const;
+    /* Returns the number of cycles monitored                              */
+
   asignal getmonsignal (int n);
   asignal getmonsignal (moninfo& mon);
     /* Returns signal level of n'th monitor point.                         */

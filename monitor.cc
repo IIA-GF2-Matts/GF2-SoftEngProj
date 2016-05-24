@@ -73,6 +73,17 @@ int monitor::moncount (void)
 
 /***********************************************************************
  *
+ * Returns number of data points recorded.
+ *
+ */
+int monitor::cycles() const {
+  if (mtab.empty()) return 0;
+  return mtab[0].sig.size();
+}
+
+
+/***********************************************************************
+ *
  * Returns signal level of n'th monitor point.
  *
  */
