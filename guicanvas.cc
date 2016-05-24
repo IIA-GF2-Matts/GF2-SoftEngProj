@@ -35,18 +35,8 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   label_width = 100.0;    // x allowed for labels at start
   end_gap = 10;           // dist between end and side
 
-  // trace colour
-  trace_RGB[0] = 0.32;     // Red
-  trace_RGB[1] = 0.55;     // Green
-  trace_RGB[2] = 0.87;     // Blue
-  // axis colour
-  lines_RGB[0] = 0.58;     // Red
-  lines_RGB[1] = 0.59;     // Green
-  lines_RGB[2] = 0.60;     // Blue
-  // background colour
-  background_RGB[0] = 0.21; // Red
-  background_RGB[1] = 0.21; // Green
-  background_RGB[2] = 0.21; // Blue
+  // select cool blue colour scheme
+  colourSelector(0);
 
   zoom_changed = false;
 
@@ -253,7 +243,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   if (event.ButtonUp()) {
     text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
 
-
   }
   if (event.Dragging()) {
     if (!on_title){
@@ -292,7 +281,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   if (event.GetWheelRotation() > 0) {
     zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
     if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
-    
     text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
   }
   if (event.GetWheelRotation()) {
@@ -356,4 +344,9 @@ void MyGLCanvas::colourSelector(int colourInd) {
     {0.15, 0.15, 0.15},       // Retro Green
     {1.00, 1.00, 1.00}        // Simple B+W
   };
+  int i;
+  for (i=0; i<3; i++) trace_RGB[i] = traceColours[colourInd][i];
+  for (i=0; i<3; i++) lines_RGB[i] = axisColours[colourInd][i];
+  for (i=0; i<3; i++) background_RGB[i] = backColours[colourInd][i];
+  init = false;
 }
