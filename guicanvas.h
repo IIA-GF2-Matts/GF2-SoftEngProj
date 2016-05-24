@@ -51,6 +51,9 @@ void setNetwork(monitor* mmz, names* nmz);
   void drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing);
   void colourSelector(int colourInd);
 
+  void zoomIn(double zoom_amount);
+  void zoomOut(double zoom_amount, bool fully=false);
+
 
   void InitGL();                     // function to initialise OpenGL context
   void OnSize(wxSizeEvent& event);   // event handler for when canvas is resized

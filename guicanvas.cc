@@ -274,14 +274,10 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
 
   if (event.GetWheelRotation() < 0) {
-    zoom = zoom * (1.0 - (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
-    if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom 
-    text.Printf("Negative mouse wheel rotation, zoom now %f", zoom);
+    zoomIn((double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
   }
   if (event.GetWheelRotation() > 0) {
-    zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
-    if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
-    text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
+    zoomOut((double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
   }
   if (event.GetWheelRotation()) {
     init = false;
@@ -289,6 +285,20 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   }
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
+}
+
+void MyGLCanvas::zoomIn(double zoom_amount){
+  zoom = zoom * (1 - zoom_amount);
+  if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom 
+}
+
+void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
+  if (fully) {
+    zoom = 1;
+    return;
+  }
+  zoom = zoom / (1.0 + zoom_amount);
+  if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
 }
 
 void MyGLCanvas::titleScreen(){
