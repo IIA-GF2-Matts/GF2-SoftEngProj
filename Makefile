@@ -93,9 +93,6 @@ parser_unittest : gtest_main.a parser_unittest.o parser.o errorhandler.o names.o
 
 # DO NOT DELETE
 
-logsim.o: logsim.h names.h cistring.h devices.h network.h sourcepos.h
-logsim.o: errorhandler.h monitor.h parser.h scanner.h iposstream.h
-logsim.o: networkbuilder.h userint.h
 names.o: names.h cistring.h
 scanner.o: names.h cistring.h iposstream.h sourcepos.h errorhandler.h
 scanner.o: network.h scanner.h
@@ -106,8 +103,6 @@ parser.o: networkbuilder.h
 monitor.o: monitor.h names.h cistring.h network.h sourcepos.h errorhandler.h
 monitor.o: devices.h
 devices.o: devices.h names.h cistring.h network.h sourcepos.h errorhandler.h
-userint.o: userint.h names.h cistring.h network.h sourcepos.h errorhandler.h
-userint.o: devices.h monitor.h scanner.h iposstream.h
 iposstream.o: sourcepos.h iposstream.h
 cistring.o: cistring.h
 errorhandler.o: iposstream.h sourcepos.h errorhandler.h
@@ -116,10 +111,12 @@ autocorrect.o: names.h cistring.h autocorrect.h
 networkbuilder.o: parser.h names.h cistring.h scanner.h iposstream.h
 networkbuilder.o: sourcepos.h network.h errorhandler.h devices.h monitor.h
 networkbuilder.o: networkbuilder.h autocorrect.h
+userint.o: userint.h names.h cistring.h network.h sourcepos.h errorhandler.h
+userint.o: devices.h monitor.h scanner.h iposstream.h
+clisim.o: names.h cistring.h network.h sourcepos.h errorhandler.h devices.h
+clisim.o: monitor.h scanner.h iposstream.h parser.h networkbuilder.h
+clisim.o: userint.h
 
-gui_logsim.o: logsim.h names.h cistring.h devices.h network.h sourcepos.h
-gui_logsim.o: errorhandler.h monitor.h parser.h scanner.h iposstream.h
-gui_logsim.o: networkbuilder.h userint.h
 gui_names.o: names.h cistring.h
 gui_scanner.o: names.h cistring.h iposstream.h sourcepos.h errorhandler.h
 gui_scanner.o: network.h scanner.h
@@ -130,9 +127,6 @@ gui_parser.o: networkbuilder.h
 gui_monitor.o: monitor.h names.h cistring.h network.h sourcepos.h errorhandler.h
 gui_monitor.o: devices.h
 gui_devices.o: devices.h names.h cistring.h network.h sourcepos.h errorhandler.h
-gui_gui.o: gui.h names.h cistring.h devices.h network.h sourcepos.h
-gui_gui.o: errorhandler.h monitor.h guicanvas.h logo32.xpm scanner.h iposstream.h
-gui_gui.o: parser.h networkbuilder.h guierrordialog.h guicanvas.cc
 gui_iposstream.o: sourcepos.h iposstream.h
 gui_cistring.o: cistring.h
 gui_errorhandler.o: iposstream.h sourcepos.h errorhandler.h
@@ -141,3 +135,14 @@ gui_autocorrect.o: names.h cistring.h autocorrect.h
 gui_networkbuilder.o: parser.h names.h cistring.h scanner.h iposstream.h
 gui_networkbuilder.o: sourcepos.h network.h errorhandler.h devices.h monitor.h
 gui_networkbuilder.o: networkbuilder.h autocorrect.h
+gui_gui.o: gui.h rearrangectrl_matt.h names.h cistring.h devices.h network.h
+gui_gui.o: sourcepos.h errorhandler.h monitor.h guicanvas.h logo32.xpm scanner.h
+gui_gui.o: iposstream.h parser.h networkbuilder.h guierrordialog.h
+gui_gui.o: guimonitordialog.h guicanvas.cc
+gui_guierrordialog.o: guierrordialog.h errorhandler.h sourcepos.h
+gui_mattlab.o: mattlab.h names.h cistring.h devices.h network.h sourcepos.h
+gui_mattlab.o: errorhandler.h monitor.h parser.h scanner.h iposstream.h
+gui_mattlab.o: networkbuilder.h gui.h rearrangectrl_matt.h guicanvas.h
+gui_guimonitordialog.o: guimonitordialog.h network.h names.h cistring.h
+gui_guimonitordialog.o: sourcepos.h errorhandler.h
+
