@@ -66,7 +66,7 @@ class monitor {
   void displaysignals (void);
     /* Displays state of monitored signals.                                */
 
-  int findmonitor (name dev, name pin);
+  int findmonitor (name dev, name pin, bool inclAlias = false);
     /* Gets the index of the monitor measuring the given signal            */
 
   monitor (names* names_mod, network* network_mod);

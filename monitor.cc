@@ -213,10 +213,15 @@ void monitor::displaysignals (void)
  * there is no monitor for that signal.
  *
  */
-int monitor::findmonitor (name dev, name pin) {
+int monitor::findmonitor (name dev, name pin, bool inclAlias) {
   for (int n = 0; n < mtab.size(); n++) {
     if (mtab[n].devid == dev && (!mtab[n].op || mtab[n].op->id == pin))
       return n;
+
+    if (inclAlias
+        && (mtab[n].aliasDev == dev && mtab[n].aliasPin == pin)) {
+      return n;
+    }
   }
   return -1;
 }
