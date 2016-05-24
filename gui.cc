@@ -191,8 +191,20 @@ void MyFrame::OnZoomReset(wxCommandEvent &event)
 }
 
 void MyFrame::OnSwitchListEvent(wxCommandEvent &event)
-    // Event handler for (un)checking swtich list items
+    // Event handler for (un)checking switch list items
 {
+    if (!fileOpen) return;
+
+    int n = event.GetInt();
+    bool statehigh = switchlist->IsChecked(n);
+    devlink sw = switches[n];
+    wxASSERT_MSG(sw, "A runtime error occurred; the switch could not be found");
+    bool ok = true;
+    if (statehigh)
+        dmz->setswitch(sw->id, high, ok);
+    else
+        dmz->setswitch(sw->id, low, ok);
+    wxASSERT_MSG(ok, "A runtime error occurred; the switch could not be set");
 }
 
 void MyFrame::runnetwork(int ncycles)
@@ -300,8 +312,10 @@ void MyFrame::openFile(wxString file) {
         monitorItems.Add(oss.str());
         monitorOrder.Add(n);
     }
-
-    monitorlist->GetList()->Reset(monitorOrder, monitorItems);
+    if (mmz->moncount())
+        monitorlist->GetList()->Reset(monitorOrder, monitorItems);
+    else
+        monitorlist->GetList()->Clear();
 
     for ( int i = 0; i < mmz->moncount(); i++ ) {
         monitorlist->GetList()->Check(i, true);
@@ -309,13 +323,13 @@ void MyFrame::openFile(wxString file) {
 
 
     // Add switches to the list
-    std::vector<devlink> sws = netz->findswitches();
+    switches = netz->findswitches();
     wxArrayString switchItems;
 
     switchlist->Clear();
     int n = 0;
-    for (auto sw : sws) {
-        wxString s = nmz->namestr(sw->id).c_str();
+    for (auto sw : switches) {
+        wxString s(nmz->namestr(sw->id).c_str());
         switchlist->InsertItems(++n, &s, n);
 
         switchlist->Check(n-1, sw->swstate == high);

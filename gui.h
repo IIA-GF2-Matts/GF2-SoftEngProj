@@ -9,6 +9,8 @@
 #include "rearrangectrl_matt.h"
 #include <wx/arrstr.h>
 // #include <wx/arrint.h>
+#include <vector>
+
 #include "names.h"
 #include "devices.h"
 #include "monitor.h"
@@ -54,6 +56,9 @@ class MyFrame: public wxFrame
   bool hasNetwork;
   bool fileOpen;
   wxString fname;
+
+  std::vector<devlink> switches;
+
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
