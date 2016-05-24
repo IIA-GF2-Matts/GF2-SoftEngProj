@@ -48,6 +48,8 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   background_RGB[1] = 0.21; // Green
   background_RGB[2] = 0.21; // Blue
 
+  zoom_changed = false;
+
 }
 
 void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
@@ -68,7 +70,6 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   name mon_name_dev;
   name mon_name_pin;
   wxString mon_name_text;
-  int zoomrange[2];
 
 
   if (cycles >= 0) {
@@ -96,10 +97,14 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       cycles_on_screen = cyclesdisplayed / zoom;
     dx = (float)(end_width - label_width) / cycles_on_screen; // dx between points
 
-    int scaled_pan_x = pan_x * zoom +1;
-    // Todo: panning scaling with zoom currently jumps around a bit.
+    // if zoomed then scale pan_x based on last zoomrange, else set zoomrange based on pan_x
+    if (zoom_changed) {
+      pan_x = zoomrange[0] * dx;
+      zoom_changed = false;
+    }
+    else 
+      zoomrange[0] = pan_x / dx;
 
-    zoomrange[0] = scaled_pan_x / dx;
     // stop from panning over end of screen.
     if (zoomrange[0] + cycles_on_screen > cyclesdisplayed)
       zoomrange[0] = cyclesdisplayed - cycles_on_screen;
@@ -256,13 +261,10 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
       // check for scrolling off left
       if (pan_x < 0) pan_x = 0;
       // check for scrolling off right
-      int max_scaled_pan_x = (cyclesdisplayed - cycles_on_screen)*dx;
-      int max_pan = max_scaled_pan_x / zoom + dx;
+      int max_pan = (cyclesdisplayed - cycles_on_screen)*dx + dx;
       // + dx ensures that it can reach last value in all situations.
-      // Extra check performed when calculating zoomrange in Render to ensure
-      // it cannot display past end of data. Less easy (I think) to implement
-      // here.
-      // Todo: if time combine these two separate checks into one.
+      // second check is performed when setting zoomrange. Both these tests combined ensure that the pan value cannot get
+      // too high and that can always reach the last value and not get further.
       if (pan_x > max_pan)       
         pan_x = max_pan;
       text.Printf("dx is %f, max_pan is %d, pan_x is %d", dx, max_pan, pan_x);
@@ -284,14 +286,17 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   if (event.GetWheelRotation() < 0) {
     zoom = zoom * (1.0 - (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
     if (zoom > 100) zoom = 100; // Max zoom 
-    init = false;
     text.Printf("Negative mouse wheel rotation, zoom now %f", zoom);
   }
   if (event.GetWheelRotation() > 0) {
     zoom = zoom / (1.0 + (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
     if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
-    init = false;
+    
     text.Printf("Positive mouse wheel rotation, zoom now %f", zoom);
+  }
+  if (event.GetWheelRotation()) {
+    init = false;
+    zoom_changed = true;
   }
 
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);

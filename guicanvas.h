@@ -28,7 +28,8 @@ void setNetwork(monitor* mmz, names* nmz);
   double zoom;                       // the current zoom
   int cyclesdisplayed;               // how many simulation cycles have been displayed
   int cycles_on_screen;              // number of cycles currently on screen with current zoom
-  int cycle_no;
+  int zoomrange[2];                  // limits of current zoom
+  int cycle_no;                      // total number of cycles run through
   monitor *mmz;                      // pointer to monitor class, used to extract signal traces
   names *nmz;                        // pointer to names class, used to extract signal names
 
@@ -42,6 +43,7 @@ void setNetwork(monitor* mmz, names* nmz);
   int label_width;                   // x allowed for labels at start
   int end_gap;                       // dist between end and side
   bool on_title;                     // stores whether system state is on title screen
+  bool zoom_changed;                 // stores whether the zoom has been changed since previous Render
 
   void drawText(wxString text, int pos_x, int pos_y, void* font);
   void titleScreen();
