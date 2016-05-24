@@ -97,13 +97,36 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
 
     // Monitors
-    // Lol. It's not my fault, wxWidgets should allow clearing and resetting of the control.
     wxArrayString monitorItems;
     wxArrayInt monitorOrder;
-    monitorlist = new wxRearrangeCtrlMatt(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, monitorOrder, monitorItems);
+    // monitorlist = new wxRearrangeCtrlMatt(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, monitorOrder, monitorItems);
+
+    wxPanel* listpanel = new wxPanel(this, wxID_ANY,
+        wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxRearrangeListMattNameStr);
+
+    monitorlist = new wxRearrangeListMatt(listpanel, wxID_ANY,
+                                 wxDefaultPosition, wxDefaultSize,
+                                 monitorOrder, monitorItems,
+                                 0, wxDefaultValidator);
+    wxButton * const btnAdd = new wxButton(listpanel, wxID_ADD);
+    wxButton * const btnUp = new wxButton(listpanel, wxID_UP);
+    wxButton * const btnDown = new wxButton(listpanel, wxID_DOWN);
+    // arrange them in a sizer
+    wxSizer * const sizerBtns = new wxBoxSizer(wxVERTICAL);
+    sizerBtns->Add(btnAdd, wxSizerFlags().Centre().Border(wxBOTTOM));
+    sizerBtns->Add(btnUp, wxSizerFlags().Centre().Border(wxBOTTOM | wxTOP));
+    sizerBtns->Add(btnDown, wxSizerFlags().Centre().Border(wxTOP));
+
+    wxSizer * const sizerTop = new wxBoxSizer(wxHORIZONTAL);
+    sizerTop->Add(monitorlist, wxSizerFlags(1).Expand().Border(wxRIGHT));
+    sizerTop->Add(sizerBtns, wxSizerFlags(0).Centre().Border(wxLEFT));
+    listpanel->SetSizer(sizerTop);
+
+
+
 
     controls_sizer->Add(switchlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
-    controls_sizer->Add(monitorlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
+    controls_sizer->Add(listpanel, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
     controls_sizer->Add(button_sizer, 0, wxALL|wxALIGN_BOTTOM, 0);
     // Todo: borders around separate control groups (e.g. around monitor controls, switch controls, other controls)?
     // Todo: add monitor dialogue button.
@@ -144,12 +167,12 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
 
     // todo: update list.
 
-
     monitorOrder.clear();
     wxArrayString monitorItems;
     wxArrayInt wxmonitorOrder;
     std::ostringstream oss;
-    int n = 0;
+    int n = 0, x;
+    bool ok;
     for (int i = 0; i < signals.size(); i++) {
         if (monitored[i]) {
             oss.str("");
@@ -162,14 +185,29 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
             wxmonitorOrder.Add(n);
             monitorOrder.push_back(n);
 
+            x = mmz->findmonitor(signals[i].devicename, signals[i].pinname);
+            if (x == -1) {
+                mmz->makemonitor(signals[i].devicename, signals[i].pinname, ok, blankname, blankname);
+                std::cout << "Created monitor " << oss.str() << std::endl;
+                if (!ok) {
+                    // Todo: Error message
+                }
+            }
+
             n++;
         }
     }
 
     if (monitorOrder.size())
-        monitorlist->GetList()->Reset(wxmonitorOrder, monitorItems);
+        monitorlist->Reset(wxmonitorOrder, monitorItems);
     else
-        monitorlist->GetList()->Clear();
+        monitorlist->Clear();
+
+    for (int i = 0; i < monitorOrder.size(); i++ ) {
+        monitorlist->Check(i, true);
+    }
+
+
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
@@ -365,12 +403,12 @@ void MyFrame::openFile(wxString file) {
     }
 
     if (mmz->moncount())
-        monitorlist->GetList()->Reset(wxmonitorOrder, monitorItems);
+        monitorlist->Reset(wxmonitorOrder, monitorItems);
     else
-        monitorlist->GetList()->Clear();
+        monitorlist->Clear();
 
     for ( int i = 0; i < mmz->moncount(); i++ ) {
-        monitorlist->GetList()->Check(i, true);
+        monitorlist->Check(i, true);
     }
 
 
