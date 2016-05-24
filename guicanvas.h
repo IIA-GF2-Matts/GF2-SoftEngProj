@@ -17,6 +17,9 @@ class MyGLCanvas: public wxGLCanvas
          const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
          const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
+
+  void zoomIn(double zoom_amount);
+  void zoomOut(double zoom_amount, bool fully=false);
   
 void setNetwork(monitor* mmz, names* nmz);
  private:
@@ -50,9 +53,6 @@ void setNetwork(monitor* mmz, names* nmz);
   void setLineColour(float RGB[3]);
   void drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing);
   void colourSelector(int colourInd);
-
-  void zoomIn(double zoom_amount);
-  void zoomOut(double zoom_amount, bool fully=false);
 
 
   void InitGL();                     // function to initialise OpenGL context

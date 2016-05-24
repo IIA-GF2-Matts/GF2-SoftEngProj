@@ -289,16 +289,18 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 
 void MyGLCanvas::zoomIn(double zoom_amount){
   zoom = zoom * (1 - zoom_amount);
-  if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom 
+  if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom
+  Render("Zoomed in");
 }
 
 void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
-  if (fully) {
+  if (fully)
     zoom = 1;
-    return;
+  else {
+    zoom = zoom / (1.0 + zoom_amount);
+    if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
   }
-  zoom = zoom / (1.0 + zoom_amount);
-  if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
+  Render("Zoomed out");
 }
 
 void MyGLCanvas::titleScreen(){
