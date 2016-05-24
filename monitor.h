@@ -62,6 +62,8 @@ class monitor {
   void displaysignals (void);
     /* Displays state of monitored signals.                                */
 
+  int findmonitor (name dev, name pin);
+
   monitor (names* names_mod, network* network_mod);
     /* Called to initialise the monitor module.                            */
 };

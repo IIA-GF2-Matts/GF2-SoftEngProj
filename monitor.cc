@@ -178,6 +178,13 @@ void monitor::displaysignals (void)
 }
 
 
+
+int monitor::findmonitor (name dev, name pin) {
+  // todo: populate findmonitor
+  return -1;
+}
+
+
 /***********************************************************************
  *
  * Called to initialise the monitor module.
