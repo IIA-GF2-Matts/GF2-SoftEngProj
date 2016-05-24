@@ -79,8 +79,10 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
   GetClientSize(&w, &h);
   int end_width = w - end_gap;
 
-
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) {
+    
+    wxASSERT_MSG((mmz->moncount() == order.size()), "Conflicting number of monitors");
+
     on_title = false;
     if ((int)(cyclesdisplayed/zoom) == 0)
       cycles_on_screen = 1;
@@ -107,7 +109,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
     // draw each plot
     for (j = 0; j<mmz->moncount(); j++) {
-      drawPlot(s, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
+      drawPlot(s, order[j], zoomrange, cycle_no, cyclesdisplayed, num_spacing);
     }
 
     // draw vertical line
@@ -119,13 +121,13 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
 
   } else { // draw title screen
-    titleScreen();
+    titleScreen("Select 'file' -> 'open' to begin...");
   }
 
   // todo: remove after debgging
   // Draw example text
-  glColor3f(1.0, 0.0, 0.0);
-  drawText(example_text, 10, 100, GLUT_BITMAP_HELVETICA_12);
+  // glColor3f(1.0, 0.0, 0.0);
+  // drawText(example_text, 10, 100, GLUT_BITMAP_HELVETICA_12);
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
   glFlush();
   SwapBuffers();
@@ -303,7 +305,7 @@ void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
   Render("Zoomed out");
 }
 
-void MyGLCanvas::titleScreen(){
+void MyGLCanvas::titleScreen(wxString message_text){
   // Todo: redesign title screen: add getting started message etc.
   on_title = true;
   int w, h;
@@ -320,6 +322,8 @@ void MyGLCanvas::titleScreen(){
     "|                         | \n"
     " `[]`[]`[]`[]`[]`[]`[]`[]`  ";
   drawText(logo, label_width/2, h-2*plot_height, GLUT_BITMAP_9_BY_15);
+
+  drawText(message_text, label_width/2, 80, GLUT_BITMAP_HELVETICA_12);
 }
 
 
