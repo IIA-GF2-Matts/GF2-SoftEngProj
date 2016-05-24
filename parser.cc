@@ -27,8 +27,19 @@ bool parser::readin() {
     Token tk;
 
     try {
-        tk = _scan->peek();
-        parseFile(tk);
+        for (;;) {
+            tk = _scan->peek();
+            parseFile(tk);
+
+            if (_scan->parent) {
+                // Go back to original file.
+                scanner* old = _scan;
+                _scan = _scan->parent;
+                delete old;
+            }
+            else 
+                break;
+        }
 
        _netz->checknetwork(errs);
     }
@@ -93,10 +104,50 @@ void parser::parseStatement(Token& tk) {
             parseDefineMonitor(tk);
 
             break;
+#ifdef EXT_INCLUDES
+        case TokType::IncludeKeyword:
+            stepAndPeek(tk);
+            parseInclude(tk);
+            break;
+#endif
         default:
             throw mattsyntaxerror("Unexpected token type. Expected a device or monitor definition (beginning with dev or monitor keywords).", tk.at);
     }
 }
+
+
+#ifdef EXT_INCLUDES
+
+/// include = "include" , string , ";" ;
+void parser::parseInclude(Token& tk) {
+    if (tk.type != TokType::String) {
+        throw mattsyntaxerror("Expected a string filename to include.", tk.at);
+    }
+
+    Token incStr = tk;
+
+    stepAndPeek(tk);
+
+    if (tk.type != TokType::SemiColon) {
+        throw mattsyntaxerror("Missing the semicolon on the end of include statement.", tk.at);
+    }
+
+    stepAndPeek(tk);
+
+    // Use new scanner for file.
+    fscanner* f = new fscanner(_nms);
+    if (!f->open(incStr.str)) {
+        delete f;
+
+        throw mattruntimeerror("Unable to read include file.", incStr.at);
+    }
+
+    f->parent = _scan;
+    _scan = f;
+    tk = _scan->peek();
+}
+
+#endif
 
 
 // definedevice = "dev" , devicename , [ "=" , type ] , data ;

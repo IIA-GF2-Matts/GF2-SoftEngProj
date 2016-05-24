@@ -31,7 +31,7 @@ int main(int argc, char const *argv[]) {
     }
 
     delete pmz;
-    delete smz;
+    // delete smz;
     delete mmz;
     delete dmz;
     delete netz;

@@ -26,6 +26,7 @@ const std::map<namestring, devicekind> deviceTypes = {
 
 
 // struct Token
+  inplink ilist;
 
 Token::Token()
     : type(TokType::EndOfFile)
@@ -143,6 +144,12 @@ Token scanner::readNext() {
         case '.':
             ret.type = TokType::Dot;
             break;
+#ifdef EXT_INCLUDES
+        case '"':
+            ret.type = TokType::String;
+            ret.str = readString(c);
+            break;
+#endif
         default:
             if (std::isdigit(c)) {
                 ret.type = TokType::Number;
@@ -167,6 +174,11 @@ Token scanner::readNext() {
                 else if (ret.id == kwordAs) {
                     ret.type = TokType::AsKeyword;
                 }
+#ifdef EXT_INCLUDES
+                else if (ret.id == kwordInclude) {
+                    ret.type = TokType::IncludeKeyword;
+                }
+#endif
                 else { // Check for device types
                     auto it = deviceTypes.find(*ret.id);
                     if (it != deviceTypes.end()) {
@@ -203,7 +215,7 @@ Token scanner::readNext() {
 
 
 name scanner::readName(int c1) {
-    std::basic_ostringstream<char, ci_char_traits> oss;
+    std::basic_ostringstream<char, namestring::traits_type> oss;
     oss << char(c1);
 
     while (std::isalnum(_ips.peek()) || _ips.peek() == '_') {
@@ -234,6 +246,38 @@ int scanner::readNumber(int c1) {
     return ret;
 }
 
+#ifdef EXT_INCLUDES
+
+// string = "..."
+// To use include quotes in the string, double them up:
+//     "this is ""A Test""" -> this is "A Test"
+std::string scanner::readString(int c1) {
+    std::ostringstream oss;
+
+    SourcePos start = _ips.Pos;
+
+    for (int c = _ips.get();;c = _ips.get()) {
+
+        if (c == c1) {
+            if (_ips.peek() == c1) {
+                c = _ips.get();
+            }
+            else
+                break;
+        }
+
+        if (_ips.eof()) {
+            throw mattsyntaxerror("Unterminated string.", start);
+        }
+
+        oss << char(c);
+    }
+
+    return oss.str();
+}
+
+#endif
+
 
 scanner::scanner(names* nmz)
         : _open(false), _hasNext(false), _nmz(nmz) {
@@ -241,15 +285,20 @@ scanner::scanner(names* nmz)
     kwordDev = _nmz->lookup("dev");
     kwordMonitor = _nmz->lookup("monitor");
     kwordAs = _nmz->lookup("as");
+    kwordInclude = _nmz->lookup("include");
 }
 
 
-void scanner::open(std::istream* is, std::string fname) {
-    _ips.setStream(is, fname);
-    _file = fname;
+bool scanner::open(std::istream* is, std::string fname) {
+    if (is->good()) {
+        _ips.setStream(is, fname);
+        _file = fname;
 
-    _open = true;
-    _hasNext = false;
+        _open = true;
+        _hasNext = false;
+    }
+
+    return _open;
 }
 
 scanner::~scanner() {
@@ -283,10 +332,10 @@ std::string scanner::getFile() const {
 fscanner::fscanner(names* nmz) : scanner(nmz) {
 }
 
-void fscanner::open(std::string fname) {
+bool fscanner::open(std::string fname) {
     _ifs.open(fname, std::ifstream::in | std::ifstream::binary);
 
-    scanner::open(&_ifs, fname);
+    return scanner::open(&_ifs, fname);
 }
 
 
