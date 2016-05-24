@@ -318,12 +318,14 @@ void MyFrame::openFile(wxString file) {
     wxArrayString switchItems;
 
     switchlist->Clear();
+
+    for (auto sw : switches) {
+        switchItems.Add(nmz->namestr(sw->id).c_str());
+    }
+    switchlist->InsertItems(switchItems, 0);
     int n = 0;
     for (auto sw : switches) {
-        wxString s(nmz->namestr(sw->id).c_str());
-        switchlist->InsertItems(++n, &s, n);
-
-        switchlist->Check(n-1, sw->swstate == high);
+        switchlist->Check(n++, sw->swstate == high);
     }
 }
 
