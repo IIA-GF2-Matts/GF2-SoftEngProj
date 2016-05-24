@@ -45,7 +45,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxMenu *colourMenu = new wxMenu;
     colourMenu->AppendRadioItem(wxID_ANY, "Retro Green");
     colourMenu->AppendRadioItem(wxID_ANY, "Cool Blue");
-    colourMenu->AppendRadioItem(wxID_ANY, "Simple B&W");
+    colourMenu->AppendRadioItem(wxID_ANY, "Simple B+W");
     viewMenu->Append(wxID_ANY, "&Colour", colourMenu);
 
     wxMenuBar *menuBar = new wxMenuBar;
