@@ -35,6 +35,7 @@ class MyFrame: public wxFrame
  private:
   MyGLCanvas *canvas;                     // OpenGL drawing area widget to draw traces
   wxSpinCtrl *spin;                       // control widget to select the number of cycles
+  wxButton *runbutton;
   wxCheckListBox *switchlist;             // widget to turn swicthes on/off
   wxRearrangeCtrl *monitorlist;           // widget to switch monitors
   names *nmz;                             // pointer to names class

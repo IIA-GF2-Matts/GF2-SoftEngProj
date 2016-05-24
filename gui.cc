@@ -40,8 +40,17 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     fileMenu->Append(ID_FILEOPEN, "&Open\tCtrl+O");
     fileMenu->Append(wxID_ABOUT, "&About");
     fileMenu->Append(wxID_EXIT, "&Quit");
+
+    wxMenu *viewMenu = new wxMenu;
+    wxMenu *colourMenu = new wxMenu;
+    colourMenu->AppendRadioItem(wxID_ANY, "Retro Green");
+    colourMenu->AppendRadioItem(wxID_ANY, "Cool Blue");
+    colourMenu->AppendRadioItem(wxID_ANY, "Simple B&W");
+    viewMenu->Append(wxID_ANY, "&Colour", colourMenu);
+
     wxMenuBar *menuBar = new wxMenuBar;
     menuBar->Append(fileMenu, "&File");
+    menuBar->Append(viewMenu, "&View");
     SetMenuBar(menuBar);
 
     wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
@@ -49,7 +58,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
     wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
-    button_sizer->Add(new wxButton(this, MY_BUTTON_ID, "Run"), 0, wxBOTTOM|wxALL, 10);
+    runbutton = new wxButton(this, MY_BUTTON_ID, "Run");
+    runbutton->Enable(false);
+    button_sizer->Add(runbutton, 0, wxBOTTOM|wxALL, 10);
     button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP|wxLEFT|wxRIGHT, 10);
     spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
     button_sizer->Add(spin, 0 , wxALL, 10);
@@ -117,8 +128,6 @@ void MyFrame::OnButton(wxCommandEvent &event)
     // Event handler for the push button
 {
     int n, ncycles;
-
-    // Todo: segfaults here if no file loaded.
 
     cyclescompleted = 0;
     mmz->resetmonitor ();
@@ -223,6 +232,7 @@ void MyFrame::openFile(wxString file) {
     fname = file;
     fileOpen = true;
     updateTitle();
+    runbutton->Enable(true);
 }
 
 void MyFrame::closeFile() {
@@ -230,6 +240,7 @@ void MyFrame::closeFile() {
     fname = "";
     fileOpen = false;
     updateTitle();
+    runbutton->Enable(false);
 }
 
 void MyFrame::updateTitle() {
