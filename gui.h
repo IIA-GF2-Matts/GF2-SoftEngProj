@@ -24,12 +24,13 @@ enum {
   MY_TEXTCTRL_ID,
   MY_BUTTON_ID,
   MY_ZOOM_RESET_ID,
+  MY_SWITCH_LIST_ID,
+
   BLUE_ID,
   GREEN_ID,
   BW_ID,
   PINK_ID
 }; // widget identifiers
-
 
 class MyFrame: public wxFrame
 {
@@ -61,9 +62,11 @@ class MyFrame: public wxFrame
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
   
-  void OnZoomIn(wxCommandEvent& event);     // event handler for text entry field
-  void OnZoomOut(wxCommandEvent& event);     // event handler for text entry field
-  void OnZoomReset(wxCommandEvent& event);     // event handler for text entry field
+  void OnZoomIn(wxCommandEvent& event);     // event handler for zooming in
+  void OnZoomOut(wxCommandEvent& event);     // event handler for zooming out
+  void OnZoomReset(wxCommandEvent& event);     // event handler for resetting zooming
+
+  void OnSwitchListEvent(wxCommandEvent& event);     // event handler for (un)checking switch list items
 
   void colourChange(int index);
   void OnColourBlue(wxCommandEvent& event);
