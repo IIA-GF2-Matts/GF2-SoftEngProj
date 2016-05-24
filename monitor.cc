@@ -213,7 +213,7 @@ void monitor::displaysignals (void)
  */
 int monitor::findmonitor (name dev, name pin) {
   for (int n = 0; n < mtab.size(); n++) {
-    if (mtab[n].devid == dev && mtab[n].op == pin)
+    if (mtab[n].devid == dev && (!mtab[n].op || mtab[n].op->id == pin))
       return n;
   }
   return -1;
