@@ -21,16 +21,21 @@ int main(int argc, char const *argv[]) {
     devices* dmz = new devices(nmz, netz);
     monitor* mmz = new monitor(nmz, netz);
     fscanner* smz = new fscanner(nmz);
-    smz->open(argv[1]);
-    parser* pmz = new parser(netz, dmz, mmz, smz, nmz);
+    if (smz->open(argv[1])) {
+        parser* pmz = new parser(netz, dmz, mmz, smz, nmz);
 
-    if (pmz->readin ()) { // check the logic file parsed correctly
-        // Construct the text-based interface
-        userint umz(nmz, dmz, mmz);
-        umz.userinterface();
+        if (pmz->readin ()) { // check the logic file parsed correctly
+            // Construct the text-based interface
+            userint umz(nmz, dmz, mmz);
+            umz.userinterface();
+        }
+
+        delete pmz;
+    } else {
+        std::cerr << "File not found:      " << argv[1] << std::endl;
+        exit(1);
     }
-
-    delete pmz;
+    
     // delete smz;
     delete mmz;
     delete dmz;
