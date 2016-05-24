@@ -382,10 +382,12 @@ void MyFrame::openFile(wxString file) {
     for (auto sw : switches) {
         switchItems.Add(nmz->namestr(sw->id).c_str());
     }
-    switchlist->InsertItems(switchItems, 0);
-    int n = 0;
-    for (auto sw : switches) {
-        switchlist->Check(n++, sw->swstate == high);
+    if (!switchItems.IsEmpty()) {
+        switchlist->InsertItems(switchItems, 0);
+        int n = 0;
+        for (auto sw : switches) {
+            switchlist->Check(n++, sw->swstate == high);
+        }
     }
 }
 
