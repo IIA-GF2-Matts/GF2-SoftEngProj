@@ -360,5 +360,6 @@ void MyGLCanvas::colourSelector(int colourInd) {
   for (i=0; i<3; i++) trace_RGB[i] = traceColours[colourInd][i];
   for (i=0; i<3; i++) lines_RGB[i] = axisColours[colourInd][i];
   for (i=0; i<3; i++) background_RGB[i] = backColours[colourInd][i];
+
   init = false;
 }

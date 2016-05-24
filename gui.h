@@ -24,6 +24,9 @@ enum {
   MY_TEXTCTRL_ID,
   MY_BUTTON_ID,
   MY_ZOOM_RESET_ID,
+  BLUE_ID,
+  GREEN_ID,
+  BW_ID
 }; // widget identifiers
 
 
@@ -60,6 +63,11 @@ class MyFrame: public wxFrame
   void OnZoomIn(wxCommandEvent& event);     // event handler for text entry field
   void OnZoomOut(wxCommandEvent& event);     // event handler for text entry field
   void OnZoomReset(wxCommandEvent& event);     // event handler for text entry field
+
+  void colourChange(int index);
+  void OnColourBlue(wxCommandEvent& event);
+  void OnColourGreen(wxCommandEvent& event);
+  void OnColourBW(wxCommandEvent& event);
 
   void initNetwork();                     // Initialises network elements
   void delNetwork();                      // Clears network elements

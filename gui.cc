@@ -27,6 +27,11 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ZOOM_IN, MyFrame::OnZoomIn)
     EVT_MENU(wxID_ZOOM_OUT, MyFrame::OnZoomOut)
     EVT_MENU(MY_ZOOM_RESET_ID, MyFrame::OnZoomReset)
+    // Colours
+    EVT_MENU(BLUE_ID, MyFrame::OnColourBlue)
+    EVT_MENU(GREEN_ID, MyFrame::OnColourGreen)
+    EVT_MENU(BW_ID, MyFrame::OnColourBW)
+    
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long style):
@@ -47,9 +52,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
     wxMenu *viewMenu = new wxMenu;
     wxMenu *colourMenu = new wxMenu;
-    colourMenu->AppendRadioItem(wxID_ANY, "Retro Green");
-    colourMenu->AppendRadioItem(wxID_ANY, "Cool Blue");
-    colourMenu->AppendRadioItem(wxID_ANY, "Simple B+W");
+    colourMenu->AppendRadioItem(BLUE_ID, "Cool Blue");
+    colourMenu->AppendRadioItem(GREEN_ID, "Retro Green");
+    colourMenu->AppendRadioItem(BW_ID, "Simple B+W");
     viewMenu->Append(wxID_ANY, "&Colour", colourMenu);
 
     // zoom section
@@ -326,4 +331,21 @@ void MyFrame::updateTitle() {
     }
 
     SetTitle(oss.str());
+}
+
+void MyFrame::OnColourBlue(wxCommandEvent &event) {
+    colourChange(0);
+}
+
+void MyFrame::OnColourGreen(wxCommandEvent &event) {
+    colourChange(1);
+}
+
+void MyFrame::OnColourBW(wxCommandEvent &event) {
+    colourChange(2);
+}
+
+void MyFrame::colourChange(int index) {
+    canvas->colourSelector(index);
+    canvas->Render("Colour Changed");
 }
