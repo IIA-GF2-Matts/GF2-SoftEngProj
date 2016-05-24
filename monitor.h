@@ -67,6 +67,7 @@ class monitor {
     /* Displays state of monitored signals.                                */
 
   int findmonitor (name dev, name pin);
+    /* Gets the index of the monitor measuring the given signal            */
 
   monitor (names* names_mod, network* network_mod);
     /* Called to initialise the monitor module.                            */

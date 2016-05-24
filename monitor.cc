@@ -205,9 +205,17 @@ void monitor::displaysignals (void)
 }
 
 
-
+/***********************************************************************
+ *
+ * Returns the index of the monitor measuring signal dev.pin, or -1 if
+ * there is no monitor for that signal.
+ *
+ */
 int monitor::findmonitor (name dev, name pin) {
-  // todo: populate findmonitor
+  for (int n = 0; n < mtab.size(); n++) {
+    if (mtab[n].devid == dev && mtab[n].op == pin)
+      return n;
+  }
   return -1;
 }
 
