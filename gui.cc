@@ -128,12 +128,10 @@ void MyFrame::OnAbout(wxCommandEvent &event)
 void MyFrame::OnButton(wxCommandEvent &event)
     // Event handler for the push button
 {
-    int n, ncycles;
+    if (!fileOpen) return;
 
-    cyclescompleted = 0;
-    mmz->resetmonitor ();
     runnetwork(spin->GetValue());
-    canvas->Render("Run button pressed", cyclescompleted);
+    canvas->Render("Run button pressed", mmz->cycles());
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
@@ -168,8 +166,7 @@ void MyFrame::runnetwork(int ncycles)
         } else
             cout << "Error: network is oscillating" << endl;
     }
-    if (ok) cyclescompleted += ncycles;
-    else cyclescompleted = 0;
+    if (!ok) mmz->resetmonitor();
 }
 
 
