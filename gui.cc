@@ -24,7 +24,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
     EVT_MENU(ID_FILEOPEN, MyFrame::OnOpen)
     EVT_MENU(ID_ADDMONITOR, MyFrame::OnAddMonitor)
-    EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
+    EVT_BUTTON(MY_RUN_BUTTON_ID, MyFrame::OnButton)
     EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
     EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
     EVT_MENU(wxID_ZOOM_IN, MyFrame::OnZoomIn)
@@ -81,7 +81,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
     wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
-    runbutton = new wxButton(this, MY_BUTTON_ID, "Run");
+    runbutton = new wxButton(this, MY_RUN_BUTTON_ID, "Run");
     runbutton->Enable(false);
     button_sizer->Add(runbutton, 0, wxBOTTOM|wxALL, 10);
     button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP|wxLEFT|wxRIGHT, 10);
