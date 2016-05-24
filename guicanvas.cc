@@ -15,7 +15,7 @@ END_EVENT_TABLE()
 
 int wxglcanvas_attrib_list[5] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
-MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
+MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, names* names_mod, std::vector<int> &order, const wxPoint& pos,
                const wxSize& size, long style, const wxString& name, const wxPalette& palette):
   wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette)
   // Constructor - initialises private variables
@@ -34,6 +34,8 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   plot_height = 4 * dy;   // height allocated 2x plot height
   label_width = 100.0;    // x allowed for labels at start
   end_gap = 10;           // dist between end and side
+
+
 
   // select cool blue colour scheme
   colourSelector(0);
