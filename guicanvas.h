@@ -16,7 +16,7 @@ class MyGLCanvas: public wxGLCanvas
   MyGLCanvas(wxWindow *parent, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
          const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
          const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
-  void Render(wxString example_text = "", int cycles = -1); // function to draw canvas contents
+  void Render(int cycles = -1); // function to draw canvas contents
 
   void zoomIn(double zoom_amount);
   void zoomOut(double zoom_amount, bool fully=false);

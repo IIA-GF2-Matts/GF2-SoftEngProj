@@ -47,12 +47,8 @@ void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
   nmz = nms;
 }
 
-void MyGLCanvas::Render(wxString example_text, int cycles) {
-  // Draws canvas contents - the following example writes the string "example text" onto the canvas
-  // and draws a signal trace. The trace is artificial if the simulator has not yet been run.
-  // When the simulator is run, the number of cycles is passed as a parameter
-
-  // Todo: remove example text after debugging is finished.
+void MyGLCanvas::Render(int cycles) {
+  // Main function for drawing to the GUI GL Canvas
 
   int x, y;
   unsigned int j, k;
@@ -124,10 +120,6 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     titleScreen("Select 'file' -> 'open' to begin...");
   }
 
-  // todo: remove after debgging
-  // Draw example text
-  // glColor3f(1.0, 0.0, 0.0);
-  // drawText(example_text, 10, 100, GLUT_BITMAP_HELVETICA_12);
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
   glFlush();
   SwapBuffers();
@@ -219,8 +211,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& event)
 
   wxPaintDC dc(this); // required for correct refreshing under MS windows
   GetClientSize(&w, &h);
-  text.Printf("Canvas redrawn by OnPaint event handler, canvas size is %d by %d", w, h);
-  Render(text);
+  Render();
 }
 
 void MyGLCanvas::OnSize(wxSizeEvent& event)
@@ -240,11 +231,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   if (event.ButtonDown()) {
     last_x = event.m_x;
     last_y = event.m_y;
-    text.Printf("Mouse button %d pressed at %d %d", event.GetButton(), event.m_x, h-event.m_y);
-  }
-  if (event.ButtonUp()) {
-    text.Printf("Mouse button %d released at %d %d", event.GetButton(), event.m_x, h-event.m_y);
-
   }
   if (event.Dragging()) {
     if (!on_title){
@@ -259,7 +245,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
       // too high and that can always reach the last value and not get further.
       if (pan_x > max_pan)       
         pan_x = max_pan;
-      text.Printf("dx is %f, max_pan is %d, pan_x is %d", dx, max_pan, pan_x);
 
       // y panning
       pan_y -= event.m_y - last_y;
@@ -273,8 +258,6 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     }
   }
 
-  if (event.Leaving()) text.Printf("Mouse left window at %d %d", event.m_x, h-event.m_y);
-
   if (event.GetWheelRotation() < 0) {
     zoomIn((double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
   }
@@ -286,13 +269,13 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     zoom_changed = true;
   }
 
-  if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render(text);
+  if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render();
 }
 
 void MyGLCanvas::zoomIn(double zoom_amount){
   zoom = zoom * (1 - zoom_amount);
   if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom
-  Render("Zoomed in");
+  Render();
 }
 
 void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
@@ -302,11 +285,11 @@ void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
     zoom = zoom / (1.0 + zoom_amount);
     if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
   }
-  Render("Zoomed out");
+  Render();
 }
 
 void MyGLCanvas::titleScreen(wxString message_text){
-  // Todo: redesign title screen: add getting started message etc.
+  
   on_title = true;
   int w, h;
   GetClientSize(&w, &h);

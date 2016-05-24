@@ -147,25 +147,19 @@ void MyFrame::OnButton(wxCommandEvent &event)
     if (!fileOpen) return;
 
     runnetwork(spin->GetValue());
-    canvas->Render("Run button pressed", mmz->cycles());
+    canvas->Render(mmz->cycles());
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
     // Event handler for the spin control
 {
-    wxString text;
-
-    text.Printf("New spinctrl value %d", event.GetPosition());
-    canvas->Render(text);
+    canvas->Render();
 }
 
 void MyFrame::OnText(wxCommandEvent &event)
     // Event handler for the text entry field
 {
-    wxString text;
-
-    text.Printf("New text entered %s", event.GetString().c_str());
-    canvas->Render(text);
+    canvas->Render();
 }
 
 void MyFrame::OnZoomIn(wxCommandEvent &event)
@@ -358,7 +352,7 @@ void MyFrame::updateTitle() {
 
 void MyFrame::colourChange(int index) {
     canvas->colourSelector(index);
-    canvas->Render("Colour Changed");
+    canvas->Render();
 }
 
 void MyFrame::OnColourBlue(wxCommandEvent &event) {
