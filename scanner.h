@@ -98,7 +98,7 @@ public:
     scanner* parent;
 
     scanner(names* nmz);
-    ~scanner();
+    virtual ~scanner();
 
     /// Open an input character stream with the given file name.
     /// Note: Streams should be opened as binary in order to prevent issues with
@@ -125,6 +125,7 @@ private:
     std::ifstream _ifs;
 public:
     fscanner(names* nmz);
+    ~fscanner();
 
     bool open(std::string fname);
 };

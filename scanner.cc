@@ -332,6 +332,8 @@ std::string scanner::getFile() const {
 fscanner::fscanner(names* nmz) : scanner(nmz) {
 }
 
+fscanner::~fscanner() {}
+
 bool fscanner::open(std::string fname) {
     _ifs.open(fname, std::ifstream::in | std::ifstream::binary);
 
