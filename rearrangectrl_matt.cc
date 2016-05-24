@@ -9,6 +9,8 @@
 // Licence:     wxWindows licence
 ///////////////////////////////////////////////////////////////////////////////
 
+// Modified version to allow dynamic adding of items.
+
 // ============================================================================
 // declarations
 // ============================================================================
@@ -195,9 +197,11 @@ void wxRearrangeListMatt::OnCheck(wxCommandEvent& event)
 // ============================================================================
 
 BEGIN_EVENT_TABLE(wxRearrangeCtrlMatt, wxPanel)
+    EVT_UPDATE_UI(wxID_ADD, wxRearrangeCtrlMatt::OnUpdateButtonUI)
     EVT_UPDATE_UI(wxID_UP, wxRearrangeCtrlMatt::OnUpdateButtonUI)
     EVT_UPDATE_UI(wxID_DOWN, wxRearrangeCtrlMatt::OnUpdateButtonUI)
 
+    EVT_BUTTON(wxID_ADD, wxRearrangeCtrlMatt::OnButton)
     EVT_BUTTON(wxID_UP, wxRearrangeCtrlMatt::OnButton)
     EVT_BUTTON(wxID_DOWN, wxRearrangeCtrlMatt::OnButton)
 END_EVENT_TABLE()
@@ -222,16 +226,17 @@ wxRearrangeCtrlMatt::Create(wxWindow *parent,
     if ( !wxPanel::Create(parent, id, pos, size, wxTAB_TRAVERSAL, name) )
         return false;
 
-    m_list = new wxRearrangeListMatt(this, wxID_ANY,
+    m_list = new wxRearrangeListMatt(this, id+1,
                                  wxDefaultPosition, wxDefaultSize,
                                  order, items,
                                  style, validator);
+    wxButton * const btnAdd = new wxButton(this, wxID_ADD);
     wxButton * const btnUp = new wxButton(this, wxID_UP);
     wxButton * const btnDown = new wxButton(this, wxID_DOWN);
-
     // arrange them in a sizer
     wxSizer * const sizerBtns = new wxBoxSizer(wxVERTICAL);
-    sizerBtns->Add(btnUp, wxSizerFlags().Centre().Border(wxBOTTOM));
+    sizerBtns->Add(btnAdd, wxSizerFlags().Centre().Border(wxBOTTOM));
+    sizerBtns->Add(btnUp, wxSizerFlags().Centre().Border(wxBOTTOM | wxTOP));
     sizerBtns->Add(btnDown, wxSizerFlags().Centre().Border(wxTOP));
 
     wxSizer * const sizerTop = new wxBoxSizer(wxHORIZONTAL);
@@ -246,16 +251,38 @@ wxRearrangeCtrlMatt::Create(wxWindow *parent,
 
 void wxRearrangeCtrlMatt::OnUpdateButtonUI(wxUpdateUIEvent& event)
 {
-    event.Enable( event.GetId() == wxID_UP ? m_list->CanMoveCurrentUp()
-                                           : m_list->CanMoveCurrentDown() );
+    switch (event.GetId()) {
+        case wxID_UP:
+            event.Enable(m_list->CanMoveCurrentUp());
+            break;
+        case wxID_DOWN:
+            event.Enable(m_list->CanMoveCurrentDown());
+            break;
+        case wxID_ADD:
+            // Todo
+            break;
+
+        default:
+            break;
+    }
 }
 
 void wxRearrangeCtrlMatt::OnButton(wxCommandEvent& event)
 {
-    if ( event.GetId() == wxID_UP )
-        m_list->MoveCurrentUp();
-    else
-        m_list->MoveCurrentDown();
+    switch (event.GetId()) {
+        case wxID_UP:
+            m_list->MoveCurrentUp();
+            break;
+        case wxID_DOWN:
+            m_list->MoveCurrentDown();
+            break;
+        case wxID_ADD:
+            // Todo
+            break;
+
+        default:
+            break;
+    }
 }
 
 // ============================================================================
