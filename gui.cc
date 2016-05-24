@@ -8,6 +8,7 @@
 #include <wx/filedlg.h>
 #include "guierrordialog.h"
 #include "rearrangectrl_matt.h"
+#include "guimonitordialog.h"
 
 #include <iostream>
 
@@ -22,6 +23,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_EXIT, MyFrame::OnExit)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
     EVT_MENU(ID_FILEOPEN, MyFrame::OnOpen)
+    EVT_MENU(ID_ADDMONITOR, MyFrame::OnAddMonitor)
     EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
     EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
     EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
@@ -51,6 +53,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
     wxMenu *fileMenu = new wxMenu;
     fileMenu->Append(ID_FILEOPEN, "&Open\tCtrl+O");
+    fileMenu->Append(ID_ADDMONITOR, "Monitor Signal List");
     fileMenu->Append(wxID_ABOUT, "&About");
     fileMenu->Append(wxID_EXIT, "&Quit");
 
@@ -74,7 +77,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     SetMenuBar(menuBar);
 
     wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
-    canvas = new MyGLCanvas(this, order, wxID_ANY, NULL, NULL);
+    canvas = new MyGLCanvas(this, monitorOrder, wxID_ANY, NULL, NULL);
     topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
     wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
@@ -130,6 +133,43 @@ void MyFrame::OnOpen(wxCommandEvent &event)
         return;
 
     openFile(openFileDialog.GetPath());
+}
+
+void MyFrame::OnAddMonitor(wxCommandEvent &event)
+    // Event handler for the Add monitor button
+{
+    MonitorDialog dlg(this, wxID_ANY, nmz, signals, monitored);
+    if (dlg.ShowModal() == wxID_CANCEL)
+        return;
+
+    // todo: update list.
+
+
+    monitorOrder.clear();
+    wxArrayString monitorItems;
+    wxArrayInt wxmonitorOrder;
+    std::ostringstream oss;
+    int n = 0;
+    for (int i = 0; i < signals.size(); i++) {
+        if (monitored[i]) {
+            oss.str("");
+            oss << nmz->namestr(signals[i].devicename);
+            if (signals[i].pinname != blankname) {
+                oss << "." << nmz->namestr(signals[i].pinname);
+            }
+
+            monitorItems.Add(oss.str());
+            wxmonitorOrder.Add(n);
+            monitorOrder.push_back(n);
+
+            n++;
+        }
+    }
+
+    if (monitorOrder.size())
+        monitorlist->GetList()->Reset(wxmonitorOrder, monitorItems);
+    else
+        monitorlist->GetList()->Clear();
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)
@@ -282,15 +322,24 @@ void MyFrame::openFile(wxString file) {
     fileOpen = true;
     updateTitle();
 
+    // Get info
+    switches = netz->findswitches();
+    signals = netz->findoutputsignals();
+    monitored.clear();
+    monitored.resize(signals.size(), false);
+
+
     // Update controls
     runbutton->Enable(true);
 
     // Add monitors to list
     wxArrayString monitorItems;
-    wxArrayInt monitorOrder;
+    wxArrayInt wxmonitorOrder;
 
+    monitorOrder.clear();
     name D, P;
     std::ostringstream oss;
+    int i;
     for (int n = 0; n < mmz->moncount(); n++) {
         mmz->getmonname(n, D, P);
 
@@ -301,10 +350,22 @@ void MyFrame::openFile(wxString file) {
         }
 
         monitorItems.Add(oss.str());
-        monitorOrder.Add(n);
+        wxmonitorOrder.Add(n);
+        monitorOrder.push_back(n);
+
+        // check in the monitored table
+        // Todo: Not linear search.
+        mmz->getmonname(n, D, P, false);
+        for (i = 0; i < signals.size(); i++) {
+            if (D == signals[i].devicename && P == signals[i].pinname) {
+                monitored[i] = true;
+                break;
+            }
+        }
     }
+
     if (mmz->moncount())
-        monitorlist->GetList()->Reset(monitorOrder, monitorItems);
+        monitorlist->GetList()->Reset(wxmonitorOrder, monitorItems);
     else
         monitorlist->GetList()->Clear();
 
@@ -314,7 +375,6 @@ void MyFrame::openFile(wxString file) {
 
 
     // Add switches to the list
-    switches = netz->findswitches();
     wxArrayString switchItems;
 
     switchlist->Clear();

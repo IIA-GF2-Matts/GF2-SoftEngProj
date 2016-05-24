@@ -15,9 +15,9 @@ END_EVENT_TABLE()
 
 int wxglcanvas_attrib_list[5] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
-MyGLCanvas::MyGLCanvas(wxWindow *parent, std::vector<int> &order, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
+MyGLCanvas::MyGLCanvas(wxWindow *parent, std::vector<int> &ord, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
                const wxSize& size, long style, const wxString& name, const wxPalette& palette):
-  wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette)
+  wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette), order(ord)
   // Constructor - initialises private variables
 {
   context = new wxGLContext(this);

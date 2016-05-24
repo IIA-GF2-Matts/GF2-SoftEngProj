@@ -19,6 +19,7 @@
 
 
 #define ID_FILEOPEN 2001
+#define ID_ADDMONITOR 2002
 
 
 enum {
@@ -58,11 +59,15 @@ class MyFrame: public wxFrame
   wxString fname;
 
   std::vector<devlink> switches;
+  std::vector<outputsignal> signals;
+  std::vector<bool> monitored;
+  std::vector<int> monitorOrder;
 
   void runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
   void OnOpen(wxCommandEvent& event);     // Event handler for file->Open
+  void OnAddMonitor(wxCommandEvent& event);     // Event handler for Add monitor button
   void OnButton(wxCommandEvent& event);   // event handler for push button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
