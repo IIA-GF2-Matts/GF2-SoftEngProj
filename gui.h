@@ -22,6 +22,7 @@ enum {
   MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
   MY_TEXTCTRL_ID,
   MY_BUTTON_ID,
+  MY_ZOOM_RESET_ID,
 }; // widget identifiers
 
 
@@ -53,6 +54,10 @@ class MyFrame: public wxFrame
   void OnButton(wxCommandEvent& event);   // event handler for push button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
+  
+  void OnZoomIn(wxCommandEvent& event);     // event handler for text entry field
+  void OnZoomOut(wxCommandEvent& event);     // event handler for text entry field
+  void OnZoomReset(wxCommandEvent& event);     // event handler for text entry field
 
   void initNetwork();                     // Initialises network elements
   void delNetwork();                      // Clears network elements

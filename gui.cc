@@ -23,6 +23,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(MY_BUTTON_ID, MyFrame::OnButton)
     EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
     EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
+    EVT_MENU(wxID_ZOOM_IN, MyFrame::OnZoomIn)
+    EVT_MENU(wxID_ZOOM_OUT, MyFrame::OnZoomOut)
+    EVT_MENU(MY_ZOOM_RESET_ID, MyFrame::OnZoomReset)
 END_EVENT_TABLE()
 
 MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long style):
@@ -47,6 +50,12 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     colourMenu->AppendRadioItem(wxID_ANY, "Cool Blue");
     colourMenu->AppendRadioItem(wxID_ANY, "Simple B+W");
     viewMenu->Append(wxID_ANY, "&Colour", colourMenu);
+
+    // zoom section
+    viewMenu->AppendSeparator();
+    viewMenu->Append(wxID_ZOOM_IN, "&Zoom in\tCtrl+=");
+    viewMenu->Append(wxID_ZOOM_OUT, "&Zoom out\tCtrl+-");
+    viewMenu->Append(MY_ZOOM_RESET_ID, "&Reset zoom\tCtrl+0");
 
     wxMenuBar *menuBar = new wxMenuBar;
     menuBar->Append(fileMenu, "&File");
@@ -150,6 +159,25 @@ void MyFrame::OnText(wxCommandEvent &event)
 
     text.Printf("New text entered %s", event.GetString().c_str());
     canvas->Render(text);
+}
+
+void MyFrame::OnZoomIn(wxCommandEvent &event)
+    // Event handler for zooming in
+{
+    canvas->zoomIn(-0.2);
+}
+
+
+void MyFrame::OnZoomOut(wxCommandEvent &event)
+    // Event handler for zooming in
+{
+    canvas->zoomOut(0.2);
+}
+
+void MyFrame::OnZoomReset(wxCommandEvent &event)
+    // Event handler for zooming in
+{
+    canvas->zoomOut(0, true);
 }
 
 void MyFrame::runnetwork(int ncycles)
