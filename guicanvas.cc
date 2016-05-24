@@ -113,8 +113,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       drawPlot(s, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
     }
 
-    // draw verticle line
-    glColor3f(0.4, 0.4, 0.4);
+    // draw vertical line
+    setLineColour(lines_RGB);
     glBegin(GL_LINE_STRIP);
     glVertex2f(label_width-5, h-dy);
     glVertex2f(label_width-5, h-(2*dy + plot_height*mmz->moncount()));
@@ -125,6 +125,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     titleScreen();
   }
 
+  // todo: remove after debgging
   // Draw example text
   glColor3f(1.0, 0.0, 0.0);
   drawText(example_text, 10, 100, GLUT_BITMAP_HELVETICA_12);
