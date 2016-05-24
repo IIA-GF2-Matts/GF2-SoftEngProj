@@ -62,13 +62,13 @@ bool wxRearrangeListMatt::Create(wxWindow *parent,
 
     // do create the real control
     if ( !wxCheckListBox::Create(parent, id, pos, size, itemsInOrder,
-                                 style, validator, name) )
+                                 style, validator, name) ) {
         return false;
+    }
 
     // and now check all the items which should be initially checked
     for ( int n = 0; n < count; n++ ) {
-        if ( order[n] >= 0 )
-            Check(n);
+        Check(n, true);
     }
 
     m_order = order;
@@ -85,8 +85,6 @@ wxArrayString wxRearrangeListMatt::OrderList(const wxArrayInt& order, const wxAr
     for ( n = 0; n < count; n++ )
     {
         int idx = order[n];
-        if ( idx < 0 )
-            idx = -idx - 1;
         itemsInOrder.push_back(items[idx]);
     }
 
@@ -186,7 +184,7 @@ void wxRearrangeListMatt::OnCheck(wxCommandEvent& event)
     // update the internal state to match the new item state
     const int n = event.GetInt();
 
-    m_order[n] = ~m_order[n];
+    // m_order[n] = ~m_order[n];
 }
 
 

@@ -281,10 +281,14 @@ void MyFrame::openFile(wxString file) {
         }
 
         monitorItems.Add(oss.str());
-        monitorOrder.Add(-n-1);
+        monitorOrder.Add(n);
     }
 
     monitorlist->GetList()->Reset(monitorOrder, monitorItems);
+
+    for ( int i = 0; i < mmz->moncount(); i++ ) {
+        monitorlist->GetList()->Check(i, true);
+    }
 
 
     // Add switches to the list
