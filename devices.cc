@@ -534,3 +534,12 @@ devices::devices (names* names_mod, network* net_mod)
   makedevice(aswitch, zero, 0, ok);
   makedevice(aswitch, one, 1, ok);
 }
+
+
+/***********************************************************************
+ *
+ * Clears up resources allocated by devices
+ *
+ */
+devices::~devices() {
+}

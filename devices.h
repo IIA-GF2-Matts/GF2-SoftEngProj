@@ -68,6 +68,8 @@ public:
 
   devices (names* names_mod, network* net_mod);
     /* Called to initialise module.                                        */
+
+  ~devices();
 };
 
 #endif /* devices_h */
