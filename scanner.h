@@ -30,7 +30,9 @@ enum TokType {
     Dot,
     Number,
     Identifier,
-    DeviceType
+    DeviceType,
+    IncludeKeyword,
+    String
 };
 
 extern const std::map<namestring, devicekind> deviceTypes;
@@ -46,6 +48,9 @@ public:
     name id; ///< If type == TokType::Identifier, this is the string name
     int number; ///< If type == TokType::Number, this is the integer value.
     devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
+#ifdef EXT_INCLUDES
+    std::string str;
+#endif
 
     Token();
     Token(SourcePos pos, TokType t);
@@ -70,6 +75,7 @@ protected:
     name kwordDev;
     name kwordMonitor;
     name kwordAs;
+    name kwordInclude;
 
     /// Read the next character from the input character stream
     int readChar();
@@ -83,14 +89,21 @@ protected:
     /// Consume characters while they match a number
     int readNumber(int c1);
 
+#ifdef EXT_INCLUDES
+    /// Consumes characters matching a string.
+    std::string readString(int c1);
+#endif
+
 public:
+    scanner* parent;
+
     scanner(names* nmz);
     ~scanner();
 
     /// Open an input character stream with the given file name.
     /// Note: Streams should be opened as binary in order to prevent issues with
     /// changing EoL characters.
-    void open(std::istream* is, std::string fname);
+    bool open(std::istream* is, std::string fname);
 
     /// Steps to the next token
     Token step();
@@ -113,7 +126,7 @@ private:
 public:
     fscanner(names* nmz);
 
-    void open(std::string fname);
+    bool open(std::string fname);
 };
 
 

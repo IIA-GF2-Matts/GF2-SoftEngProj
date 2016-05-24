@@ -55,8 +55,6 @@ void networkbuilder::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
 
 template<typename T>
 void networkbuilder::getPredefinedError(devlink dvl, name key, T prevval, std::ostream& warnoss, std::ostream& noteoss) {
-    // todo: note isn't displaying
-
     warnoss << "Attempt to redefine " //<< *_devz->getname(dvl->kind)
         << _nms->namestr(dvl->id) << "." << _nms->namestr(key);
     noteoss << "Previously defined as " << prevval << " here";
@@ -77,8 +75,17 @@ networkbuilder::~networkbuilder() {
 
 void networkbuilder::defineDevice(Token& devName, Token& type) {
     // Semantic check: has devicename been defined before?
-    if (_netz->finddevice(devName.id) != NULL) {
-        _errs.report(mattsemanticerror("Device types may not be assigned to devices that already exist.", devName.at));
+    devlink dl = _netz->finddevice(devName.id);
+    if (dl != NULL) {
+        if (dl->kind == type.devtype) {
+            _errs.report(mattwarning(
+                "Repeated definition of the same device.", devName.at));
+        }
+        else {
+            _errs.report(mattsemanticerror(
+                "Device types may not be assigned to devices that already exist.", devName.at));
+        }
+        _errs.report(mattnote("Previously defined here.", dl->definedAt));
         return;
     }
 
@@ -93,21 +100,21 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
     }
 
     if (!success) {
-        // TODO: Better error message? Shouldn't ever reach here.
-        _errs.report(mattruntimeerror("Unable to add device.", type.at));
+        // Shouldn't ever reach here
+        // TODO: Better error message? 
+        _errs.report(mattruntimeerror(
+            "Unable to add device to the network.", type.at));
         return;
     }
 }
 
 
 bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
-
     // Todo: Merge key check switches
-
 
     // Key semantic checks
     switch(dvl->kind) {
-        // Todo: quality check errors
+
         case aswitch:
             if (keyTok.id != _devz->initvalnm) {
                 _errs.report(mattsemanticerror(
@@ -164,7 +171,6 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
 
             break;
         case dtype:
-            // Todo: Name table comparison rather than string comparison
             if (!(keyTok.id == _devz->datapin || keyTok.id == _devz->clkpin
                     || keyTok.id == _devz->setpin || keyTok.id == _devz->clrpin)) {
                 std::ostringstream oss;
@@ -177,14 +183,13 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case baddevice:
         default:
             // Should never reach here
-            // Todo: better error message?
-            _errs.report(mattruntimeerror("Could not assign key to a bad device type", keyTok.at));
+            _errs.report(mattruntimeerror(
+                "Could not assign option to an unknown device type", keyTok.at));
             return false;
     }
 
     // check if key has already been defined for particular device
     switch(dvl->kind) {
-        // Todo: check errors
         case aswitch:
             // initially set to floating
             if (dvl->swstate != floating) {
@@ -223,7 +228,8 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 devlink dl = _netz->findoutputdevice(ol);
                 if (dl == NULL) {
                     // Should never reach here
-                    _errs.report(mattruntimeerror("Device with requested output pin could not be found in the network. Connection not made.", keyTok.at));
+                    _errs.report(mattruntimeerror(
+                        "Device with requested output pin could not be found in the network. Connection not made.", keyTok.at));
                     return false;
                 }
 
@@ -257,8 +263,7 @@ void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok)
     }
     else {
         if (valTok.number != 0 && valTok.number != 1) {
-            // Todo: improve error message
-            _errs.report(mattsyntaxerror("Invalid signal.", valTok.at));
+            _errs.report(mattsemanticerror("Invalid signal name: input pins should be assigned a valid signal name or a logical state (0 or 1)", valTok.at));
             return;
         }
         Signal sig;
@@ -280,13 +285,15 @@ void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSi
 
     if (isLegalProperty(dvl, keyTok.id)) {
         // attempting to assign a signal to a property (not an input pin)
-        // todo: check this
         if (keyTok.id == _devz->periodnm) {
-            _errs.report(mattsemanticerror("Clock periods must be numeric (assigning an identifier was attempted)", valSig.device.at));
+            _errs.report(mattsemanticerror(
+                "Clock periods must be numeric (assigning an identifier was attempted)", valSig.device.at));
         } else if (keyTok.id == _devz->initvalnm) {
-            _errs.report(mattsemanticerror("Initial values may only be 0 or 1, assigning a signal is not supported.", valSig.device.at));
+            _errs.report(mattsemanticerror(
+                "Initial values may only be 0 or 1, assigning a signal is not supported.", valSig.device.at));
         } else {
-            _errs.report(mattsemanticerror("Attempt to assign an identifier to a property", valSig.device.at));
+            _errs.report(mattsemanticerror(
+                "Attempt to assign an identifier to a property", valSig.device.at));
         }
         return;
     }
@@ -321,12 +328,11 @@ void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
     else
         il->definedAt = keytk.at;  // store this token position for xors
 
-    // todo: store token position?
     _netz->makeconnection(dvl->id, keytk.id, sig.device.id, sig.pin.id, success);
     if (!success) {
         // should never reach here
-        // Todo: improve error message
-        _errs.report(mattruntimeerror("Could not make connection", keytk.at));
+        _errs.report(mattruntimeerror(
+            "Could not make connection. One of the signals could not be found.", keytk.at));
         return;
     }
 }
@@ -336,7 +342,8 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
     if (dvl->kind == aswitch) {
         // Switch
         if (valTok.type != TokType::Number || (valTok.number != 0 && valTok.number != 1)) {
-            _errs.report(mattsemanticerror("Switches must have initial values of either 0 or 1", valTok.at));
+            _errs.report(mattsemanticerror(
+                "Switches must have initial values of either 0 or 1", valTok.at));
             return;
         }
 
@@ -351,11 +358,11 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
     } else if (dvl->kind == aclock) {
         // Clock
         if (valTok.type != TokType::Number || valTok.number < 1 || valTok.number > 32767) {
-            _errs.report(mattsemanticerror("Clock periods must be integers between 1 and 32767", valTok.at));
+            _errs.report(mattsemanticerror(
+                "Clock periods must be integers between 1 and 32767", valTok.at));
             return;
         }
 
-        // Todo: these might want to store a different token position
         _devz->setclock(dvl->id, valTok.number, success, keytk.at);
 
         if (!success) {
@@ -401,8 +408,7 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
     bool success = false;
     _mons->makemonitor(monSig.device.id, monSig.pin.id, success, aliSig.device.id, aliSig.pin.id);
     if (!success) {
-        // Todo: improve error message
-        _errs.report(mattruntimeerror("Could not make monitor", monSig.device.at));
+        _errs.report(mattruntimeerror("Could not make monitor. All available monitors are used, or the device output could not be found.", monSig.device.at));
         return;
     }
 }

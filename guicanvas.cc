@@ -36,17 +36,17 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, wxWindowID id, monitor* monitor_mod, na
   end_gap = 10;           // dist between end and side
 
   // trace colour
-  trace_RGB[0] = 0.0;     // Red
-  trace_RGB[1] = 1.0;     // Green
-  trace_RGB[2] = 0.0;     // Blue
+  trace_RGB[0] = 0.32;     // Red
+  trace_RGB[1] = 0.55;     // Green
+  trace_RGB[2] = 0.87;     // Blue
   // axis colour
-  lines_RGB[0] = 0.4;     // Red
-  lines_RGB[1] = 0.4;     // Green
-  lines_RGB[2] = 0.4;     // Blue
+  lines_RGB[0] = 0.58;     // Red
+  lines_RGB[1] = 0.59;     // Green
+  lines_RGB[2] = 0.60;     // Blue
   // background colour
-  background_RGB[0] = 0.15; // Red
-  background_RGB[1] = 0.15; // Green
-  background_RGB[2] = 0.15; // Blue
+  background_RGB[0] = 0.21; // Red
+  background_RGB[1] = 0.21; // Green
+  background_RGB[2] = 0.21; // Blue
 
 }
 
@@ -113,8 +113,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
       drawPlot(s, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
     }
 
-    // draw verticle line
-    glColor3f(0.4, 0.4, 0.4);
+    // draw vertical line
+    setLineColour(lines_RGB);
     glBegin(GL_LINE_STRIP);
     glVertex2f(label_width-5, h-dy);
     glVertex2f(label_width-5, h-(2*dy + plot_height*mmz->moncount()));
@@ -125,6 +125,7 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
     titleScreen();
   }
 
+  // todo: remove after debgging
   // Draw example text
   glColor3f(1.0, 0.0, 0.0);
   drawText(example_text, 10, 100, GLUT_BITMAP_HELVETICA_12);
@@ -164,6 +165,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   // draw trace
   int signal_y;
   setLineColour(trace_RGB);
+  glLineWidth(2.0);
   glBegin(GL_LINE_STRIP);
   for (i=zoomrange[0]; i<zoomrange[1]; i++) {
     if (mmz->getsignaltrace(plot_num, i, s)) {
@@ -174,6 +176,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
     }
   }
   glEnd();
+  glLineWidth(1.0);
   // draw text label
   name mon_name_dev, mon_name_pin;
   wxString mon_name_text;
