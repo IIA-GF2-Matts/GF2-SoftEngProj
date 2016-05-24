@@ -5,13 +5,28 @@
 using namespace std;
 
 
+
+/***********************************************************************
+ *
+ * Gets the definedAt property of monitor n
+ *
+ */
+const SourcePos& monitor::getdefinedpos(int n) const {
+  return getdefinedpos(mtab.at(n));
+}
+
+const SourcePos& monitor::getdefinedpos(const moninfo& m) const {
+  return m.definedAt;
+}
+
+
 /***********************************************************************
  *
  * Sets a monitor on the 'outp' output of device 'dev' by placing an
  * entry in the monitor table. 'ok' is set true if operation succeeds.
  *
  */
-void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name aliasOutp)
+void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name aliasOutp, SourcePos p)
 {
   devlink d;
   outplink o;
@@ -26,6 +41,7 @@ void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name
         moninfo newmon;
         newmon.devid = dev;
         newmon.op = o;
+        newmon.definedAt = p;
         newmon.aliasDev = aliasDevice;
         newmon.aliasPin = aliasOutp;
         newmon.sig.reserve(50);
@@ -66,7 +82,7 @@ void monitor::remmonitor (name dev, name outp, bool& ok)
  * Returns number of signals currently monitored.
  *
  */
-int monitor::moncount (void)
+int monitor::moncount (void) const
 {
   return (mtab.size());
 }
@@ -88,12 +104,12 @@ int monitor::cycles() const {
  * Returns signal level of n'th monitor point.
  *
  */
-asignal monitor::getmonsignal (int n)
+asignal monitor::getmonsignal (int n) const
 {
   return getmonsignal(mtab[n]);
 }
 
-asignal monitor::getmonsignal(moninfo& mon) {
+asignal monitor::getmonsignal(const moninfo& mon) const {
   if (!mon.op) return floating;
 
   return mon.op->sig;
