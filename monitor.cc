@@ -28,6 +28,7 @@ void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name
         newmon.op = o;
         newmon.aliasDev = aliasDevice;
         newmon.aliasPin = aliasOutp;
+        newmon.sig.reserve(50);
 
         mtab.push_back(newmon);
       }
@@ -130,7 +131,7 @@ void monitor::getmonname (moninfo& mon, name& dev, name& outp)
  */
 void monitor::resetmonitor (void)
 {
-  for (auto it : mtab) {
+  for (auto& it : mtab) {
     it.sig.clear();
   }
 }
@@ -144,8 +145,9 @@ void monitor::resetmonitor (void)
  */
 void monitor::recordsignals (void)
 {
-  for (auto m : mtab)
+  for (auto& m : mtab) {
     m.sig.push_back(getmonsignal(m));
+  }
 }
 
 /***********************************************************************
@@ -191,6 +193,7 @@ void monitor::displaysignals (void)
       cout << ":";
     }
 
+    std::cout << mon.sig.size() << std::endl;
     for (auto i : mon.sig) {
       switch (i) {
         case high:    cout << "-"; break;
