@@ -280,7 +280,7 @@ std::string scanner::readString(int c1) {
 
 
 scanner::scanner(names* nmz)
-        : _open(false), _hasNext(false), _nmz(nmz) {
+        : _open(false), _hasNext(false), _nmz(nmz), parent(NULL) {
 
     kwordDev = _nmz->lookup("dev");
     kwordMonitor = _nmz->lookup("monitor");
