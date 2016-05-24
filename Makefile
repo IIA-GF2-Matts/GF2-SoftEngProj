@@ -8,7 +8,7 @@ GUIFLAGS = -DUSE_GUI `wx-config --version=3.0 --cxxflags`
 GUILINKFLAGS = `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
 SRC = names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc autocorrect.cc networkbuilder.cc
-GUISRC = gui.cc guierrordialog.cc mattlab.cc
+GUISRC = gui.cc guierrordialog.cc mattlab.cc rearrangectrl_matt.cc
 CLISRC = userint.cc clisim.cc
 
 G_OBJECTS = $(patsubst %.cc,gui_%.o,$(GUISRC) $(SRC))

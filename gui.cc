@@ -8,6 +8,7 @@
 #include <sstream>
 #include <wx/filedlg.h>
 #include "guierrordialog.h"
+#include "rearrangectrl_matt.h"
 
 using namespace std;
 
@@ -76,20 +77,17 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     button_sizer->Add(spin, 0 , wxALL, 10);
 
     // Switches
-    wxBoxSizer *controls_sizer = new wxBoxSizer(wxVERTICAL);
+    controls_sizer = new wxBoxSizer(wxVERTICAL);
     wxArrayString switchItems;
     switchItems.Add("Switch1");
     switchlist = new wxCheckListBox(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, switchItems);
 
 
     // Monitors
+    // Lol. It's not my fault, wxWidgets should allow clearing and resetting of the control.
     wxArrayString monitorItems;
-    monitorItems.Add("Monitor1");
-    monitorItems.Add("Monitor2");
     wxArrayInt monitorOrder;
-    monitorOrder.Add(1);
-    monitorOrder.Add(0);
-    monitorlist = new wxRearrangeCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, monitorOrder, monitorItems);
+    monitorlist = new wxRearrangeCtrlMatt(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, monitorOrder, monitorItems);
 
     controls_sizer->Add(switchlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
     controls_sizer->Add(monitorlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
@@ -252,13 +250,55 @@ void MyFrame::openFile(wxString file) {
         delNetwork();
         return;
     }
+    else if (pmz.errors().warnCount()) {
+        ErrorDialog dlg(this, wxID_ANY, pmz.errors());
+
+        dlg.ShowModal();
+    }
 
 
     canvas->setNetwork(mmz, nmz);
     fname = file;
     fileOpen = true;
     updateTitle();
+
+    // Update controls
     runbutton->Enable(true);
+
+    // Add monitors to list
+    wxArrayString monitorItems;
+    wxArrayInt monitorOrder;
+
+    name D, P;
+    std::ostringstream oss;
+    for (int n = 0; n < mmz->moncount(); n++) {
+        mmz->getmonname(n, D, P);
+
+        oss.str("");
+        oss << nmz->namestr(D);
+        if (P != blankname) {
+            oss << "." << nmz->namestr(P);
+        }
+
+        monitorItems.Add(oss.str());
+        monitorOrder.Add(-n-1);
+    }
+
+    monitorlist->GetList()->Reset(monitorOrder, monitorItems);
+
+
+    // Add switches to the list
+    std::vector<devlink> sws = netz->findswitches();
+    wxArrayString switchItems;
+
+    switchlist->Clear();
+    int n = 0;
+    for (auto sw : sws) {
+        wxString s = nmz->namestr(sw->id).c_str();
+        switchlist->InsertItems(++n, &s, n);
+
+        switchlist->Check(n-1, sw->swstate == high);
+    }
 }
 
 void MyFrame::closeFile() {
@@ -266,6 +306,8 @@ void MyFrame::closeFile() {
     fname = "";
     fileOpen = false;
     updateTitle();
+
+    // Update Controls
     runbutton->Enable(false);
 }
 
