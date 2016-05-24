@@ -28,16 +28,13 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ZOOM_IN, MyFrame::OnZoomIn)
     EVT_MENU(wxID_ZOOM_OUT, MyFrame::OnZoomOut)
     EVT_MENU(MY_ZOOM_RESET_ID, MyFrame::OnZoomReset)
-<<<<<<< 81d683a02713f2cf5cb7a017c3d8ca3081b71142
     // Colours
     EVT_MENU(BLUE_ID, MyFrame::OnColourBlue)
     EVT_MENU(GREEN_ID, MyFrame::OnColourGreen)
     EVT_MENU(BW_ID, MyFrame::OnColourBW)
     EVT_MENU(PINK_ID, MyFrame::OnColourPink)
     
-=======
     EVT_CHECKLISTBOX(MY_SWITCH_LIST_ID, MyFrame::OnSwitchListEvent)
->>>>>>> Added blank event handler for (un)checking switch list items
 END_EVENT_TABLE()
 
 
