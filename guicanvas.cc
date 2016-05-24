@@ -74,7 +74,8 @@ void MyGLCanvas::Render(wxString example_text, int cycles) {
 
   if (cycles >= 0) {
     cyclesdisplayed = cycles;
-    cycle_no += cycles;
+    cycle_no = cycles; // cycle_no follows actual number of cycles when array vector is full and cycles displayed const.
+    // Todo: implement for limit on data vector
   }
 
   SetCurrent(*context);
@@ -285,7 +286,7 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 
   if (event.GetWheelRotation() < 0) {
     zoom = zoom * (1.0 - (double)event.GetWheelRotation()/(20*event.GetWheelDelta()));
-    if (zoom > 100) zoom = 100; // Max zoom 
+    if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom 
     text.Printf("Negative mouse wheel rotation, zoom now %f", zoom);
   }
   if (event.GetWheelRotation() > 0) {

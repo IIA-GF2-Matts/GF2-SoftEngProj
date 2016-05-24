@@ -395,7 +395,7 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
         }
     }
 
-    if (-1 == _mons->findmonitor(monSig.device.id, monSig.pin.id)) {
+    if (-1 != _mons->findmonitor(monSig.device.id, monSig.pin.id)) {
         // signal is already being monitored - warn
         _errs.report(mattwarning("Signal is already being monitored", monSig.device.at));
     }
@@ -418,6 +418,10 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
         } else if (!isBadSignal(aliSig)) {
             _errs.report(mattwarning(
                 "Alias signal name already exists as a device output in the network", aliSig.device.at));
+        } else if (-1 != _mons->findmonitor(monSig.device.id, monSig.pin.id, true)) {
+            // alias is already used, monitoring a diff signal
+            _errs.report(mattwarning(
+                "Alias name already exists, monitoring a different signal", aliSig.device.at));
         }
     }
 
