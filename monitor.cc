@@ -15,7 +15,7 @@ void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name
 {
   devlink d;
   outplink o;
-  ok = (mtab.used < maxmonitors);
+  ok = (mtab.size() < maxmonitors);
   if (ok) {
     d = netz->finddevice (dev);
     ok = (d != NULL);
@@ -23,11 +23,13 @@ void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name
       o = netz->findoutput (d, outp);
       ok = (o != NULL);
       if (ok) {
-        mtab.sigs[mtab.used].devid = dev;
-        mtab.sigs[mtab.used].op = o;
-        mtab.sigs[mtab.used].aliasDev = aliasDevice;
-        mtab.sigs[mtab.used].aliasPin = aliasOutp;
-        (mtab.used)++;
+        moninfo newmon;
+        newmon.devid = dev;
+        newmon.op = o;
+        newmon.aliasDev = aliasDevice;
+        newmon.aliasPin = aliasOutp;
+
+        mtab.push_back(newmon);
       }
     }
   }
@@ -44,17 +46,15 @@ void monitor::remmonitor (name dev, name outp, bool& ok)
 {
   int i, j;
   bool found;
-  ok = (mtab.used > 0);
+  ok = !mtab.empty();
   if (ok) {
     found = false;
-    for (i = 0; ((i < mtab.used) && (! found)); i++)
-      found = ((mtab.sigs[i].devid == dev) &&
-	       (mtab.sigs[i].op->id == outp));
+    for (i = 0; ((i < mtab.size()) && (! found)); i++)
+      found = ((mtab[i].devid == dev) &&
+         (mtab[i].op->id == outp));
     ok = found;
-    if (found) {
-      (mtab.used)--;
-      for(j = (i-1); j < mtab.used; j++)
-	mtab.sigs[j] = mtab.sigs[j + 1];
+    if (found) { // Remove the monitor
+      mtab.erase(mtab.begin() + i);
     }
   }
 }
@@ -67,7 +67,7 @@ void monitor::remmonitor (name dev, name outp, bool& ok)
  */
 int monitor::moncount (void)
 {
-  return (mtab.used);
+  return (mtab.size());
 }
 
 
@@ -78,7 +78,13 @@ int monitor::moncount (void)
  */
 asignal monitor::getmonsignal (int n)
 {
-  return (mtab.sigs[n].op->sig);
+  return getmonsignal(mtab[n]);
+}
+
+asignal monitor::getmonsignal(moninfo& mon) {
+  if (!mon.op) return floating;
+
+  return mon.op->sig;
 }
 
 
@@ -89,14 +95,19 @@ asignal monitor::getmonsignal (int n)
  */
 void monitor::getmonname (int n, name& dev, name& outp)
 {
+  getmonname(mtab[n], dev, outp);
+}
+
+void monitor::getmonname (moninfo& mon, name& dev, name& outp)
+{
   // Check for alias
-  if (mtab.sigs[n].aliasDev != blankname) {
-    dev = mtab.sigs[n].aliasDev;
-    outp = mtab.sigs[n].aliasPin;
+  if (mon.aliasDev != blankname) {
+    dev = mon.aliasDev;
+    outp = mon.aliasPin;
   }
   else {
-    dev = mtab.sigs[n].devid;
-    outp = mtab.sigs[n].op->id;
+    dev = mon.devid;
+    outp = mon.op->id;
   }
 }
 
@@ -108,7 +119,9 @@ void monitor::getmonname (int n, name& dev, name& outp)
  */
 void monitor::resetmonitor (void)
 {
-  cycles = 0;
+  for (auto it : mtab) {
+    it.sig.clear();
+  }
 }
 
 
@@ -120,10 +133,8 @@ void monitor::resetmonitor (void)
  */
 void monitor::recordsignals (void)
 {
-  int n;
-  for (n = 0; n < moncount (); n++)
-    disp[n][cycles] = getmonsignal(n);
-  cycles++;
+  for (auto m : mtab)
+    m.sig.push_back(getmonsignal(m));
 }
 
 /***********************************************************************
@@ -134,8 +145,8 @@ void monitor::recordsignals (void)
  */
 bool monitor::getsignaltrace(int m, int c, asignal &s)
 {
-  if ((c < cycles) && (m < moncount ())) {
-    s = disp[m][c];
+  if ((m < moncount()) && (c < mtab[m].sig.size())) {
+    s = mtab[m].sig[c];
     return true;
   }
   return false;
@@ -152,27 +163,32 @@ void monitor::displaysignals (void)
   int n, i;
   name dev, outp;
   int namesize;
-  for (n = 0; n < moncount (); n++) {
-    getmonname (n, dev, outp);
-    namesize = nmz->namelength (dev);
+  for (auto mon : mtab) {
+
+    // Print monitor name
+    getmonname(mon, dev, outp);
+    namesize = nmz->namelength(dev);
     cout << nmz->namestr(dev);
     if (outp != blankname) {
       cout << "." << nmz->namestr(outp);
       namesize = namesize + nmz->namelength(outp) + 1;
     }
+
     if ((margin - namesize) > 0) {
       for (i = 0; i < (margin - namesize - 1); i++)
         cout << " ";
       cout << ":";
     }
-    for (i = 0; i < cycles; i++)
-      switch (disp[n][i]) {
+
+    for (auto i : mon.sig) {
+      switch (i) {
         case high:    cout << "-"; break;
         case low:     cout << "_"; break;
         case rising:  cout << "/"; break;
         case falling: cout << "\\"; break;
         case floating: cout << "?"; break;
       }
+    }
     cout << endl;
   }
 }
@@ -195,5 +211,14 @@ monitor::monitor (names* names_mod, network* network_mod)
 {
   nmz = names_mod;
   netz = network_mod;
-  mtab.used = 0;
+  mtab.clear();
+}
+
+
+/***********************************************************************
+ *
+ * Clears up resources used by monitor
+ *
+ */
+monitor::~monitor() {
 }
