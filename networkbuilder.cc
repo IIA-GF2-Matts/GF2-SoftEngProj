@@ -236,7 +236,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 prevval << *dl->id;
 
                 if (ol->id != blankname)
-                    prevval << *ol->id;
+                    prevval << "." << *ol->id;
                 getPredefinedError(dvl, keyTok.id, prevval.str(), warnoss, noteoss);
                 _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
                 _errs.report(mattnote(noteoss.str(), il->definedAt));
