@@ -338,3 +338,21 @@ void MyGLCanvas::drawText(wxString text, int pos_x, int pos_y, void* font) {
 void MyGLCanvas::setLineColour(float RGB[3]) {
   glColor3f(RGB[0], RGB[1], RGB[2]);
 }
+
+void MyGLCanvas::colourSelector(int colourInd) {
+  float traceColours[3][3] = {
+    {0.32, 0.55, 0.87},       // Cool blue
+    {0.00, 0.90, 0.00},       // Retro Green
+    {0.00, 0.00, 0.00}        // Simple B+W
+  };
+  float axisColours[3][3] = {
+    {0.58, 0.59, 0.60},       // Cool blue
+    {0.40, 0.40, 0.40},       // Retro Green
+    {0.50, 0.50, 0.50}        // Simple B+W
+  };
+  float backColours[3][3] = {
+    {0.21, 0.21, 0.21},       // Cool blue
+    {0.15, 0.15, 0.15},       // Retro Green
+    {1.00, 1.00, 1.00}        // Simple B+W
+  };
+}

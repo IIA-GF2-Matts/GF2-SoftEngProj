@@ -49,6 +49,7 @@ void setNetwork(monitor* mmz, names* nmz);
   void titleScreen();
   void setLineColour(float RGB[3]);
   void drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing);
+  void colourSelector(int colourInd);
 
 
   void InitGL();                     // function to initialise OpenGL context
