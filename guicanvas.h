@@ -50,7 +50,7 @@ void setNetwork(monitor* mmz, names* nmz);
   bool on_title;                     // stores whether system state is on title screen
   bool zoom_changed;                 // stores whether the zoom has been changed since previous Render
 
-  void drawText(wxString text, int pos_x, int pos_y, void* font);
+  void drawText(wxString text, int pos_x, int pos_y, void* font, int line_spacing = 18);
   void titleScreen(wxString message_text);
   void setLineColour(float RGB[3]);
   void drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing);

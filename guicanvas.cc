@@ -52,13 +52,8 @@ void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
 void MyGLCanvas::Render(int cycles) {
   // Main function for drawing to the GUI GL Canvas
 
-  int x, y;
-  unsigned int j, k;
+  unsigned int j;
   asignal s;
-  name mon_name_dev;
-  name mon_name_pin;
-  wxString mon_name_text;
-
 
   if (cycles >= 0) {
     cyclesdisplayed = cycles;
@@ -77,13 +72,15 @@ void MyGLCanvas::Render(int cycles) {
   GetClientSize(&w, &h);
   int end_width = w - end_gap;
 
+  // if any cycles have been run and at least one monitor display plots else display title screen.
+  // Todo: once able to delete monitors title screen with no monitors may not make sense?
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) {
-    
-    wxASSERT_MSG((mmz->moncount() == order.size()), "Conflicting number of monitors");
+    // Assert to ensure that order is correct.
+    wxASSERT_MSG((mmz->moncount() == order.size()), "Conflicting number of monitors, this shouldn't happen.");
 
-    on_title = false;
+    on_title = false;           // enables zoom and pan controls.
     if ((int)(cyclesdisplayed/zoom) == 0)
-      cycles_on_screen = 1;
+      cycles_on_screen = 1;     // fix for floating point error with 1 cycle, high zoom.
     else
       cycles_on_screen = cyclesdisplayed / zoom;
     dx = (float)(end_width - label_width) / cycles_on_screen; // dx between points
@@ -104,7 +101,6 @@ void MyGLCanvas::Render(int cycles) {
     // x axis number spacing
     int num_spacing = (1 + cycles_on_screen/20) * to_string(cycle_no).length()/2;
 
-
     // draw each plot
     for (j = 0; j<mmz->moncount(); j++) {
       drawPlot(s, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
@@ -119,6 +115,8 @@ void MyGLCanvas::Render(int cycles) {
 
 
   } else { // draw title screen
+    on_title = true;
+    pan_y = 0;
     titleScreen("Select 'file' -> 'open' to begin...");
   }
 
@@ -139,16 +137,20 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   // draw x axis
   setLineColour(lines_RGB);
   glBegin(GL_LINE_STRIP);
+  // set axis height
   y = h - (plot_num+1)*plot_height - dy;
+  // draw x axis line
   glVertex2f(label_width-5, y);
   glVertex2f(end_width, y);
   glEnd();
   for (i=zoomrange[0]; i<=zoomrange[1]; i++) {
     x = dx*(i-zoomrange[0]) + label_width;
+    // draw axis ticks
     glBegin(GL_LINE_STRIP);
     glVertex2f(x, y-3);
     glVertex2f(x, y+3);
     glEnd();
+    // draw axis numbers
     if (i%num_spacing == 0){
       drawText(to_string(i+cycle_no-cyclesdisplayed), x-4, y-12, GLUT_BITMAP_HELVETICA_10);
     }
@@ -170,17 +172,19 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   }
   glEnd();
   glLineWidth(1.0);
+
   // draw text label
   name mon_name_dev, mon_name_pin;
   wxString mon_name_text;
-
-  glRasterPos2f(10, h - 5 - (plot_num+1)*plot_height);
+  // get monitor name indices
   mmz->getmonname(order[plot_num], mon_name_dev, mon_name_pin);
+  // get name text and combine with "."
   mon_name_text = mon_name_dev ->c_str();
   if (mon_name_pin != blankname) {
     mon_name_text += ".";
     mon_name_text += mon_name_pin ->c_str();
   }
+  // draw name
   drawText(mon_name_text, 10, h-5-(plot_num+1)*plot_height, GLUT_BITMAP_HELVETICA_12);
   
 }
@@ -202,7 +206,6 @@ void MyGLCanvas::InitGL()
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslated(0.0, pan_y, 0.0);
-  // glScaled(zoom, 1, 1);
 }
 
 void MyGLCanvas::OnPaint(wxPaintEvent& event)
@@ -225,7 +228,9 @@ void MyGLCanvas::OnSize(wxSizeEvent& event)
 void MyGLCanvas::OnMouse(wxMouseEvent& event)
   // Event handler for mouse events inside the GL canvas
 {
-  wxString text;
+  // title screen disables mouse controls
+  if (on_title) return;
+
   int w, h;;
   static int last_x, last_y;
 
@@ -235,29 +240,29 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     last_y = event.m_y;
   }
   if (event.Dragging()) {
-    if (!on_title){
-      // x panning
-      pan_x += last_x - event.m_x;
-      // check for scrolling off left
-      if (pan_x < 0) pan_x = 0;
-      // check for scrolling off right
-      int max_pan = (cyclesdisplayed - cycles_on_screen)*dx + dx;
-      // + dx ensures that it can reach last value in all situations.
-      // second check is performed when setting zoomrange. Both these tests combined ensure that the pan value cannot get
-      // too high and that can always reach the last value and not get further.
-      if (pan_x > max_pan)       
-        pan_x = max_pan;
+    // x panning
+    pan_x += last_x - event.m_x;
+    // check for scrolling off left
+    if (pan_x < 0) pan_x = 0;
+    // check for scrolling off right
+    int max_pan = (cyclesdisplayed - cycles_on_screen)*dx + dx;
+    // + dx ensures that it can reach last value in all situations.
+    // second check is performed when setting zoomrange in Render. Both these tests combined
+    // ensure that the pan value cannot get too high and that can always reach the last value 
+    // and not get further.
+    if (pan_x > max_pan)       
+      pan_x = max_pan;
 
-      // y panning
-      pan_y -= event.m_y - last_y;
-      // check for scrolling off bottom
-      if (pan_y > (mmz->moncount()+1)*plot_height - h) pan_y = (mmz->moncount()+1)*plot_height - h;
-      // check for scrolling off top
-      if (pan_y < 0) pan_y = 0;
-      last_x = event.m_x;
-      last_y = event.m_y;
-      init = false;
-    }
+    // y panning
+    pan_y -= event.m_y - last_y;
+    // check for scrolling off bottom
+    if (pan_y > (mmz->moncount()+1)*plot_height - h) pan_y = (mmz->moncount()+1)*plot_height - h;
+    // check for scrolling off top
+    if (pan_y < 0) pan_y = 0;
+
+    last_x = event.m_x;
+    last_y = event.m_y;
+    init = false;
   }
 
   if (event.GetWheelRotation() < 0) {
@@ -274,19 +279,22 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
   if (event.GetWheelRotation() || event.ButtonDown() || event.ButtonUp() || event.Dragging() || event.Leaving()) Render();
 }
 
+// Function to zoom in. Note that zoom in requires a negative value.
 void MyGLCanvas::zoomIn(double zoom_amount){
+  wxASSERT_MSG((zoom_amount < 0), "Input to zoomIn must be a negative amount.");
   zoom = zoom * (1 - zoom_amount);
   if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom
   Render();
 }
 
+// Function to zoom out. This requires a positive value. Fully is true to zoom out completely (defaults to false)
 void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
-  if (fully)
+  wxASSERT_MSG((zoom_amount > 0), "Input to zoomOut must be a positive value.");
+  double new_zoom = zoom / (1.0 + zoom_amount);
+  if (fully || zoom < 1)
     zoom = 1;
-  else {
-    zoom = zoom / (1.0 + zoom_amount);
-    if (zoom < 1) zoom = 1;     // Don't allow zoom out from full trace.
-  }
+  else 
+    zoom = new_zoom;
   Render();
 }
 
@@ -296,10 +304,13 @@ void MyGLCanvas::titleScreen(wxString message_text){
   int w, h;
   GetClientSize(&w, &h);
 
-  wxString title_text = "Welcome to MattLab Logic Simulator";
   setLineColour(trace_RGB);
+
+  // Draw title
+  wxString title_text = "Welcome to MattLab Logic Simulator";
   drawText(title_text, label_width/2, h-plot_height, GLUT_BITMAP_HELVETICA_18);
 
+  // Draw logo
   wxString logo =
     " _[]_[]_[]_[]_[]_[]_[]_[]_  \n"
     "|                         | \n"
@@ -308,16 +319,17 @@ void MyGLCanvas::titleScreen(wxString message_text){
     " `[]`[]`[]`[]`[]`[]`[]`[]`  ";
   drawText(logo, label_width/2, h-2*plot_height, GLUT_BITMAP_9_BY_15);
 
+  // Draw message
   drawText(message_text, label_width/2, 80, GLUT_BITMAP_HELVETICA_12);
 }
 
 
-
-void MyGLCanvas::drawText(wxString text, int pos_x, int pos_y, void* font) {
+// Draw text to screen. line_spacing for new line characters defaults to 18.
+void MyGLCanvas::drawText(wxString text, int pos_x, int pos_y, void* font, int line_spacing) {
   glRasterPos2f(pos_x, pos_y);
   for (int k=0; k<text.Len(); k++){
     if (text[k] == '\n'){
-      pos_y -= 18;                  // set up for title screen logo
+      pos_y -= line_spacing;
       glRasterPos2f(pos_x, pos_y);
     }
     else
@@ -329,6 +341,8 @@ void MyGLCanvas::setLineColour(float RGB[3]) {
   glColor3f(RGB[0], RGB[1], RGB[2]);
 }
 
+// allows colour scheme to be selected. Currently a bit of a pain to add new colours and not
+// the most efficient (could use pointers) but likely to be rarely changed.
 void MyGLCanvas::colourSelector(int colourInd) {
   float traceColours[4][3] = {
     {0.32, 0.55, 0.87},       // Cool blue
