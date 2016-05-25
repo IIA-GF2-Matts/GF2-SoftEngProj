@@ -93,8 +93,10 @@ void MyGLCanvas::Render(int cycles) {
     else 
       zoomrange[0] = pan_x / dx;
 
-    // stop from panning over end of screen.
-    if (zoomrange[0] + cycles_on_screen > cyclesdisplayed)
+    // stop from panning over either end of screen.
+    if (zoomrange[0] < 0)
+      zoomrange[0] = 0;
+    else if (zoomrange[0] + cycles_on_screen > cyclesdisplayed)
       zoomrange[0] = cyclesdisplayed - cycles_on_screen;
     zoomrange[1] = zoomrange[0] + cycles_on_screen;
 
@@ -289,7 +291,7 @@ void MyGLCanvas::zoomIn(double zoom_amount){
 
 // Function to zoom out. This requires a positive value. Fully is true to zoom out completely (defaults to false)
 void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
-  wxASSERT_MSG((zoom_amount > 0), "Input to zoomOut must be a positive value.");
+  wxASSERT_MSG((zoom_amount >= 0), "Input to zoomOut must be a positive value.");
   double new_zoom = zoom / (1.0 + zoom_amount);
   if (fully || zoom < 1)
     zoom = 1;
