@@ -79,6 +79,7 @@ class MyFrame: public wxFrame
   void OnAddMonitor(wxCommandEvent& event);     // Event handler for Add monitor button
   void OnMonitorUp(wxCommandEvent& event);
   void OnMonitorDown(wxCommandEvent& event);
+  void RefreshMonitors();
  
 
   void colourChange(int index);

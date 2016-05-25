@@ -173,45 +173,67 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
         return;
 
     // todo: update list.
-
-    monitorOrder.clear();
-    wxArrayString monitorItems;
-    wxArrayInt wxmonitorOrder;
-    std::ostringstream oss;
-    int n = 0, x;
+    
+    int x;
     bool ok;
     for (int i = 0; i < signals.size(); i++) {
         if (monitored[i]) {
-            oss.str("");
-            oss << nmz->namestr(signals[i].devicename);
-            if (signals[i].pinname != blankname) {
-                oss << "." << nmz->namestr(signals[i].pinname);
-            }
-
-            monitorItems.Add(oss.str());
-            wxmonitorOrder.Add(n);
-            monitorOrder.push_back(n);
-
             x = mmz->findmonitor(signals[i].devicename, signals[i].pinname);
             if (x == -1) {
                 mmz->makemonitor(signals[i].devicename, signals[i].pinname, ok, blankname, blankname);
-                std::cout << "Created monitor " << oss.str() << std::endl;
+                //std::cout << "Created monitor " << oss.str() << std::endl;
                 if (!ok) {
                     // Todo: Error message
                 }
             }
-            n++;
+        }
+    }
+    RefreshMonitors();
+}
+
+
+void MyFrame::RefreshMonitors() {
+
+    wxArrayString monitorItems;
+    wxArrayInt wxmonitorOrder;
+
+    monitorOrder.clear();
+    name D, P;
+    std::ostringstream oss;
+    int i;
+    for (int n = 0; n < mmz->moncount(); n++) {
+        mmz->getmonname(n, D, P);
+
+        oss.str("");
+        oss << nmz->namestr(D);
+        if (P != blankname) {
+            oss << "." << nmz->namestr(P);
+        }
+
+        monitorItems.Add(oss.str());
+        wxmonitorOrder.Add(n);
+        monitorOrder.push_back(n);
+
+        // check in the monitored table
+        // Todo: Not linear search.
+        mmz->getmonname(n, D, P, false);
+        for (i = 0; i < signals.size(); i++) {
+            if (D == signals[i].devicename && P == signals[i].pinname) {
+                monitored[i] = true;
+                break;
+            }
         }
     }
 
-    if (monitorOrder.size())
+    if (mmz->moncount())
         monitorlist->Reset(wxmonitorOrder, monitorItems);
     else
         monitorlist->Clear();
 
-    for (int i = 0; i < monitorOrder.size(); i++ ) {
+    for ( int i = 0; i < mmz->moncount(); i++ ) {
         monitorlist->Check(i, true);
     }
+    canvas->Render();
 }
 
 void MyFrame::OnMonitorUp(wxCommandEvent &event) {
@@ -393,51 +415,11 @@ void MyFrame::openFile(wxString file) {
     monitored.clear();
     monitored.resize(signals.size(), false);
 
-
     // Update controls
     runbutton->Enable(true);
 
     // Add monitors to list
-    wxArrayString monitorItems;
-    wxArrayInt wxmonitorOrder;
-
-    monitorOrder.clear();
-    name D, P;
-    std::ostringstream oss;
-    int i;
-    for (int n = 0; n < mmz->moncount(); n++) {
-        mmz->getmonname(n, D, P);
-
-        oss.str("");
-        oss << nmz->namestr(D);
-        if (P != blankname) {
-            oss << "." << nmz->namestr(P);
-        }
-
-        monitorItems.Add(oss.str());
-        wxmonitorOrder.Add(n);
-        monitorOrder.push_back(n);
-
-        // check in the monitored table
-        // Todo: Not linear search.
-        mmz->getmonname(n, D, P, false);
-        for (i = 0; i < signals.size(); i++) {
-            if (D == signals[i].devicename && P == signals[i].pinname) {
-                monitored[i] = true;
-                break;
-            }
-        }
-    }
-
-    if (mmz->moncount())
-        monitorlist->Reset(wxmonitorOrder, monitorItems);
-    else
-        monitorlist->Clear();
-
-    for ( int i = 0; i < mmz->moncount(); i++ ) {
-        monitorlist->Check(i, true);
-    }
-
+    RefreshMonitors();
 
     // Add switches to the list
     wxArrayString switchItems;
