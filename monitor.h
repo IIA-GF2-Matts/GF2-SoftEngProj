@@ -8,8 +8,8 @@
 #include "devices.h"
 #include "sourcepos.h"
 
-const int maxmonitors = 10;      /* max number of monitor points */
-const int maxcycles = 100;        /* max number of cycles per run */
+const int maxmonitors = 1000;      /* max number of monitor points */
+const int maxcycles = 100000;        /* max number of cycles per run */
 
 
 struct moninfo {
@@ -31,8 +31,11 @@ class monitor {
   monitortable mtab;                 // table of monitored signals
 
  public:
-  const SourcePos& getdefinedpos(int n) const;
-  const SourcePos& getdefinedpos(const moninfo& m) const;
+  outplink getoutplink(int n);
+    /* Returns the output link associated with this monitor                */
+
+  SourcePos& getdefinedpos(int n);
+  SourcePos& getdefinedpos(moninfo& m);
     /* Gets the definedAt property of monitor n                            */
 
   void makemonitor (name dev, name outp, bool& ok

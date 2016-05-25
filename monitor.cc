@@ -5,17 +5,25 @@
 using namespace std;
 
 
+/***********************************************************************
+ *
+ * Gets the op property of monitor n
+ *
+ */
+outplink monitor::getoutplink(int n) {
+  return mtab[n].op;
+}
 
 /***********************************************************************
  *
  * Gets the definedAt property of monitor n
  *
  */
-const SourcePos& monitor::getdefinedpos(int n) const {
+SourcePos& monitor::getdefinedpos(int n) {
   return getdefinedpos(mtab.at(n));
 }
 
-const SourcePos& monitor::getdefinedpos(const moninfo& m) const {
+SourcePos& monitor::getdefinedpos(moninfo& m) {
   return m.definedAt;
 }
 
