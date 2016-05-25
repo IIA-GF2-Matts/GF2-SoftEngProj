@@ -37,7 +37,7 @@ bool parser::readin() {
                 _scan = _scan->parent;
                 delete old;
             }
-            else 
+            else
                 break;
         }
 
@@ -104,7 +104,7 @@ void parser::parseStatement(Token& tk) {
             parseDefineMonitor(tk);
 
             break;
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
         case TokType::IncludeKeyword:
             stepAndPeek(tk);
             parseInclude(tk);
@@ -116,7 +116,7 @@ void parser::parseStatement(Token& tk) {
 }
 
 
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
 
 /// include = "include" , string , ";" ;
 void parser::parseInclude(Token& tk) {
@@ -168,23 +168,41 @@ void parser::parseDefineDevice(Token& tk) {
 
         stepAndPeek(tk);
 
-        if (tk.type != TokType::DeviceType) {
-            std::ostringstream oss;
-            oss << "Expected device type";
-            if (tk.type == TokType::Identifier) {
-                // get the closest match input and display a suggestion
-                oss << ". ";
-                getClosestMatchError(_nms->namestr(tk.id), devicesset, oss);
-            } else {
-                // user got it hopelessly wrong
-                oss << " such as CLOCK, SWITCH, NAND or others (see documentation).";
+#ifdef EXPERIMENTAL
+        if (tk.type == TokType::IncludeKeyword) {
+            // dev DN = include "file";
+            stepAndPeek(tk);
+
+            if (tk.type != TokType::String) {
+                throw mattsyntaxerror("Expected a string file name to include.", tk.at);
             }
-            throw mattsyntaxerror(oss.str(), tk.at);
+
+            netbuild.importDevice(nameToken, tk);
+
+            stepAndPeek(tk);
         }
+        else {
+#endif
+            if (tk.type != TokType::DeviceType) {
+                std::ostringstream oss;
+                oss << "Expected device type";
+                if (tk.type == TokType::Identifier) {
+                    // get the closest match input and display a suggestion
+                    oss << ". ";
+                    getClosestMatchError(_nms->namestr(tk.id), devicesset, oss);
+                } else {
+                    // user got it hopelessly wrong
+                    oss << " such as CLOCK, SWITCH, NAND or others (see documentation).";
+                }
+                throw mattsyntaxerror(oss.str(), tk.at);
+            }
 
-        netbuild.defineDevice(nameToken, tk);
+            netbuild.defineDevice(nameToken, tk);
 
-        stepAndPeek(tk);
+            stepAndPeek(tk);
+#ifdef EXPERIMENTAL
+        }
+#endif
     }
 
     parseData(tk, nameToken);

@@ -48,7 +48,7 @@ private:
     /// statement = definedevice | definemonitor ;
     void parseStatement(Token& tk);
 
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
     /// include = "include" , string , ";" ;
     void parseInclude(Token& tk);
 #endif
