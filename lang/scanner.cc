@@ -5,10 +5,10 @@
 #include <sstream>
 #include <string>
 
-#include "names.h"
-#include "iposstream.h"
-#include "errorhandler.h"
-#include "network.h"
+#include "../com/names.h"
+#include "../com/iposstream.h"
+#include "../com/errorhandler.h"
+#include "../sim/network.h"
 
 #include "scanner.h"
 

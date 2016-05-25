@@ -1,13 +1,14 @@
 
-
+#include <string>
+#include <sstream>
 #include <wx/wx.h>
 #include <wx/statbmp.h>
 #include <wx/artprov.h>
 #include <wx/textctrl.h>
-#include <string>
-#include <sstream>
+
 #include "guierrordialog.h"
-#include "errorhandler.h"
+#include "../com/errorhandler.h"
+
 
 ErrorDialog::ErrorDialog(wxWindow* parent,
         wxWindowID id,

@@ -5,13 +5,14 @@
 
 #include <ostream>
 
-#include "parser.h"
-#include "names.h"
+#include "../com/names.h"
+#include "../com/errorhandler.h"
+#include "../sim/network.h"
+#include "../sim/devices.h"
+#include "../sim/monitor.h"
+
 #include "scanner.h"
-#include "network.h"
-#include "devices.h"
-#include "monitor.h"
-#include "errorhandler.h"
+#include "parser.h"
 
 
 typedef enum {

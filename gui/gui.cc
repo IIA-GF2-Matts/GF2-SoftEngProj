@@ -1,21 +1,24 @@
 
-#include "gui.h"
-#include "guicanvas.h"
-#include "logo32.xpm"
-#include "scanner.h"
-#include "parser.h"
 #include <sstream>
 #include <algorithm>
+#include <iostream>
 #include <wx/filedlg.h>
+
+#include "../lang/scanner.h"
+#include "../lang/parser.h"
+
 #include "guierrordialog.h"
 #include "rearrangectrl_matt.h"
 #include "guimonitordialog.h"
+#include "guicanvas.h"
 
-#include <iostream>
+#include "gui.h"
+#include "logo32.xpm"
 
 using namespace std;
 
-#include "guicanvas.cc"
+// Note: Needs to be included here to work for some unknown reason
+#include "guicanvas.inc"
 
 // MyFrame ///////////////////////////////////////////////////////////////////////////////////////
 
@@ -42,8 +45,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(wxID_ADD, MyFrame::OnAddMonitor)
     EVT_BUTTON(wxID_UP, MyFrame::OnMonitorUp)
     EVT_BUTTON(wxID_DOWN, MyFrame::OnMonitorDown)
-    
-    
+
+
     EVT_CHECKLISTBOX(MY_SWITCH_LIST_ID, MyFrame::OnSwitchListEvent)
 END_EVENT_TABLE()
 
@@ -199,7 +202,7 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
         return;
 
     // todo: update list.
-    
+
     int x;
     bool ok;
     for (int i = 0; i < signals.size(); i++) {

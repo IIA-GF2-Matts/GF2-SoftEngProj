@@ -9,13 +9,13 @@
 #include <sstream>
 #include <set>
 
-#include "names.h"
-#include "scanner.h"
-#include "network.h"
-#include "devices.h"
-#include "monitor.h"
-#include "errorhandler.h"
+#include "../com/names.h"
+#include "../com/errorhandler.h"
+#include "../sim/network.h"
+#include "../sim/devices.h"
+#include "../sim/monitor.h"
 
+#include "scanner.h"
 
 /// Signal struct, representing a DEVICE.PIN pair.
 struct Signal {

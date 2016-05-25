@@ -4,15 +4,16 @@
 #include <sstream>
 #include <set>
 
-#include "parser.h"
-#include "names.h"
+#include "../com/names.h"
+#include "../com/errorhandler.h"
+#include "../com/autocorrect.h"
+#include "../sim/network.h"
+#include "../sim/devices.h"
+#include "../sim/monitor.h"
+#include "../sim/importeddevice.h"
+
 #include "scanner.h"
-#include "network.h"
-#include "devices.h"
-#include "monitor.h"
-#include "errorhandler.h"
-#include "autocorrect.h"
-#include "importeddevice.h"
+#include "parser.h"
 
 #include "networkbuilder.h"
 

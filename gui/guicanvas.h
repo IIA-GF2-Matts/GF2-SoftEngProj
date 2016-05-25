@@ -1,13 +1,12 @@
 
-
 #ifndef GF2_GUICANVAS_H
 #define GF2_GUICANVAS_H
 
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 
-#include "monitor.h"
-#include "names.h"
+#include "../sim/monitor.h"
+#include "../com/names.h"
 
 
 class MyGLCanvas: public wxGLCanvas
@@ -23,7 +22,7 @@ class MyGLCanvas: public wxGLCanvas
   void colourSelector(int colourInd);
   void resetCycles();
   std::vector<int>& order;
-  
+
 void setNetwork(monitor* mmz, names* nmz);
  private:
   wxGLContext *context;              // OpenGL rendering context

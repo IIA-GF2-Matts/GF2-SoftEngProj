@@ -1,8 +1,9 @@
-#include "devices.h"
+
 #include <iostream>
 #include <string>
-#include "names.h"
+#include "../com/names.h"
 #include "importeddevice.h"
+#include "devices.h"
 
 using namespace std;
 

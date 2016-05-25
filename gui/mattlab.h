@@ -1,12 +1,13 @@
 
-
 #include <wx/wx.h>
 
-#include "names.h"
-#include "devices.h"
-#include "monitor.h"
-#include "network.h"
-#include "parser.h"
+#include "../com/names.h"
+#include "../sim/devices.h"
+#include "../sim/monitor.h"
+#include "../sim/network.h"
+#include "../lang/scanner.h"
+#include "../lang/parser.h"
+
 
 #ifndef logsim_h
 #define logsim_h

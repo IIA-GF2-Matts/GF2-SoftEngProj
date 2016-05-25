@@ -1,9 +1,11 @@
 
-#include "guicanvas.h"
 #include <GL/glut.h>
-#include "names.h"
-#include "monitor.h"
 #include <iostream>
+
+#include "../com/names.h"
+#include "../sim/monitor.h"
+
+#include "guicanvas.h"
 
 // MyGLCanvas ////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +91,7 @@ void MyGLCanvas::Render(int cycles) {
       pan_x = zoomrange[0] * dx;
       zoom_changed = false;
     }
-    else 
+    else
       zoomrange[0] = pan_x / dx;
 
     // stop from panning over either end of screen.
@@ -136,13 +138,13 @@ void MyGLCanvas::Render(int cycles) {
 
 
 void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing){
-  
+
   int w, h;
   GetClientSize(&w, &h);
   int end_width = w - end_gap;
   int x, y;
   int i;
-  
+
   // draw x axis
   setLineColour(lines_RGB);
   glBegin(GL_LINE_STRIP);
@@ -165,7 +167,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
     }
 
   }
-  
+
   // draw trace
   int signal_y;
   setLineColour(trace_RGB);
@@ -195,7 +197,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   }
   // draw name
   drawText(mon_name_text, 10, h-5-(plot_num+1)*plot_height, GLUT_BITMAP_HELVETICA_12);
-  
+
 }
 
 
@@ -257,9 +259,9 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
     int max_pan = (cyclesdisplayed - cycles_on_screen)*dx + dx;
     // + dx ensures that it can reach last value in all situations.
     // second check is performed when setting zoomrange in Render. Both these tests combined
-    // ensure that the pan value cannot get too high and that can always reach the last value 
+    // ensure that the pan value cannot get too high and that can always reach the last value
     // and not get further.
-    if (pan_x > max_pan)       
+    if (pan_x > max_pan)
       pan_x = max_pan;
 
     // y panning
@@ -302,13 +304,13 @@ void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
   double new_zoom = zoom / (1.0 + zoom_amount);
   if (fully || zoom < 1)
     zoom = 1;
-  else 
+  else
     zoom = new_zoom;
   Render();
 }
 
 void MyGLCanvas::titleScreen(wxString message_text){
-  
+
   on_title = true;
   int w, h;
   GetClientSize(&w, &h);

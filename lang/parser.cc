@@ -4,10 +4,11 @@
 #include <set>
 #include <iterator>
 
-#include "errorhandler.h"
+#include "../com/errorhandler.h"
+#include "../com/names.h"
+#include "../com/autocorrect.h"
+
 #include "scanner.h"
-#include "names.h"
-#include "autocorrect.h"
 
 #include "parser.h"
 

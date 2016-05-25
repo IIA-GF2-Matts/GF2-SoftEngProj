@@ -1,9 +1,9 @@
 
 
-#include <wx/wx.h>
 #include <string>
 #include <sstream>
 #include <vector>
+#include <wx/wx.h>
 #include "guimonitordialog.h"
 
 

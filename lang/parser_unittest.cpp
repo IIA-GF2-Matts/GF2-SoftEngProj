@@ -6,10 +6,11 @@
 #include <sstream>
 #include <ostream>
 #include <vector>
-#include "errorhandler.h"
+
+#include "../com/names.h"
+#include "../com/errorhandler.h"
+#include "../sim/network.h"
 #include "scanner.h"
-#include "names.h"
-#include "network.h"
 
 #include "networkbuilder.h"
 
@@ -29,7 +30,7 @@ struct Action {
     namestring name3;
     namestring name4;
     devicekind devknd;
-    int valnum;    
+    int valnum;
 };
 
 
@@ -160,7 +161,7 @@ public:
         return Token(tktype, num);
     }
     Token genToken(TokType tktype, namestring str) {
-        if (tktype == DeviceType) 
+        if (tktype == DeviceType)
             return Token(DeviceType, dmz->devkind(nmz->lookup(str)));
         else
             return Token(tktype, nmz->lookup(str));
@@ -173,7 +174,7 @@ std::vector<Token> ParserTest::_tkstream;
 
 
 
-/// Dummy network builder to accept parser output 
+/// Dummy network builder to accept parser output
 networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc)
     : _netz(netz), _devz(devz), _mons(mons), _nms(nms), _errs(errc) {
 }
@@ -185,19 +186,19 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
     ParserTest::pushAction(ac);
 }
 
-void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok) { 
+void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok) {
     Action ac = getSetOptionAction(_nms->namestr(devName.id), _nms->namestr(keyTok.id), valTok.number, _nms->namestr(valTok.id));
     ParserTest::pushAction(ac);
 }
 
-void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSig) { 
+void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSig) {
     Action ac = getSetOptionAction(_nms->namestr(devName.id), _nms->namestr(keyTok.id), _nms->namestr(valSig.device.id), _nms->namestr(valSig.pin.id));
     ParserTest::pushAction(ac);
 }
 
 void networkbuilder::defineMonitor(Signal& monSig) {
     Signal aliSig;
-    defineMonitor(monSig, aliSig);    
+    defineMonitor(monSig, aliSig);
 }
 
 void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {

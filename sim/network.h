@@ -2,9 +2,9 @@
 #define network_h
 
 #include <vector>
-#include "names.h"
-#include "sourcepos.h"
-#include "errorhandler.h"
+#include "../com/names.h"
+#include "../com/sourcepos.h"
+#include "../com/errorhandler.h"
 
 struct importeddevice;
 

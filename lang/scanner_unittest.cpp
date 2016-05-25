@@ -5,10 +5,10 @@
 #include <string>
 #include <sstream>
 #include <ostream>
-#include "errorhandler.h"
-#include "names.h"
-#include "network.h"
-#include "devices.h"
+#include "../com/names.h"
+#include "../com/errorhandler.h"
+#include "../sim/network.h"
+#include "../sim/devices.h"
 
 
 /*
@@ -131,7 +131,7 @@ class ScannerTest : public ::testing::Test {
         return Token(tktype, num);
     }
     Token genToken(TokType tktype, namestring str) {
-        if (tktype == DeviceType) 
+        if (tktype == DeviceType)
             return Token(DeviceType, dmz->devkind(nmz->lookup(str)));
         else
             return Token(tktype, nmz->lookup(str));

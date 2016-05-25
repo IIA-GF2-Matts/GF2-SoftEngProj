@@ -1,8 +1,9 @@
+
 #include <iostream>
 #include <sstream>
+#include "../com/sourcepos.h"
+#include "../com/errorhandler.h"
 #include "network.h"
-#include "sourcepos.h"
-#include "errorhandler.h"
 #include "importeddevice.h"
 
 using namespace std;

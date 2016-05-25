@@ -5,17 +5,16 @@
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
 #include <wx/checklst.h>
-//#include <wx/rearrangectrl.h>
-#include "rearrangectrl_matt.h"
 #include <wx/arrstr.h>
 #include <wx/statbox.h>
 // #include <wx/arrint.h>
 #include <vector>
 
-#include "names.h"
-#include "devices.h"
-#include "monitor.h"
+#include "../com/names.h"
+#include "../sim/devices.h"
+#include "../sim/monitor.h"
 
+#include "rearrangectrl_matt.h"
 #include "guicanvas.h"
 
 
@@ -42,7 +41,7 @@ class MyFrame: public wxFrame
  public:
   MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size,
 	  long style = wxDEFAULT_FRAME_STYLE); // constructor
-  
+
   void openFile(wxString fname);          // Opens a .matt file
  private:
   MyGLCanvas *canvas;                     // OpenGL drawing area widget to draw traces
@@ -77,7 +76,7 @@ class MyFrame: public wxFrame
   void OnContinueButton(wxCommandEvent &event);   // event handler for continue button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
-  
+
   void OnZoomIn(wxCommandEvent& event);     // event handler for zooming in
   void OnZoomOut(wxCommandEvent& event);     // event handler for zooming out
   void OnZoomReset(wxCommandEvent& event);     // event handler for resetting zooming
@@ -87,8 +86,12 @@ class MyFrame: public wxFrame
   void OnMonitorUp(wxCommandEvent& event);
   void OnMonitorDown(wxCommandEvent& event);
   void RefreshMonitors();
- 
+<<<<<<< 3c2e913bd380e85a5d1bb7dd3e25e1fcc1ed6760:gui.h
+
   void toggleButtonsEnabled(bool enabled);
+=======
+
+>>>>>>> Reorganised project into folders.:gui/gui.h
 
   void colourChange(int index);
   void OnColourBlue(wxCommandEvent& event);

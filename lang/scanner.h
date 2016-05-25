@@ -5,9 +5,9 @@
 #include <sstream>
 #include <map>
 
-#include "iposstream.h" // SourcePos
-#include "names.h" // namestring
-#include "network.h"
+#include "../com/iposstream.h" // SourcePos
+#include "../com/names.h" // namestring
+#include "../sim/network.h"
 
 
 #ifndef GF2_SCANNER_H

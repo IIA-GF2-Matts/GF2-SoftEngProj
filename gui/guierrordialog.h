@@ -2,9 +2,9 @@
 #ifndef GF2_GUIERRORDIALOG_H
 #define GF2_GUIERRORDIALOG_H
 
-#include <wx/wx.h>
 #include <string>
-#include "errorhandler.h"
+#include <wx/wx.h>
+#include "../com/errorhandler.h"
 
 
 class ErrorDialog: public wxDialog {
@@ -18,5 +18,6 @@ private:
     bool process_ = false;
     wxTextCtrl* nameTextCtrl_;
 };
+
 
 #endif /* GF2_GUIERRORDIALOG_H */

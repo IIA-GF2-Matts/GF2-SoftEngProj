@@ -4,8 +4,8 @@
 #include <map>
 #include <string>
 
-#include "scanner.h"
-#include "parser.h"
+#include "../lang/scanner.h"
+#include "../lang/parser.h"
 
 #include "importeddevice.h"
 

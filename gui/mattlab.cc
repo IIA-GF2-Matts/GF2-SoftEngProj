@@ -1,8 +1,7 @@
-#include "mattlab.h"
-
 
 #include "gui.h"
-#include <GL/glut.h>
+
+#include "mattlab.h"
 
 
 IMPLEMENT_APP(MyApp)

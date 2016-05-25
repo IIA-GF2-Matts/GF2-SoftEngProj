@@ -1,9 +1,11 @@
+
 #include <iostream>
-#include "userint.h"
 #include <cctype>
 
-#include "scanner.h"
-#include "errorhandler.h"
+#include "../lang/scanner.h"
+#include "../com/errorhandler.h"
+
+#include "userint.h"
 
 using namespace std;
 

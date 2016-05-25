@@ -5,11 +5,11 @@
 
 #include <vector>
 
-#include "names.h"
+#include "../com/names.h"
+#include "../com/errorhandler.h"
 #include "network.h"
-#include "errorhandler.h"
-// #include "devices.h"
-// #include "monitor.h"
+// #include "../sim/devices.h"
+// #include "../sim/monitor.h"
 class devices;
 class monitor;
 

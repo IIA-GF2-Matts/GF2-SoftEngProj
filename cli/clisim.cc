@@ -1,12 +1,13 @@
 
 #include <iostream>
 
-#include "names.h"
-#include "network.h"
-#include "devices.h"
-#include "monitor.h"
-#include "scanner.h"
-#include "parser.h"
+#include "../com/names.h"
+#include "../sim/network.h"
+#include "../sim/devices.h"
+#include "../sim/monitor.h"
+#include "../lang/scanner.h"
+#include "../lang/parser.h"
+
 #include "userint.h"
 
 
@@ -35,7 +36,7 @@ int main(int argc, char const *argv[]) {
         std::cerr << "File not found:      " << argv[1] << std::endl;
         exit(1);
     }
-    
+
     // delete smz;
     delete mmz;
     delete dmz;

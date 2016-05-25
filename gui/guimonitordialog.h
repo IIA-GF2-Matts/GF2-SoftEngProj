@@ -2,16 +2,16 @@
 #ifndef GF2_GUIMONITORDIALOG_H
 #define GF2_GUIMONITORDIALOG_H
 
-#include <wx/wx.h>
 #include <string>
+#include <wx/wx.h>
 
-#include "network.h"
-#include "names.h"
+#include "../sim/network.h"
+#include "../com/names.h"
 
 
 class MonitorDialog: public wxDialog {
 public:
-    MonitorDialog(wxWindow* parent, wxWindowID id, names* nmz, 
+    MonitorDialog(wxWindow* parent, wxWindowID id, names* nmz,
     	const std::vector<outputsignal>& signals, std::vector<bool>& monitored);
     virtual ~MonitorDialog();
     void onOk(wxCommandEvent& pEvent);
@@ -26,5 +26,6 @@ private:
 
     bool process_ = false;
 };
+
 
 #endif /* GF2_GUIMONITORDIALOG_H */

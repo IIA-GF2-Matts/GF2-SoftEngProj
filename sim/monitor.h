@@ -1,12 +1,13 @@
+
 #ifndef monitor_h
 #define monitor_h
 
 #include <vector>
 
-#include "names.h"
+#include "../com/names.h"
+#include "../com/sourcepos.h"
 #include "network.h"
 #include "devices.h"
-#include "sourcepos.h"
 
 const int maxmonitors = 1000;      /* max number of monitor points */
 const int maxcycles = 100000;        /* max number of cycles per run */

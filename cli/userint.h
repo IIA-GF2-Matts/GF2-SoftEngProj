@@ -1,11 +1,12 @@
 #ifndef userint_h
 #define userint_h
 
-#include "names.h"
-#include "network.h"
-#include "devices.h"
-#include "monitor.h"
 #include <set>
+
+#include "../com/names.h"
+#include "../sim/network.h"
+#include "../sim/devices.h"
+#include "../sim/monitor.h"
 
 using namespace std;
 

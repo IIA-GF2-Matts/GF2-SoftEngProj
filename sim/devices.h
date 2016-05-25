@@ -3,10 +3,11 @@
 
 #include <string>
 
-#include "names.h"
+#include "../com/names.h"
+#include "../com/sourcepos.h"
+#include "../com/errorhandler.h"
 #include "network.h"
-#include "sourcepos.h"
-#include "errorhandler.h"
+
 
 class devices{
   names* nmz;      // the version of the names module we use.
