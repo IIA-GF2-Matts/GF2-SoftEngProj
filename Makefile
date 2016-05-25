@@ -3,11 +3,14 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 GUICXX = $(shell wx-config --version=3.0 --cxx)
 CLICXX = g++
 
+#-DEXPERIMENTAL
 FLAGS = -std=c++11 -g
 GUIFLAGS = -DUSE_GUI `wx-config --version=3.0 --cxxflags`
 GUILINKFLAGS = `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)
 
-SRC = names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc iposstream.cc cistring.cc errorhandler.cc sourcepos.cc autocorrect.cc networkbuilder.cc
+SRC = names.cc scanner.cc network.cc parser.cc monitor.cc devices.cc iposstream.cc \
+		cistring.cc errorhandler.cc sourcepos.cc autocorrect.cc networkbuilder.cc \
+		importeddevice.cc
 GUISRC = gui.cc guierrordialog.cc mattlab.cc rearrangectrl_matt.cc guimonitordialog.cc
 CLISRC = userint.cc clisim.cc
 
