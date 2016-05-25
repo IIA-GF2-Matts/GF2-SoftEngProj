@@ -69,6 +69,7 @@ void MonitorDialog::onOk(wxCommandEvent& WXUNUSED(pEvent)) {
         _monitor[n] = switchlist->IsChecked(n);
     }
 
+    // Todo: Segfault here if no file is loaded.
     EndModal(wxID_OK);
     Destroy();
 }
