@@ -25,7 +25,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_ABOUT, MyFrame::OnAbout)
     EVT_MENU(ID_FILEOPEN, MyFrame::OnOpen)
     EVT_MENU(ID_ADDMONITOR, MyFrame::OnAddMonitor)
-    EVT_BUTTON(MY_RUN_BUTTON_ID, MyFrame::OnButton)
+    EVT_BUTTON(MY_RUN_BUTTON_ID, MyFrame::OnRunButton)
+    EVT_BUTTON(MY_CONTINUE_BUTTON_ID, MyFrame::OnContinueButton)
     EVT_SPINCTRL(MY_SPINCNTRL_ID, MyFrame::OnSpin)
     EVT_TEXT_ENTER(MY_TEXTCTRL_ID, MyFrame::OnText)
     EVT_MENU(wxID_ZOOM_IN, MyFrame::OnZoomIn)
@@ -297,11 +298,21 @@ void MyFrame::OnAbout(wxCommandEvent &event)
     about.ShowModal();
 }
 
-void MyFrame::OnButton(wxCommandEvent &event)
+void MyFrame::OnRunButton(wxCommandEvent &event)
     // Event handler for the push button
 {
     if (!fileOpen) return;
 
+    // Todo: make run reset system.
+
+    runnetwork(spin->GetValue());
+    canvas->Render(mmz->cycles());
+    continuebutton->Enable(true);
+}
+
+void MyFrame::OnContinueButton(wxCommandEvent &event) 
+{
+    if (!fileOpen) return;
     runnetwork(spin->GetValue());
     canvas->Render(mmz->cycles());
 }
@@ -446,6 +457,7 @@ void MyFrame::openFile(wxString file) {
 
     // Update controls
     runbutton->Enable(true);
+    continuebutton->Enable(false);
 
     // Add monitors to list
     RefreshMonitors();

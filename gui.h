@@ -71,7 +71,8 @@ class MyFrame: public wxFrame
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
   void OnOpen(wxCommandEvent& event);     // Event handler for file->Open
-  void OnButton(wxCommandEvent& event);   // event handler for push button
+  void OnRunButton(wxCommandEvent& event);   // event handler for run button
+  void OnContinueButton(wxCommandEvent &event);   // event handler for continue button
   void OnSpin(wxSpinEvent& event);        // event handler for spin control
   void OnText(wxCommandEvent& event);     // event handler for text entry field
   
