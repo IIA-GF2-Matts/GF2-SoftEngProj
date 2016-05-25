@@ -66,6 +66,10 @@ public:
     void defineMonitor(Signal& monSig);
     void defineMonitor(Signal& monSig, Signal& aliSig);
 
+#ifdef EXPERIMENTAL
+    void importDevice(Token& devName, Token& fileStr);
+#endif
+
 };
 
 

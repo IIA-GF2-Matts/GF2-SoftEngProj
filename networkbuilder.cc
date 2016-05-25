@@ -12,6 +12,7 @@
 #include "monitor.h"
 #include "errorhandler.h"
 #include "autocorrect.h"
+#include "importeddevice.h"
 
 #include "networkbuilder.h"
 
@@ -101,12 +102,36 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
 
     if (!success) {
         // Shouldn't ever reach here
-        // TODO: Better error message? 
+        // TODO: Better error message?
         _errs.report(mattruntimeerror(
             "Unable to add device to the network.", type.at));
         return;
     }
 }
+
+
+#ifdef EXPERIMENTAL
+
+void networkbuilder::importDevice(Token& devName, Token& fileStr) {
+    // Todo: Merge with defineDevice to avoid duplication
+    devlink dl = _netz->finddevice(devName.id);
+    if (dl != NULL) {
+        if (dl->kind == imported) {
+            _errs.report(mattwarning(
+                "Repeated definition of the same device.", devName.at));
+        }
+        else {
+            _errs.report(mattsemanticerror(
+                "Device types may not be assigned to devices that already exist.", devName.at));
+        }
+        _errs.report(mattnote("Previously defined here.", dl->definedAt));
+        return;
+    }
+
+    _devz->makeimported(devName.id, fileStr.str, _errs, devName.at);
+}
+
+#endif
 
 
 bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
@@ -180,6 +205,17 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 return false;
             }
             break;
+#ifdef EXPERIMENTAL
+        case imported:
+            if (!dvl->device->hasInput(keyTok.id)) {
+                std::ostringstream oss;
+                oss << "Imported device " << _nms->namestr(dvl->id) << " has no input pin "
+                    << _nms->namestr(keyTok.id);
+                _errs.report(mattsemanticerror(oss.str(), keyTok.at));
+                return false;
+            }
+            break;
+#endif
         case baddevice:
         default:
             // Should never reach here
@@ -216,6 +252,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case norgate:
         case xorgate:
         case dtype:
+        case imported:
         default: {
             // get the input link
             inplink il = _netz->findinput(dvl, keyTok.id);
@@ -257,7 +294,7 @@ void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok)
     if (!checkKey(dvl, keyTok)) {
         return;
     }
- 
+
     if (isLegalProperty(dvl, keyTok.id)) {
         assignProperty(dvl, keyTok, valTok);
     }
