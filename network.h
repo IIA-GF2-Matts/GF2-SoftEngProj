@@ -6,11 +6,13 @@
 #include "sourcepos.h"
 #include "errorhandler.h"
 
+struct importeddevice;
+
 /* Network specification */
 
 typedef enum {falling, low, rising, high, floating} asignal;
 typedef enum {aswitch, aclock, andgate, nandgate, orgate,
-	      norgate, xorgate, dtype, baddevice} devicekind;
+	      norgate, xorgate, dtype, jk, siggen, imported, baddevice} devicekind;
 
 struct outputsignal {
   name devicename;
@@ -24,6 +26,7 @@ struct outputrec {
   outputrec* next;
 };
 typedef outputrec* outplink;
+
 struct inputrec {
   name      id;
   SourcePos  definedAt;
@@ -31,6 +34,8 @@ struct inputrec {
   inputrec* next;
 };
 typedef inputrec* inplink;
+
+
 struct devicerec {
   name id;
   SourcePos  definedAt;
@@ -43,6 +48,10 @@ struct devicerec {
   int frequency;        // used when kind == aclock
   int counter;          // used when kind == aclock
   asignal memory;       // used when kind == dtype
+#ifdef EXPERIMENTAL
+  importeddevice* device;  // used when kind == imported
+#endif
+
   SourcePos setAt;
 };
 typedef devicerec* devlink;
@@ -61,7 +70,7 @@ class network {
   // find all the user defined switches in the network
 
   std::vector<outputsignal> findoutputsignals();
-  // find all the output signals 
+  // find all the output signals
 
   devlink finddevice (name id);
    /* Returns link to device with specified name. Returns NULL if not      */

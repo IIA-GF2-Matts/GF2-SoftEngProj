@@ -3,6 +3,7 @@
 #include "network.h"
 #include "sourcepos.h"
 #include "errorhandler.h"
+#include "importeddevice.h"
 
 using namespace std;
 
@@ -48,7 +49,7 @@ std::vector<devlink> network::findswitches() {
 
   while (d != NULL) {
     // ensures switches returned aren't special logic line switches
-    // Todo: it might be cleaner to return all switches, and the 
+    // Todo: it might be cleaner to return all switches, and the
     // caller filter the results, since the zero and one handles
     // in devices could then be checked directly
     if (d->kind == aswitch && nmz->namestr(d->id) != "0" && nmz->namestr(d->id) != "1")
@@ -321,6 +322,12 @@ void delDevList(devicerec* dr) {
 
   delDevList(dr->next);
   dr->next = NULL;
+
+#ifdef EXPERIMENTAL
+  if (dr->kind == imported) {
+    delete dr->device;
+  }
+#endif
 
   delInpList(dr->ilist);
   delOutpList(dr->olist);
