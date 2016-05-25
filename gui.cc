@@ -58,13 +58,16 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     fileOpen = false;
     cyclescompleted = 0;
 
+    // file menu
     wxMenu *fileMenu = new wxMenu;
     fileMenu->Append(ID_FILEOPEN, "&Open\tCtrl+O");
     fileMenu->Append(ID_ADDMONITOR, "Monitor Signal List");
     fileMenu->Append(wxID_ABOUT, "&About");
     fileMenu->Append(wxID_EXIT, "&Quit");
 
+    // view menu
     wxMenu *viewMenu = new wxMenu;
+    // colour menu
     wxMenu *colourMenu = new wxMenu;
     colourMenu->AppendRadioItem(BLUE_ID, "Cool Blue");
     colourMenu->AppendRadioItem(GREEN_ID, "Retro Green");
@@ -78,30 +81,50 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     viewMenu->Append(wxID_ZOOM_OUT, "&Zoom out\tCtrl+-");
     viewMenu->Append(MY_ZOOM_RESET_ID, "&Reset zoom\tCtrl+0");
 
+    // top level menu
     wxMenuBar *menuBar = new wxMenuBar;
     menuBar->Append(fileMenu, "&File");
     menuBar->Append(viewMenu, "&View");
     SetMenuBar(menuBar);
 
+    // top level sizer
     wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
+    
+    // canvas
     canvas = new MyGLCanvas(this, monitorOrder, wxID_ANY, NULL, NULL);
     topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
-    wxBoxSizer *button_sizer = new wxBoxSizer(wxVERTICAL);
+
+    // run and continue buttons
+    wxBoxSizer *button_sizer = new wxBoxSizer(wxHORIZONTAL);
     runbutton = new wxButton(this, MY_RUN_BUTTON_ID, "Run");
     runbutton->Enable(false);
-    button_sizer->Add(runbutton, 0, wxBOTTOM|wxALL, 10);
-    button_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles"), 0, wxTOP|wxLEFT|wxRIGHT, 10);
+    button_sizer->Add(runbutton, 0, wxALL, 10);
+    continuebutton = new wxButton(this, MY_CONTINUE_BUTTON_ID, "Continue");
+    continuebutton->Enable(false);
+    button_sizer->Add(continuebutton, 0, wxALL, 10);
+
+    // sizer for cycle selector
+    wxBoxSizer *cycle_sizer = new wxBoxSizer(wxHORIZONTAL);
+    cycle_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles:"), 0, wxALL, 15);
     spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
     spin->SetRange(1, 100);
-    button_sizer->Add(spin, 0 , wxALL, 10);
+    cycle_sizer->Add(spin, 0 , wxALL, 10);
+    // sizer for cycles and run buttons
+
+    wxStaticBox *run_box = new wxStaticBox(this, wxID_ANY, "Run controls");
+    wxStaticBoxSizer *run_sizer = new wxStaticBoxSizer(run_box, wxVERTICAL);
+    run_sizer->Add(cycle_sizer, 0, wxALL, 10);
+    run_sizer->Add(button_sizer, 0, wxALL, 10);
 
     // Switches
-    controls_sizer = new wxBoxSizer(wxVERTICAL);
     wxArrayString switchItems;
     switchItems.Add("Switch1");
     switchlist = new wxCheckListBox(this, MY_SWITCH_LIST_ID, wxDefaultPosition, wxDefaultSize, switchItems);
-
+    // switch sizer
+    wxStaticBox *switch_box = new wxStaticBox(this, wxID_ANY, "Switches");
+    wxStaticBoxSizer *switch_sizer = new wxStaticBoxSizer(switch_box, wxVERTICAL);
+    switch_sizer->Add(switchlist, 1, wxALL|wxEXPAND, 10);
 
     // Monitors
     wxArrayString monitorItems;
@@ -118,27 +141,33 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxButton * const btnAdd = new wxButton(listpanel, wxID_ADD);
     wxButton * const btnUp = new wxButton(listpanel, wxID_UP);
     wxButton * const btnDown = new wxButton(listpanel, wxID_DOWN);
-    // arrange them in a sizer
-    wxSizer * const sizerBtns = new wxBoxSizer(wxVERTICAL);
-    sizerBtns->Add(btnAdd, wxSizerFlags().Centre().Border(wxBOTTOM));
-    sizerBtns->Add(btnUp, wxSizerFlags().Centre().Border(wxBOTTOM | wxTOP));
-    sizerBtns->Add(btnDown, wxSizerFlags().Centre().Border(wxTOP));
 
-    wxSizer * const sizerTop = new wxBoxSizer(wxHORIZONTAL);
+    // redid Diesel's sizer because I didn't understand it enough to fix it.
+    wxBoxSizer *monitor_btns_sizer = new wxBoxSizer(wxHORIZONTAL);
+    monitor_btns_sizer->Add(btnAdd, 0, wxALL, 3);
+    monitor_btns_sizer->Add(btnUp, 0, wxALL, 3);
+    monitor_btns_sizer->Add(btnDown, 0, wxALL, 3);
+
+
+    wxSizer * const sizerTop = new wxBoxSizer(wxVERTICAL);
     sizerTop->Add(monitorlist, wxSizerFlags(1).Expand().Border(wxRIGHT));
-    sizerTop->Add(sizerBtns, wxSizerFlags(0).Centre().Border(wxLEFT));
+    sizerTop->Add(monitor_btns_sizer, wxSizerFlags(0).Centre().Border(wxLEFT));
     listpanel->SetSizer(sizerTop);
 
+    // wrap Diesel's monitor panel in a static box sizer.
+    wxStaticBox *monitor_box = new wxStaticBox(this, wxID_ANY, "Monitors");
+    wxStaticBoxSizer *monitor_sizer = new wxStaticBoxSizer(monitor_box, wxVERTICAL);
+    monitor_sizer->Add(listpanel, 1, wxALL, 10);
 
 
 
-    controls_sizer->Add(switchlist, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
-    controls_sizer->Add(listpanel, 0, wxALL|wxALIGN_TOP|wxEXPAND, 10);
-    controls_sizer->Add(button_sizer, 0, wxALL|wxALIGN_BOTTOM, 0);
-    // Todo: borders around separate control groups (e.g. around monitor controls, switch controls, other controls)?
-    // Todo: add monitor dialogue button.
-    // Todo: add text to monitor and switch controls.
+    controls_sizer = new wxBoxSizer(wxVERTICAL);
+    controls_sizer->Add(switch_sizer, 1, wxALL|wxALIGN_TOP|wxEXPAND, 0);
+    controls_sizer->Add(new wxStaticLine(this, wxID_ANY), 0, wxALL, 0);
+    controls_sizer->Add(monitor_sizer, 1, wxALL|wxALIGN_TOP|wxEXPAND, 0);
+    controls_sizer->Add(run_sizer, 0, wxALL|wxALIGN_BOTTOM, 0);
 
+    // Todo: controls sizer spans off bottom of page.
 
     // button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
     topsizer->Add(controls_sizer, 0, wxALIGN_CENTER|wxEXPAND);

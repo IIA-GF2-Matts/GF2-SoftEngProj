@@ -8,6 +8,8 @@
 //#include <wx/rearrangectrl.h>
 #include "rearrangectrl_matt.h"
 #include <wx/arrstr.h>
+#include <wx/statline.h>
+#include <wx/statbox.h>
 // #include <wx/arrint.h>
 #include <vector>
 
@@ -26,6 +28,7 @@ enum {
   MY_SPINCNTRL_ID = wxID_HIGHEST + 1,
   MY_TEXTCTRL_ID,
   MY_RUN_BUTTON_ID,
+  MY_CONTINUE_BUTTON_ID,
   MY_ZOOM_RESET_ID,
   MY_SWITCH_LIST_ID,
 
@@ -47,6 +50,7 @@ class MyFrame: public wxFrame
   wxSpinCtrl *spin;                       // control widget to select the number of cycles
   wxBoxSizer* controls_sizer;
   wxButton *runbutton;
+  wxButton *continuebutton;
   wxCheckListBox *switchlist;             // widget to turn swicthes on/off
   wxRearrangeListMatt *monitorlist;       // widget to switch monitors
   names *nmz;                             // pointer to names class
