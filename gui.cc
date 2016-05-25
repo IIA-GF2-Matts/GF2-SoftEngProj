@@ -5,6 +5,7 @@
 #include "scanner.h"
 #include "parser.h"
 #include <sstream>
+#include <algorithm>
 #include <wx/filedlg.h>
 #include "guierrordialog.h"
 #include "rearrangectrl_matt.h"
@@ -199,7 +200,6 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
                     // Todo: Error message
                 }
             }
-
             n++;
         }
     }
@@ -212,16 +212,28 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
     for (int i = 0; i < monitorOrder.size(); i++ ) {
         monitorlist->Check(i, true);
     }
-
-
 }
 
 void MyFrame::OnMonitorUp(wxCommandEvent &event) {
-
+    if (monitorlist->MoveCurrentUp()) {  // moves selection up one
+        // get new position
+        const int sel = monitorlist->GetSelection();
+        // swap new position and old one in monitor order
+        std::iter_swap(monitorOrder.begin() + sel,
+            monitorOrder.begin() + sel + 1);
+    }
+    canvas->Render();
 }
 
 void MyFrame::OnMonitorDown(wxCommandEvent &event) {
-
+    if (monitorlist->MoveCurrentDown()) {  // moves selection down one
+        // get new position
+        const int sel = monitorlist->GetSelection();
+        // swap new position and old one in monitor order
+        std::iter_swap(monitorOrder.begin() + sel,
+            monitorOrder.begin() + sel - 1);
+    }
+    canvas->Render();
 }
 
 

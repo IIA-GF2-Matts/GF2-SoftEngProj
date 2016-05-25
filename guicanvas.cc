@@ -107,7 +107,7 @@ void MyGLCanvas::Render(int cycles) {
 
     // draw each plot
     for (j = 0; j<mmz->moncount(); j++) {
-      drawPlot(s, order[j], zoomrange, cycle_no, cyclesdisplayed, num_spacing);
+      drawPlot(s, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
     }
 
     // draw vertical line
@@ -161,7 +161,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   glLineWidth(2.0);
   glBegin(GL_LINE_STRIP);
   for (i=zoomrange[0]; i<zoomrange[1]; i++) {
-    if (mmz->getsignaltrace(plot_num, i, s)) {
+    if (mmz->getsignaltrace(order[plot_num], i, s)) {
       if (s==low) signal_y = y;
       if (s==high) signal_y = y + 2*dy;
       glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
@@ -175,7 +175,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   wxString mon_name_text;
 
   glRasterPos2f(10, h - 5 - (plot_num+1)*plot_height);
-  mmz->getmonname(plot_num, mon_name_dev, mon_name_pin);
+  mmz->getmonname(order[plot_num], mon_name_dev, mon_name_pin);
   mon_name_text = mon_name_dev ->c_str();
   if (mon_name_pin != blankname) {
     mon_name_text += ".";
