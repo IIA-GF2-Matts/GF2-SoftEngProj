@@ -31,7 +31,7 @@ enum TokType {
     Number,
     Identifier,
     DeviceType,
-    IncludeKeyword,
+    ImportKeyword,
     String
 };
 
@@ -75,7 +75,7 @@ protected:
     name kwordDev;
     name kwordMonitor;
     name kwordAs;
-    name kwordInclude;
+    name kwordImport;
 
     /// Read the next character from the input character stream
     int readChar();

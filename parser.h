@@ -50,7 +50,7 @@ private:
 
 #ifdef EXPERIMENTAL
     /// include = "include" , string , ";" ;
-    void parseInclude(Token& tk);
+    void parseImport(Token& tk);
 #endif
 
     /// definedevice = "dev" , devicename , [ "=" , type ] , data ;

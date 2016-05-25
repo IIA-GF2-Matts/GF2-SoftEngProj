@@ -105,9 +105,9 @@ void parser::parseStatement(Token& tk) {
 
             break;
 #ifdef EXPERIMENTAL
-        case TokType::IncludeKeyword:
+        case TokType::ImportKeyword:
             stepAndPeek(tk);
-            parseInclude(tk);
+            parseImport(tk);
             break;
 #endif
         default:
@@ -118,10 +118,10 @@ void parser::parseStatement(Token& tk) {
 
 #ifdef EXPERIMENTAL
 
-/// include = "include" , string , ";" ;
-void parser::parseInclude(Token& tk) {
+/// import = "import" , string , ";" ;
+void parser::parseImport(Token& tk) {
     if (tk.type != TokType::String) {
-        throw mattsyntaxerror("Expected a string filename to include.", tk.at);
+        throw mattsyntaxerror("Expected a string filename to import.", tk.at);
     }
 
     Token incStr = tk;
@@ -129,7 +129,7 @@ void parser::parseInclude(Token& tk) {
     stepAndPeek(tk);
 
     if (tk.type != TokType::SemiColon) {
-        throw mattsyntaxerror("Missing the semicolon on the end of include statement.", tk.at);
+        throw mattsyntaxerror("Missing the semicolon on the end of import statement.", tk.at);
     }
 
     stepAndPeek(tk);
@@ -139,7 +139,7 @@ void parser::parseInclude(Token& tk) {
     if (!f->open(incStr.str)) {
         delete f;
 
-        throw mattruntimeerror("Unable to read include file.", incStr.at);
+        throw mattruntimeerror("Unable to read import file.", incStr.at);
     }
 
     f->parent = _scan;
@@ -151,6 +151,8 @@ void parser::parseInclude(Token& tk) {
 
 
 // definedevice = "dev" , devicename , [ "=" , type ] , data ;
+// With extensions enabled:
+// type         = ( "import" , str ) | identifier
 void parser::parseDefineDevice(Token& tk) {
     Token nameToken;
 
@@ -169,8 +171,8 @@ void parser::parseDefineDevice(Token& tk) {
         stepAndPeek(tk);
 
 #ifdef EXPERIMENTAL
-        if (tk.type == TokType::IncludeKeyword) {
-            // dev DN = include "file";
+        if (tk.type == TokType::ImportKeyword) {
+            // dev DN = import "file";
             stepAndPeek(tk);
 
             if (tk.type != TokType::String) {

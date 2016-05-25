@@ -175,8 +175,8 @@ Token scanner::readNext() {
                     ret.type = TokType::AsKeyword;
                 }
 #ifdef EXPERIMENTAL
-                else if (ret.id == kwordInclude) {
-                    ret.type = TokType::IncludeKeyword;
+                else if (ret.id == kwordImport) {
+                    ret.type = TokType::ImportKeyword;
                 }
 #endif
                 else { // Check for device types
@@ -285,7 +285,7 @@ scanner::scanner(names* nmz)
     kwordDev = _nmz->lookup("dev");
     kwordMonitor = _nmz->lookup("monitor");
     kwordAs = _nmz->lookup("as");
-    kwordInclude = _nmz->lookup("include");
+    kwordImport = _nmz->lookup("import");
 }
 
 
