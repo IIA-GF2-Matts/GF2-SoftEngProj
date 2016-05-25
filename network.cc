@@ -68,12 +68,15 @@ std::vector<outputsignal> network::findoutputsignals(){
 
   // loop through all devices
   while (d != NULL) {
-    // get device's outputs
-    o = d->olist;
-    while (o != NULL) {
-      // add them to the collection
-      ret.push_back({d->id, o->id});
-      o = o->next;
+    // don't show internal logic rails
+    if (nmz->namestr(d->id) != "0" && nmz->namestr(d->id) != "1") {
+      // get device's outputs
+      o = d->olist;
+      while (o != NULL) {
+        // add them to the collection
+        ret.push_back({d->id, o->id});
+        o = o->next;
+      }
     }
     d = d->next;
   }
