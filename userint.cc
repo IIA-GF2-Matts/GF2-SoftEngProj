@@ -117,7 +117,7 @@ void userint::rdname (name& n)
 
     n = t.id;
 
-    cmdpos += scan.peek().at.Abs;
+    cmdpos += scan.peek().at.Abs - 2;
   }
   catch (matterror& e) {
     std::cout << e.what() << std::endl;
@@ -160,7 +160,7 @@ void userint::rdqualname (name& prefix, name& suffix)
       suffix = blankname;
     }
 
-    cmdpos += scan.peek().at.Abs;
+    cmdpos += scan.peek().at.Abs - 2;
   }
   catch (matterror& e) {
     std::cout << e.what() << std::endl;
@@ -184,11 +184,11 @@ void userint::setswcmd (void)
     rdnumber (level, 0, 1);
     if (cmdok) {
       if (level == 0)
-	dmz->setswitch (swid, low, cmdok);
+        dmz->setswitch (swid, low, cmdok);
       else
-	dmz->setswitch (swid, high, cmdok);
+        dmz->setswitch (swid, high, cmdok);
       if (! cmdok)
-	cout << "Error: unknown switch" << endl;
+        cout << "Error: unknown switch" << endl;
     }
   }
 }
