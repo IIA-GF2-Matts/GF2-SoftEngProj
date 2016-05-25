@@ -48,7 +48,7 @@ public:
     name id; ///< If type == TokType::Identifier, this is the string name
     int number; ///< If type == TokType::Number, this is the integer value.
     devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
     std::string str;
 #endif
 
@@ -89,7 +89,7 @@ protected:
     /// Consume characters while they match a number
     int readNumber(int c1);
 
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
     /// Consumes characters matching a string.
     std::string readString(int c1);
 #endif

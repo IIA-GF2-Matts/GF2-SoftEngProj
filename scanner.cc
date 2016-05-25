@@ -144,7 +144,7 @@ Token scanner::readNext() {
         case '.':
             ret.type = TokType::Dot;
             break;
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
         case '"':
             ret.type = TokType::String;
             ret.str = readString(c);
@@ -174,7 +174,7 @@ Token scanner::readNext() {
                 else if (ret.id == kwordAs) {
                     ret.type = TokType::AsKeyword;
                 }
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
                 else if (ret.id == kwordInclude) {
                     ret.type = TokType::IncludeKeyword;
                 }
@@ -246,7 +246,7 @@ int scanner::readNumber(int c1) {
     return ret;
 }
 
-#ifdef EXT_INCLUDES
+#ifdef EXPERIMENTAL
 
 // string = "..."
 // To use include quotes in the string, double them up:
