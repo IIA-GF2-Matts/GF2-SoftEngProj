@@ -70,7 +70,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     colourMenu->AppendRadioItem(GREEN_ID, "Retro Green");
     colourMenu->AppendRadioItem(BW_ID, "Simple B+W");
     colourMenu->AppendRadioItem(PINK_ID, "Candy Pink");
-    viewMenu->Append(wxID_ANY, "&Colour", colourMenu);
+    viewMenu->Append(wxID_ANY, "Colour Theme", colourMenu);
 
     // zoom section
     viewMenu->AppendSeparator();
