@@ -1,9 +1,12 @@
 #ifndef devices_h
 #define devices_h
 
+#include <string>
+
 #include "names.h"
 #include "network.h"
 #include "sourcepos.h"
+#include "errorhandler.h"
 
 class devices{
   names* nmz;      // the version of the names module we use.
@@ -26,10 +29,14 @@ class devices{
   void execxorgate(devlink d);
   void execdtype (devlink d);
   void execclock(devlink d);
-  void updateclocks (void);
   void outsig (asignal s);
 
 public:
+#ifdef EXPERIMENTAL
+  void makeimported(name id, std::string fname, errorcollector& errs, SourcePos at = SourcePos());
+  void execimported(devlink d);
+#endif
+
   name        clkpin, datapin, setpin;
   name        clrpin, qpin, qbarpin;     /* Input and Output Pin names */
   name        initvalnm, periodnm;
@@ -48,7 +55,10 @@ public:
     /* Sets the frequency of the named clock. 'ok' returns false if clock  */
     /* not found.                                                          */
 
-  void executedevices (bool& ok);
+  void updateclocks (void);
+    /* Updates clocks in the network, represents one "tick" of the simulation */
+
+  void executedevices (bool& ok, bool tick = true);
     /* Executes all devices in the network to simulate one complete clock  */
     /* cycle. 'ok' is returned false if network fails to stabilise (i.e.   */
     /* it is oscillating). */

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "names.h"
+#include "importeddevice.h"
 
 using namespace std;
 
@@ -71,6 +72,42 @@ void devices::setswitch (name sid, asignal level, bool& ok, SourcePos at)
     }
   }
 }
+
+
+#ifdef EXPERIMENTAL
+
+/***********************************************************************
+ *
+ * Used to make new switch devices.
+ * Called by makedevice.
+ *
+ */
+void devices::makeimported(name id, std::string fname, errorcollector& errs, SourcePos at)
+{
+  devlink d;
+  netz->adddevice (imported, id, d);
+  if (!d) {
+    errs.report(mattruntimeerror("Error creating imported device in network.", at));
+    return;
+  }
+
+  d->definedAt = at;
+
+  d->device = new importeddevice(nmz, errs);
+  d->device->scanAndParse(fname);
+
+  // Add inputs
+  for (auto inp : d->device->inputs) {
+    netz->addinput(d, inp->id, inp->definedAt);
+  }
+
+  // Add outputs
+  for (auto outp : d->device->outputs) {
+    netz->addoutput(d, outp.first, outp.second->definedAt);
+  }
+}
+
+#endif
 
 
 /***********************************************************************
@@ -228,6 +265,10 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
     case dtype:
       makedtype(did, ok, at);
       break;
+    case imported:
+      ok = false;
+      // Must call makeimported directly.
+      break;
     case baddevice:
     default:
       ok = false;
@@ -375,6 +416,32 @@ void devices::execclock(devlink d)
   }
 }
 
+#ifdef EXPERIMENTAL
+
+/***********************************************************************
+ *
+ * Used to simulate the operation of an imported network.
+ * Called by executedevices.
+ *
+ */
+void devices::execimported(devlink d) {
+  // Update input pins
+  for (inplink il = d->ilist; il; il = il->next) {
+    d->device->setInput(il->id, il->connect->sig);
+  }
+
+  d->device->execute();
+
+  // Update output pins
+  asignal s;
+  for (outplink ol = d->olist; ol; ol = ol->next) {
+    d->device->getOutput(ol->id, s);
+    signalupdate(s, ol->sig);
+  }
+}
+
+#endif
+
 
 /***********************************************************************
  *
@@ -389,14 +456,19 @@ void devices::updateclocks (void)
   for (d = netz->devicelist (); d != NULL; d = d->next) {
     if (d->kind == aclock) {
       if (d->counter == d->frequency) {
-	d->counter = 0;
-	if (d->olist->sig == high)
-	  d->olist->sig = falling;
-	else
-	  d->olist->sig = rising;
+        d->counter = 0;
+        if (d->olist->sig == high)
+          d->olist->sig = falling;
+        else
+          d->olist->sig = rising;
       }
       (d->counter)++;
     }
+#ifdef EXPERIMENTAL
+    else if (d->kind == imported) {
+      d->device->tick();
+    }
+#endif
   }
 }
 
@@ -408,14 +480,15 @@ void devices::updateclocks (void)
  * it is oscillating).
  *
  */
-void devices::executedevices (bool& ok)
+void devices::executedevices (bool& ok, bool tick)
 {
   const int maxmachinecycles = 20;
   devlink d;
   int machinecycle;
   if (debugging)
     cout << "Start of execution cycle" << endl;
-  updateclocks ();
+  if (tick)
+    updateclocks ();
   machinecycle = 0;
   do {
     machinecycle++;
@@ -432,10 +505,13 @@ void devices::executedevices (bool& ok)
         case nandgate: execgate (d, high, low);  break;
         case xorgate:  execxorgate (d);          break;
         case dtype:    execdtype (d);            break;
+#ifdef EXPERIMENTAL
+        case imported: execimported(d);          break;
+#endif
         default:       ok = false;               break;
       }
       if (debugging)
-	showdevice (d);
+        showdevice (d);
     }
   } while ((! steadystate) && (machinecycle < maxmachinecycles));
   if (debugging)
