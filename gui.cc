@@ -301,9 +301,8 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
     // Event handler for the push button
 {
     if (!fileOpen) return;
-
-    // Todo: make run reset system.
-
+    // Todo: is this a true reset?
+    mmz->resetmonitor();
     runnetwork(spin->GetValue());
     canvas->Render(mmz->cycles());
     continuebutton->Enable(true);
