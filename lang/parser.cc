@@ -172,13 +172,8 @@ void parser::parseDefineDevice(Token& tk) {
         stepAndPeek(tk);
 
 #ifdef EXPERIMENTAL
-        if (tk.type == TokType::ImportKeyword) {
-            // dev DN = import "file";
-            stepAndPeek(tk);
-
-            if (tk.type != TokType::String) {
-                throw mattsyntaxerror("Expected a string file name to include.", tk.at);
-            }
+        if (tk.type == TokType::String) {
+            // dev DN = "file";
 
             netbuild.importDevice(nameToken, tk);
 
