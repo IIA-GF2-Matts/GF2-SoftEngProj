@@ -120,7 +120,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
     // Switches
     wxArrayString switchItems;
-    switchItems.Add("Switch1");
     switchlist = new wxCheckListBox(this, MY_SWITCH_LIST_ID, wxDefaultPosition, wxDefaultSize, switchItems);
     // switch sizer
     wxStaticBox *switch_box = new wxStaticBox(this, wxID_ANY, "Switches");
