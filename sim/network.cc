@@ -8,20 +8,20 @@
 
 using namespace std;
 
-/***********************************************************************
+
+/** Returns list of devices
  *
- * Returns list of devices.
- *
+ * @author Gee
  */
 devlink network::devicelist (void)
 {
   return devs;
 }
 
-/***********************************************************************
+
+/** Finds the device that creates the output link ol
  *
- * Finds the device that creates the output link ol.
- *
+ * @author Diesel
  */
 devlink network::findoutputdevice(const outplink ol)
 {
@@ -42,7 +42,11 @@ devlink network::findoutputdevice(const outplink ol)
   return NULL;
 }
 
-// find all the user defined switches in the network
+
+/** Returns the collection of switches in the network
+ *
+ * @author Judge
+ */
 std::vector<devlink> network::findswitches() {
   std::vector<devlink> ret;
 
@@ -61,7 +65,10 @@ std::vector<devlink> network::findswitches() {
 }
 
 
-// find all the output signals
+/** Find all the output signals
+ *
+ * @author Judge
+ */
 std::vector<outputsignal> network::findoutputsignals(){
   std::vector<outputsignal> ret;
   devlink d = devs;
@@ -85,11 +92,9 @@ std::vector<outputsignal> network::findoutputsignals(){
 }
 
 
-/***********************************************************************
+/** Returns link to device with specified name.
  *
- * Returns link to device with specified name. Returns NULL if not
- * found.
- *
+ * @author Gee
  */
 devlink network::finddevice (name id)
 {
@@ -106,11 +111,9 @@ devlink network::finddevice (name id)
 }
 
 
-/***********************************************************************
+/** Returns the link to input of a device
  *
- * Returns link to input of device pointed to by dev with specified
- * name.  Returns NULL if not found.
- *
+ * @author Gee
  */
 inplink network::findinput (devlink dev, name id)
 {
@@ -127,11 +130,9 @@ inplink network::findinput (devlink dev, name id)
 }
 
 
-/***********************************************************************
+/** Returns the link to an ouput of a device
  *
- * Returns link to output of device pointed to by dev with specified
- * name.  Returns NULL if not found.
- *
+ * @author Gee
  */
 outplink network::findoutput (devlink dev, name id)
 {
@@ -148,11 +149,9 @@ outplink network::findoutput (devlink dev, name id)
 }
 
 
-/***********************************************************************
+/** Adds a device to the device list with given name and returns a link to it
  *
- * Adds a device to the device list with given name and returns a link
- * to it via 'dev'.
- *
+ * @author Gee
  */
 void network::adddevice (devicekind dkind, name did, devlink& dev, SourcePos at)
 {
@@ -180,11 +179,9 @@ void network::adddevice (devicekind dkind, name did, devlink& dev, SourcePos at)
 }
 
 
-/***********************************************************************
+/** Adds an input to a device
  *
- * Adds an input to the device pointed to by 'dev' with the specified
- * name.
- *
+ * @author Gee
  */
 void network::addinput (devlink dev, name iid, SourcePos at)
 {
@@ -197,11 +194,9 @@ void network::addinput (devlink dev, name iid, SourcePos at)
 }
 
 
-/***********************************************************************
+/** Adds an output to a device
  *
- * Adds an output to the device pointed to by 'dev' with the specified
- * name.
- *
+ * @author Gee
  */
 void network::addoutput (devlink dev, name oid, SourcePos at)
 {
@@ -214,12 +209,9 @@ void network::addoutput (devlink dev, name oid, SourcePos at)
 }
 
 
-/***********************************************************************
+/** Creates a connection to the input of one device, from the output of another.
  *
- * Makes a connection between the 'inp' input of device 'idev' and the
- * 'outp' output of device 'odev'. 'ok' is set true if operation
- * succeeds.
- *
+ * @author Gee
  */
 void network::makeconnection (name idev, name inp, name odev, name outp, bool& ok)
 {
@@ -239,10 +231,9 @@ void network::makeconnection (name idev, name inp, name odev, name outp, bool& o
 }
 
 
-/***********************************************************************
+/** Checks a network for errors
  *
- * Checks that all inputs are connected to an output.
- *
+ * @author Gee, Diesel
  */
 void network::checknetwork (errorcollector& col)
 {
@@ -283,13 +274,9 @@ void network::checknetwork (errorcollector& col)
 }
 
 
-/***********************************************************************
+/** Initialises the network
  *
- * The constructor for the network module.
- * Remember the version of the names module that is used here and
- * shared with other modules.
- * Initialise the list of devices.
- *
+ * @author Gee
  */
 network::network (names* names_mod)
 {
@@ -299,13 +286,13 @@ network::network (names* names_mod)
 }
 
 
-/***********************************************************************
+/** The network destructor.
+ *  Frees memory allocated by the network
  *
- * The network destructor.
- * Frees memory allocated by the network
- * This frees all devicerec, inputrec and outputrec in the lists
- * Recursive methods are defined locally to delete the lists.
+ *  This frees all devicerec, inputrec and outputrec in the lists
+ *  Recursive methods are defined locally to delete the lists.
  *
+ *  @author Diesel
  */
 
 void delInpList(inputrec* inpr) {
