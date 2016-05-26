@@ -24,6 +24,20 @@ C_OBJECTS = $(patsubst %.cc,build/cli/%.o,$(CLISRC) $(SRC))
 
 .SUFFIXES:	.o .cc
 
+
+mattlab: $(G_OBJECTS)
+	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
+
+clisim: $(C_OBJECTS)
+	$(CXX) $(FLAGS) -o clisim $(C_OBJECTS)
+
+clean:
+	rm -rf build mattlab clisim scanner_unittest parser_unittest
+
+depend:
+	makedepend $(SRC) $(GUISRC) $(CLISRC)
+	
+
 build:
 	mkdir -p build/cli/cli
 	mkdir build/cli/com
@@ -39,20 +53,6 @@ build/cli/%.o: %.cc build
 
 build/gui/%.o: %.cc build
 	$(GUICXX) $(FLAGS) $(GUIFLAGS) -c $< -o $@
-
-
-mattlab: $(G_OBJECTS)
-	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
-
-clisim: $(C_OBJECTS)
-	$(CXX) $(FLAGS) -o clisim $(C_OBJECTS)
-
-
-clean:
-	rm -rf build mattlab clisim scanner_unittest parser_unittest
-
-depend:
-	makedepend $(SRC) $(GUISRC) $(CLISRC)
 
 
 
