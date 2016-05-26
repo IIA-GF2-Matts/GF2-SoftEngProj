@@ -10,9 +10,10 @@
 #include "importeddevice.h"
 
 
-
-
-
+/** Initialises a new importeddevice structure
+ *
+ * @author Diesel
+ */
 importeddevice::importeddevice(names* nm, errorcollector& errc)
         : nmz(nm), errs(errc) {
     netz = new network(nmz);
@@ -20,6 +21,10 @@ importeddevice::importeddevice(names* nm, errorcollector& errc)
     mmz = new monitor(nmz, netz);
 }
 
+/** Clears resources allocated by importeddevice
+ *
+ * @author Diesel
+ */
 importeddevice::~importeddevice() {
     delete mmz;
     delete dmz;
@@ -27,6 +32,10 @@ importeddevice::~importeddevice() {
 }
 
 
+/** Reads in a Mattlang circuit definition and parses it to a network.
+ *
+ * @author Diesel
+ */
 bool importeddevice::scanAndParse(std::string file) {
     fscanner* smz = new fscanner(nmz);
     if (smz->open(file)) {
@@ -68,10 +77,20 @@ bool importeddevice::scanAndParse(std::string file) {
     return false;
 }
 
+
+/** Updates the clocks in the device.
+ *
+ * @author Diesel
+ */
 void importeddevice::tick() {
     dmz->updateclocks();
 }
 
+
+/** Executes the imported device.
+ *
+ * @author Diesel
+ */
 void importeddevice::execute() {
     bool ok = true;
 
@@ -84,6 +103,11 @@ void importeddevice::execute() {
     }
 }
 
+
+/** Checks if the imported device has an input pin.
+ *
+ * @author Diesel
+ */
 bool importeddevice::hasInput(name pin) const {
     for (auto it : inputs) {
         if (it->id == pin) {
@@ -93,6 +117,11 @@ bool importeddevice::hasInput(name pin) const {
     return false;
 }
 
+
+/** Checks if the imported device has an output pin
+ *
+ * @author Diesel
+ */
 bool importeddevice::hasOutput(name mon) const {
     for (auto it : outputs) {
         if (it.first == mon) {
@@ -102,6 +131,11 @@ bool importeddevice::hasOutput(name mon) const {
     return false;
 }
 
+
+/** Sets the value of an input pin
+ *
+ * @author Diesel
+ */
 bool importeddevice::setInput(name pin, asignal value) {
     for (auto it : inputs) {
         if (it->id == pin) {
@@ -112,6 +146,11 @@ bool importeddevice::setInput(name pin, asignal value) {
     return false;
 }
 
+
+/** Retrieves the value of an output pin.
+ *
+ * @author Diesel
+ */
 bool importeddevice::getOutput(name mon, asignal& value) {
     for (auto it : outputs) {
         if (it.first == mon) {
@@ -123,4 +162,4 @@ bool importeddevice::getOutput(name mon, asignal& value) {
 }
 
 
-#endif
+#endif // EXPERIMENTAL
