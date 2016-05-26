@@ -21,6 +21,7 @@
 
 // for compilers that support precompilation, includes "wx.h".
 #include <wx/wxprec.h>
+#include <iostream>
 
 #ifdef __BORLANDC__
     #pragma hdrstop
@@ -42,7 +43,6 @@ extern
 WXDLLIMPEXP_DATA_CORE(const char) wxRearrangeListMattNameStr[] = "wxRearrangeListMatt";
 
 BEGIN_EVENT_TABLE(wxRearrangeListMatt, wxCheckListBox)
-    EVT_CHECKLISTBOX(wxID_ANY, wxRearrangeListMatt::OnCheck)
 END_EVENT_TABLE()
 
 bool wxRearrangeListMatt::Create(wxWindow *parent,
@@ -177,12 +177,4 @@ void wxRearrangeListMatt::Swap(int pos1, int pos2)
             }
             break;
     }
-}
-
-void wxRearrangeListMatt::OnCheck(wxCommandEvent& event)
-{
-    // update the internal state to match the new item state
-    const int n = event.GetInt();
-
-    // m_order[n] = ~m_order[n];
 }

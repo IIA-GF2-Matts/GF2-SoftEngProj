@@ -106,9 +106,6 @@ private:
     // swap two items at the given positions in the listbox
     void Swap(int pos1, int pos2);
 
-    // event handler for item checking/unchecking
-    void OnCheck(wxCommandEvent& event);
-
     wxArrayString OrderList(const wxArrayInt& order,
                             const wxArrayString& items);
 
