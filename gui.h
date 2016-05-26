@@ -85,6 +85,7 @@ class MyFrame: public wxFrame
   void OnMonitorDown(wxCommandEvent& event);
   void RefreshMonitors();
  
+  void toggleButtonsEnabled(bool enabled);
 
   void colourChange(int index);
   void OnColourBlue(wxCommandEvent& event);

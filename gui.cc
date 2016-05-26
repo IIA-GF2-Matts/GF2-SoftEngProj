@@ -102,7 +102,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     runbutton->Enable(false);
     button_sizer->Add(runbutton, 0, wxALL, 10);
     continuebutton = new wxButton(this, MY_CONTINUE_BUTTON_ID, "Continue");
-    continuebutton->Enable(false);
     button_sizer->Add(continuebutton, 0, wxALL, 10);
 
     // sizer for cycle selector
@@ -166,6 +165,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     controls_sizer->Add(run_sizer, 0, wxALL|wxEXPAND, 0);
 
     topsizer->Add(controls_sizer, 0, wxALL|wxEXPAND, 10);
+
+    // disable all buttons
+    toggleButtonsEnabled(false);
 
     SetSizeHints(800, 500);
     SetSizer(topsizer);
@@ -456,8 +458,7 @@ void MyFrame::openFile(wxString file) {
     monitored.resize(signals.size(), false);
 
     // Update controls
-    runbutton->Enable(true);
-    continuebutton->Enable(false);
+    toggleButtonsEnabled(true);
 
     // Add monitors to list
     RefreshMonitors();
@@ -486,7 +487,7 @@ void MyFrame::closeFile() {
     updateTitle();
 
     // Update Controls
-    runbutton->Enable(false);
+    toggleButtonsEnabled(false);
 }
 
 void MyFrame::updateTitle() {
@@ -501,6 +502,17 @@ void MyFrame::updateTitle() {
 
     SetTitle(oss.str());
 }
+
+// Toggles whether buttons in control panel are enabled or disabled
+void MyFrame::toggleButtonsEnabled(bool enabled){
+    btnAdd->Enable(enabled);
+    btnDown->Enable(enabled);
+    btnUp->Enable(enabled);
+    runbutton->Enable(enabled);
+    // function only disables continuebutton
+    if (!enabled) continuebutton->Enable(enabled);
+}
+
 
 void MyFrame::colourChange(int index) {
     canvas->colourSelector(index);
