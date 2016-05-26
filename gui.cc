@@ -216,7 +216,7 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
     }
     RefreshMonitors();
 
-    // Todo: adding a monitor should disable continue
+    continuebutton->Enable(false);
 }
 
 
