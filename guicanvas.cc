@@ -116,7 +116,15 @@ void MyGLCanvas::Render(int cycles) {
     glEnd();
 
 
-  } else { // draw title screen
+  } else if ((cyclesdisplayed >= 0)) {
+    on_title = true;
+    pan_y = 0;
+    titleScreen("No monitors selected for simulator. \n"
+      "Select or add a monitor to view output.");
+  }
+
+
+  else { // draw title screen
     on_title = true;
     pan_y = 0;
     titleScreen("Select 'file' -> 'open' to begin...");
