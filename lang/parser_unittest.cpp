@@ -230,8 +230,8 @@ Token::Token(TokType t, int num)
 /// Dummy scanner to enter tokens to parser
 scanner::scanner(names* nmz) {}
 scanner::~scanner(){}
-bool scanner::open(std::istream* is, std::string fname) {}
-std::string scanner::getFile() const {}
+bool scanner::open(std::istream* is, std::string fname) {return true;}
+std::string scanner::getFile() const {return "";}
 Token scanner::step() {
     Token ret = _next;
     _next = readNext();
