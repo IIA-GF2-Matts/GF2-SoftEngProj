@@ -278,9 +278,6 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
     case aswitch:
       makeswitch (did, variant, ok, at);
       break;
-    case select:
-      makeselect (did, variant, ok, at);
-      break;
     case aclock:
       makeclock (did, variant, at);
       break;
@@ -296,10 +293,15 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
     case dtype:
       makedtype(did, ok, at);
       break;
+#ifdef EXPERIMENTAL
+    case select:
+      makeselect (did, variant, ok, at);
+      break;
     case imported:
       ok = false;
       // Must call makeimported directly.
       break;
+#endif
     case baddevice:
     default:
       ok = false;
