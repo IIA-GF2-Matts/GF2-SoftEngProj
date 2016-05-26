@@ -1,6 +1,7 @@
 
 #include <GL/glut.h>
 #include <iostream>
+#include <algorithm>
 
 #include "../com/names.h"
 #include "../sim/monitor.h"
@@ -17,9 +18,9 @@ END_EVENT_TABLE()
 
 int wxglcanvas_attrib_list[5] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
-MyGLCanvas::MyGLCanvas(wxWindow *parent, std::vector<int> &ord, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
+MyGLCanvas::MyGLCanvas(wxWindow *parent, std::vector<int> &ord, std::vector<bool> &disp, wxWindowID id, monitor* monitor_mod, names* names_mod, const wxPoint& pos,
                const wxSize& size, long style, const wxString& name, const wxPalette& palette):
-  wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette), order(ord)
+  wxGLCanvas(parent, id, wxglcanvas_attrib_list, pos, size, style, name, palette), order(ord), monitorDisplayed(disp)
   // Constructor - initialises private variables
 {
   context = new wxGLContext(this);
@@ -108,15 +109,23 @@ void MyGLCanvas::Render(int cycles) {
     int num_spacing = (1 + cycles_on_screen/20) * std::ceil(to_string(cycle_no).length()/2.0);
 
     // draw each plot
+    int n = 0;
     for (j = 0; j<order.size(); j++) {
-      drawPlot(s, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
+      if (monitorDisplayed[j]) {
+        drawPlot(s, n, j, zoomrange, cycle_no, cyclesdisplayed, num_spacing);
+        n++;
+      }
     }
+
+    int nmons = std::count(monitorDisplayed.begin(), monitorDisplayed.end(), true);
 
     // draw vertical line
     setLineColour(lines_RGB);
     glBegin(GL_LINE_STRIP);
-    glVertex2f(label_width-5, h-dy);
-    glVertex2f(label_width-5, h-(2*dy + plot_height*mmz->moncount()));
+    if (nmons)
+      glVertex2f(label_width-5, h-dy);
+    //glVertex2f(label_width-5, h-(2*dy + plot_height*mmz->moncount()));
+    glVertex2f(label_width-5, h-(2*dy + plot_height*nmons));
     glEnd();
 
 
@@ -140,7 +149,7 @@ void MyGLCanvas::Render(int cycles) {
 }
 
 
-void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing){
+void MyGLCanvas::drawPlot(asignal s, int plot_num, int mon_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing){
 
   int w, h;
   GetClientSize(&w, &h);
@@ -168,7 +177,6 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
     if (i%num_spacing == 0){
       drawText(to_string(i+cycle_no-cyclesdisplayed), x-4, y-12, GLUT_BITMAP_HELVETICA_10);
     }
-
   }
 
   // draw trace
@@ -177,7 +185,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   glLineWidth(2.0);
   glBegin(GL_LINE_STRIP);
   for (i=zoomrange[0]; i<zoomrange[1]; i++) {
-    if (mmz->getsignaltrace(order[plot_num], i, s)) {
+    if (mmz->getsignaltrace(order[mon_num], i, s)) {
       if (s==low) signal_y = y;
       if (s==high) signal_y = y + 2*dy;
       glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
@@ -191,7 +199,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_n
   name mon_name_dev, mon_name_pin;
   wxString mon_name_text;
   // get monitor name indices
-  mmz->getmonname(order[plot_num], mon_name_dev, mon_name_pin);
+  mmz->getmonname(order[mon_num], mon_name_dev, mon_name_pin);
   // get name text and combine with "."
   mon_name_text = mon_name_dev ->c_str();
   if (mon_name_pin != blankname) {

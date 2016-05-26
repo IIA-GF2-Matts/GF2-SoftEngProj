@@ -29,7 +29,7 @@ enum {
   MY_CONTINUE_BUTTON_ID,
   MY_ZOOM_RESET_ID,
   MY_SWITCH_LIST_ID,
-  MONITOR_BOX_ID,
+  MY_MONITOR_LIST_ID,
   BLUE_ID,
   GREEN_ID,
   BW_ID,
@@ -69,6 +69,7 @@ class MyFrame: public wxFrame
   std::vector<devlink> switches;
   std::vector<outputsignal> signals;
   std::vector<bool> monitored;
+  std::vector<bool> monitorDisplayed;
   std::vector<int> monitorOrder;
 
   bool runnetwork(int ncycles);           // function to run the logic network
@@ -85,6 +86,7 @@ class MyFrame: public wxFrame
   void OnZoomReset(wxCommandEvent& event);     // event handler for resetting zooming
 
   void OnSwitchListEvent(wxCommandEvent& event);     // event handler for (un)checking switch list items
+  void OnMonitorListEvent(wxCommandEvent& event);     // event handler for (un)checking monitor display list items
   void OnAddMonitor(wxCommandEvent& event);     // Event handler for Add monitor button
   void OnMonitorUp(wxCommandEvent& event);
   void OnMonitorDown(wxCommandEvent& event);

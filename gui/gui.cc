@@ -46,8 +46,9 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(wxID_UP, MyFrame::OnMonitorUp)
     EVT_BUTTON(wxID_DOWN, MyFrame::OnMonitorDown)
 
-
+    // switch and monitor checklists
     EVT_CHECKLISTBOX(MY_SWITCH_LIST_ID, MyFrame::OnSwitchListEvent)
+    EVT_CHECKLISTBOX(MY_MONITOR_LIST_ID, MyFrame::OnMonitorListEvent)
 END_EVENT_TABLE()
 
 
@@ -96,7 +97,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxBoxSizer *topsizer = new wxBoxSizer(wxHORIZONTAL);
     
     // canvas
-    canvas = new MyGLCanvas(this, monitorOrder, wxID_ANY, NULL, NULL);
+    canvas = new MyGLCanvas(this, monitorOrder, monitorDisplayed, wxID_ANY, NULL, NULL);
     topsizer->Add(canvas, 1, wxEXPAND | wxALL, 10);
 
 
@@ -132,12 +133,11 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     // Monitors
     wxArrayString monitorItems;
     wxArrayInt monitorOrder;
-    // monitorlist = new wxRearrangeCtrlMatt(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, monitorOrder, monitorItems);
 
     wxPanel* listpanel = new wxPanel(this, wxID_ANY,
         wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxRearrangeListMattNameStr);
 
-    monitorlist = new wxRearrangeListMatt(listpanel, MONITOR_BOX_ID,
+    monitorlist = new wxRearrangeListMatt(listpanel, MY_MONITOR_LIST_ID,
                                  wxDefaultPosition, wxDefaultSize,
                                  monitorOrder, monitorItems,
                                  0, wxDefaultValidator);
@@ -257,6 +257,10 @@ void MyFrame::RefreshMonitors() {
         }
     }
 
+    // display all monitored traces by default
+    monitorDisplayed.clear();
+    monitorDisplayed.resize(monitorOrder.size(), true);
+
     if (mmz->moncount())
         monitorlist->Reset(wxmonitorOrder, monitorItems);
     else
@@ -373,6 +377,18 @@ void MyFrame::OnSwitchListEvent(wxCommandEvent &event)
     else
         dmz->setswitch(sw->id, low, ok);
     wxASSERT_MSG(ok, "A runtime error occurred; the switch could not be set");
+}
+
+void MyFrame::OnMonitorListEvent(wxCommandEvent &event)
+    // Event handler for (un)checking monitor list items
+{
+    if (!fileOpen) return;
+
+    int n = event.GetInt();
+    bool state = monitorlist->IsChecked(n);
+    //monitorDisplayed[monitorOrder[n]] = state;
+    monitorDisplayed[n] = state;
+    canvas->Render();
 }
 
 bool MyFrame::runnetwork(int ncycles)

@@ -12,7 +12,7 @@
 class MyGLCanvas: public wxGLCanvas
 {
  public:
-  MyGLCanvas(wxWindow *parent, std::vector<int> &order, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
+  MyGLCanvas(wxWindow *parent, std::vector<int> &order, std::vector<bool> &monitorDisplayed, wxWindowID id = wxID_ANY, monitor* monitor_mod = NULL, names* names_mod = NULL,
          const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize, long style = 0,
          const wxString& name = "MyGLCanvas", const wxPalette &palette=wxNullPalette); // constructor
   void Render(int cycles = -1); // function to draw canvas contents
@@ -22,6 +22,7 @@ class MyGLCanvas: public wxGLCanvas
   void colourSelector(int colourInd);
   void resetCycles();
   std::vector<int>& order;
+  std::vector<bool>& monitorDisplayed;
 
 void setNetwork(monitor* mmz, names* nmz);
  private:
@@ -53,7 +54,7 @@ void setNetwork(monitor* mmz, names* nmz);
   void drawText(wxString text, int pos_x, int pos_y, void* font, int line_spacing = 18);
   void titleScreen(wxString message_text);
   void setLineColour(float RGB[3]);
-  void drawPlot(asignal s, int plot_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing);
+  void drawPlot(asignal s, int plot_num, int mon_num, int zoomrange[2], int cycle_no, int cyclesdisplayed, int num_spacing);
 
 
   void InitGL();                     // function to initialise OpenGL context
