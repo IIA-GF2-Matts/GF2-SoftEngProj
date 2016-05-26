@@ -1,6 +1,6 @@
 
 #include "gui.h"
-
+#include <GL/glut.h>
 #include "mattlab.h"
 
 
