@@ -17,17 +17,27 @@ SIMSRC = $(wildcard sim/*.cc)
 
 SRC = $(COMSRC) $(LANGSRC) $(SIMSRC)
 
-G_OBJECTS = $(patsubst %.cc,gui_%.o,$(GUISRC) $(SRC))
-C_OBJECTS = $(SRC:.cc=.o) $(CLISRC:.cc=.o)
+G_OBJECTS = $(patsubst %.cc,build/gui/%.o,$(GUISRC) $(SRC))
+C_OBJECTS = $(patsubst %.cc,build/cli/%.o,$(CLISRC) $(SRC))
 
 # implementation
 
 .SUFFIXES:	.o .cc
 
-%.o: %.cc
+build:
+	mkdir -p build/cli/cli
+	mkdir build/cli/com
+	mkdir build/cli/lang
+	mkdir build/cli/sim
+	mkdir -p build/gui/gui
+	mkdir build/gui/com
+	mkdir build/gui/lang
+	mkdir build/gui/sim
+
+build/cli/%.o: %.cc build
 	$(CLICXX) $(FLAGS) -c $< -o $@
 
-gui_%.o: %.cc
+build/gui/%.o: %.cc build
 	$(GUICXX) $(FLAGS) $(GUIFLAGS) -c $< -o $@
 
 
@@ -39,7 +49,7 @@ clisim: $(C_OBJECTS)
 
 
 clean:
-	rm -f cli/*.o gui/*.o com/*.o lang/*.o sim/*.o mattlab clisim scanner_unittest parser_unittest
+	rm -rf build mattlab clisim scanner_unittest parser_unittest
 
 depend:
 	makedepend $(SRC) $(GUISRC) $(CLISRC)
@@ -94,56 +104,56 @@ parser_unittest : gtest_main.a parser_unittest.o lang/parser.o com/errorhandler.
 
 # DO NOT DELETE
 
-com/names.o: com/names.h com/cistring.h
-lang/scanner.o: com/names.h com/cistring.h com/iposstream.h com/sourcepos.h com/errorhandler.h
-lang/scanner.o: sim/network.h lang/scanner.h
-sim/network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h
-lang/parser.o: com/errorhandler.h com/sourcepos.h lang/scanner.h com/iposstream.h com/names.h
-lang/parser.o: com/cistring.h sim/network.h com/autocorrect.h lang/parser.h sim/devices.h sim/monitor.h
-lang/parser.o: lang/networkbuilder.h
-sim/monitor.o: sim/monitor.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
-sim/monitor.o: sim/devices.h
-sim/devices.o: sim/devices.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
-com/iposstream.o: com/sourcepos.h com/iposstream.h
-com/cistring.o: com/cistring.h
-com/errorhandler.o: com/iposstream.h com/sourcepos.h com/errorhandler.h
-com/sourcepos.o: com/sourcepos.h
-com/autocorrect.o: com/names.h com/cistring.h com/autocorrect.h
-lang/networkbuilder.o: lang/parser.h com/names.h com/cistring.h lang/scanner.h com/iposstream.h
-lang/networkbuilder.o: com/sourcepos.h sim/network.h com/errorhandler.h sim/devices.h sim/monitor.h
-lang/networkbuilder.o: lang/networkbuilder.h com/autocorrect.h
-cli/userint.o: cli/userint.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
-cli/userint.o: sim/devices.h sim/monitor.h lang/scanner.h com/iposstream.h
-cli/clisim.o: com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h sim/devices.h
-cli/clisim.o: sim/monitor.h lang/scanner.h com/iposstream.h lang/parser.h lang/networkbuilder.h
-cli/clisim.o: cli/userint.h
+build/cli/com/names.o: com/names.h com/cistring.h
+build/cli/lang/scanner.o: com/names.h com/cistring.h com/iposstream.h com/sourcepos.h com/errorhandler.h
+build/cli/lang/scanner.o: sim/network.h lang/scanner.h
+build/cli/sim/network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h
+build/cli/lang/parser.o: com/errorhandler.h com/sourcepos.h lang/scanner.h com/iposstream.h com/names.h
+build/cli/lang/parser.o: com/cistring.h sim/network.h com/autocorrect.h lang/parser.h sim/devices.h sim/monitor.h
+build/cli/lang/parser.o: lang/networkbuilder.h
+build/cli/sim/monitor.o: sim/monitor.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
+build/cli/sim/monitor.o: sim/devices.h
+build/cli/sim/devices.o: sim/devices.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
+build/cli/com/iposstream.o: com/sourcepos.h com/iposstream.h
+build/cli/com/cistring.o: com/cistring.h
+build/cli/com/errorhandler.o: com/iposstream.h com/sourcepos.h com/errorhandler.h
+build/cli/com/sourcepos.o: com/sourcepos.h
+build/cli/com/autocorrect.o: com/names.h com/cistring.h com/autocorrect.h
+build/cli/lang/networkbuilder.o: lang/parser.h com/names.h com/cistring.h lang/scanner.h com/iposstream.h
+build/cli/lang/networkbuilder.o: com/sourcepos.h sim/network.h com/errorhandler.h sim/devices.h sim/monitor.h
+build/cli/lang/networkbuilder.o: lang/networkbuilder.h com/autocorrect.h
+build/cli/cli/userint.o: cli/userint.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
+build/cli/cli/userint.o: sim/devices.h sim/monitor.h lang/scanner.h com/iposstream.h
+build/cli/cli/clisim.o: com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h sim/devices.h
+build/cli/cli/clisim.o: sim/monitor.h lang/scanner.h com/iposstream.h lang/parser.h lang/networkbuilder.h
+build/cli/cli/clisim.o: cli/userint.h
 
-com/gui_names.o: com/names.h com/cistring.h
-lang/gui_scanner.o: com/names.h com/cistring.h com/iposstream.h com/sourcepos.h com/errorhandler.h
-lang/gui_scanner.o: sim/network.h lang/scanner.h
-sim/gui_network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h
-lang/gui_parser.o: com/errorhandler.h com/sourcepos.h lang/scanner.h com/iposstream.h com/names.h
-lang/gui_parser.o: com/cistring.h sim/network.h com/autocorrect.h lang/parser.h sim/devices.h sim/monitor.h
-lang/gui_parser.o: lang/networkbuilder.h
-sim/gui_monitor.o: sim/monitor.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
-sim/gui_monitor.o: sim/devices.h
-sim/gui_devices.o: sim/devices.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
-com/gui_iposstream.o: com/sourcepos.h com/iposstream.h
-com/gui_cistring.o: com/cistring.h
-com/gui_errorhandler.o: com/iposstream.h com/sourcepos.h com/errorhandler.h
-com/gui_sourcepos.o: com/sourcepos.h
-com/gui_autocorrect.o: com/names.h com/cistring.h com/autocorrect.h
-sim/gui_networkbuilder.o: lang/parser.h com/names.h com/cistring.h lang/scanner.h com/iposstream.h
-sim/gui_networkbuilder.o: com/sourcepos.h sim/network.h com/errorhandler.h sim/devices.h sim/monitor.h
-sim/gui_networkbuilder.o: lang/networkbuilder.h com/autocorrect.h
-gui/gui_gui.o: gui/gui.h rearrangectrl_matt.h com/names.h com/cistring.h sim/devices.h sim/network.h
-gui/gui_gui.o: com/sourcepos.h com/errorhandler.h sim/monitor.h guicanvas.h logo32.xpm lang/scanner.h
-gui/gui_gui.o: com/iposstream.h lang/parser.h lang/networkbuilder.h gui/guierrordialog.h
-gui/gui_gui.o: gui/guimonitordialog.h guicanvas.cc
-gui/gui_guierrordialog.o: gui/guierrordialog.h com/errorhandler.h com/sourcepos.h
-gui/gui_mattlab.o: gui/mattlab.h com/names.h com/cistring.h sim/devices.h sim/network.h com/sourcepos.h
-gui/gui_mattlab.o: com/errorhandler.h sim/monitor.h lang/parser.h lang/scanner.h com/iposstream.h
-gui/gui_mattlab.o: lang/networkbuilder.h gui/gui.h rearrangectrl_matt.h guicanvas.h
-gui/gui_guimonitordialog.o: gui/guimonitordialog.h sim/network.h com/names.h com/cistring.h
-gui/gui_guimonitordialog.o: com/sourcepos.h com/errorhandler.h
+build/gui/com/names.o: com/names.h com/cistring.h
+build/gui/lang/scanner.o: com/names.h com/cistring.h com/iposstream.h com/sourcepos.h com/errorhandler.h
+build/gui/lang/scanner.o: sim/network.h lang/scanner.h
+build/gui/sim/network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h
+build/gui/lang/parser.o: com/errorhandler.h com/sourcepos.h lang/scanner.h com/iposstream.h com/names.h
+build/gui/lang/parser.o: com/cistring.h sim/network.h com/autocorrect.h lang/parser.h sim/devices.h sim/monitor.h
+build/gui/lang/parser.o: lang/networkbuilder.h
+build/gui/sim/monitor.o: sim/monitor.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
+build/gui/sim/monitor.o: sim/devices.h
+build/gui/sim/devices.o: sim/devices.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
+build/gui/com/iposstream.o: com/sourcepos.h com/iposstream.h
+build/gui/com/cistring.o: com/cistring.h
+build/gui/com/errorhandler.o: com/iposstream.h com/sourcepos.h com/errorhandler.h
+build/gui/com/sourcepos.o: com/sourcepos.h
+build/gui/com/autocorrect.o: com/names.h com/cistring.h com/autocorrect.h
+build/gui/sim/networkbuilder.o: lang/parser.h com/names.h com/cistring.h lang/scanner.h com/iposstream.h
+build/gui/sim/networkbuilder.o: com/sourcepos.h sim/network.h com/errorhandler.h sim/devices.h sim/monitor.h
+build/gui/sim/networkbuilder.o: lang/networkbuilder.h com/autocorrect.h
+build/gui/gui/gui.o: gui/gui.h gui/rearrangectrl_matt.h com/names.h com/cistring.h sim/devices.h sim/network.h
+build/gui/gui/gui.o: com/sourcepos.h com/errorhandler.h sim/monitor.h gui/guicanvas.h lang/scanner.h
+build/gui/gui/gui.o: com/iposstream.h lang/parser.h lang/networkbuilder.h gui/guierrordialog.h
+build/gui/gui/gui.o: gui/guimonitordialog.h gui/guicanvas.inc
+build/gui/gui/guierrordialog.o: gui/guierrordialog.h com/errorhandler.h com/sourcepos.h
+build/gui/gui/mattlab.o: gui/mattlab.h com/names.h com/cistring.h sim/devices.h sim/network.h com/sourcepos.h
+build/gui/gui/mattlab.o: com/errorhandler.h sim/monitor.h lang/parser.h lang/scanner.h com/iposstream.h
+build/gui/gui/mattlab.o: lang/networkbuilder.h gui/gui.h gui/rearrangectrl_matt.h gui/guicanvas.h
+build/gui/gui/guimonitordialog.o: gui/guimonitordialog.h sim/network.h com/names.h com/cistring.h
+build/gui/gui/guimonitordialog.o: com/sourcepos.h com/errorhandler.h
 
