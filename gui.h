@@ -50,6 +50,9 @@ class MyFrame: public wxFrame
   wxBoxSizer* controls_sizer;
   wxButton *runbutton;
   wxButton *continuebutton;
+  wxButton *btnAdd;
+  wxButton *btnUp;
+  wxButton *btnDown;
   wxCheckListBox *switchlist;             // widget to turn swicthes on/off
   wxRearrangeListMatt *monitorlist;       // widget to switch monitors
   names *nmz;                             // pointer to names class

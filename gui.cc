@@ -137,9 +137,9 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
                                  wxDefaultPosition, wxDefaultSize,
                                  monitorOrder, monitorItems,
                                  0, wxDefaultValidator);
-    wxButton * const btnAdd = new wxButton(listpanel, wxID_ADD);
-    wxButton * const btnUp = new wxButton(listpanel, wxID_UP);
-    wxButton * const btnDown = new wxButton(listpanel, wxID_DOWN);
+    btnAdd = new wxButton(listpanel, wxID_ADD);
+    btnUp = new wxButton(listpanel, wxID_UP);
+    btnDown = new wxButton(listpanel, wxID_DOWN);
 
     wxBoxSizer *monitor_btns_sizer = new wxBoxSizer(wxHORIZONTAL);
     monitor_btns_sizer->Add(btnAdd, 0, wxALL, 3);
@@ -509,6 +509,7 @@ void MyFrame::toggleButtonsEnabled(bool enabled){
     btnDown->Enable(enabled);
     btnUp->Enable(enabled);
     runbutton->Enable(enabled);
+    spin->Enable(enabled);
     // function only disables continuebutton
     if (!enabled) continuebutton->Enable(enabled);
 }
