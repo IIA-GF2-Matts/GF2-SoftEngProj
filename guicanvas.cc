@@ -73,7 +73,6 @@ void MyGLCanvas::Render(int cycles) {
   int end_width = w - end_gap;
 
   // if any cycles have been run and at least one monitor display plots else display title screen.
-  // Todo: once able to delete monitors title screen with no monitors may not make sense?
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) {
     // Assert to ensure that order is correct.
     wxASSERT_MSG((mmz->moncount() == order.size()), "Conflicting number of monitors, this shouldn't happen.");
