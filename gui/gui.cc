@@ -381,8 +381,11 @@ bool MyFrame::runnetwork(int ncycles)
         if (ok) {
             n--;
             mmz->recordsignals ();
-        } else
-            cout << "Error: network is oscillating" << endl;
+        } else {
+            wxMessageDialog err(this, "Network is oscillating.\n\nCheck your circuit doesn't have any contradictory circuit paths, like an inverter with the output connected to the input.",
+                "An error occurred during simulation", wxICON_ERROR | wxOK);
+            err.ShowModal();
+        }
     }
     if (!ok) mmz->resetmonitor();
     return ok;
