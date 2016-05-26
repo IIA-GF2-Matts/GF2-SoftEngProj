@@ -6,19 +6,18 @@
 using namespace std;
 
 
-/***********************************************************************
+/** Returns the output link associated with this monitor
  *
- * Gets the op property of monitor n
- *
+ * @author Diesel
  */
 outplink monitor::getoutplink(int n) {
   return mtab[n].op;
 }
 
-/***********************************************************************
+
+/** Gets the definedAt property of monitor n
  *
- * Gets the definedAt property of monitor n
- *
+ * @author Diesel
  */
 SourcePos& monitor::getdefinedpos(int n) {
   return getdefinedpos(mtab.at(n));
@@ -29,11 +28,9 @@ SourcePos& monitor::getdefinedpos(moninfo& m) {
 }
 
 
-/***********************************************************************
+/** Sets a monitor in the network by placing an entry in the monitor table.
  *
- * Sets a monitor on the 'outp' output of device 'dev' by placing an
- * entry in the monitor table. 'ok' is set true if operation succeeds.
- *
+ * @author Gee
  */
 void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name aliasOutp, SourcePos p)
 {
@@ -62,11 +59,9 @@ void monitor::makemonitor (name dev, name outp, bool& ok, name aliasDevice, name
 }
 
 
-/***********************************************************************
+/** Removes a monitor point from the netowrk
  *
- * Removes the monitor set the 'outp' output of device 'dev'. 'ok' is
- * set true if operation succeeds.
- *
+ * @author Gee
  */
 void monitor::remmonitor (name dev, name outp, bool& ok)
 {
@@ -86,10 +81,9 @@ void monitor::remmonitor (name dev, name outp, bool& ok)
 }
 
 
-/***********************************************************************
+/** Returns number of signals currently monitored.
  *
- * Returns number of signals currently monitored.
- *
+ * @author Gee
  */
 int monitor::moncount (void) const
 {
@@ -97,10 +91,9 @@ int monitor::moncount (void) const
 }
 
 
-/***********************************************************************
+/** Returns the number of simulation cycles in the monitor history.
  *
- * Returns number of data points recorded.
- *
+ * @author Diesel
  */
 int monitor::cycles() const {
   if (mtab.empty()) return 0;
@@ -108,13 +101,11 @@ int monitor::cycles() const {
 }
 
 
-/***********************************************************************
+/** Returns signal level of the n'th monitor point.
  *
- * Returns signal level of n'th monitor point.
- *
+ * @author Gee
  */
-asignal monitor::getmonsignal (int n) const
-{
+asignal monitor::getmonsignal (int n) const {
   return getmonsignal(mtab[n]);
 }
 
@@ -125,10 +116,9 @@ asignal monitor::getmonsignal(const moninfo& mon) const {
 }
 
 
-/***********************************************************************
+/** Returns name of n'th monitor
  *
- * Returns name of n'th monitor.
- *
+ * @author Gee
  */
 void monitor::getmonname (int n, name& dev, name& outp, bool alias)
 {
@@ -149,10 +139,9 @@ void monitor::getmonname (moninfo& mon, name& dev, name& outp, bool alias)
 }
 
 
-/***********************************************************************
+/** Resets monitor signals and clears the history.
  *
- * Initialises monitor memory in preparation for a new output sequence.
- *
+ * @author Diesel
  */
 void monitor::resetmonitor (void)
 {
@@ -162,11 +151,9 @@ void monitor::resetmonitor (void)
 }
 
 
-/***********************************************************************
+/** Records the state of all monitor points to the history
  *
- * Called every clock cycle to record the state of each monitored
- * signal.
- *
+ * @author Gee, Diesel
  */
 void monitor::recordsignals (void)
 {
@@ -178,11 +165,10 @@ void monitor::recordsignals (void)
   }
 }
 
-/***********************************************************************
+
+/** Access recorded signal trace
  *
- * Access recorded signal trace, returns false if invalid monitor
- * or cycle.
- *
+ * @author Gee, Diesel
  */
 bool monitor::getsignaltrace(int m, int c, asignal &s)
 {
@@ -193,10 +179,10 @@ bool monitor::getsignaltrace(int m, int c, asignal &s)
   return false;
 }
 
-/***********************************************************************
+
+/** Displays the state of monitored signals
  *
- * Displays state of monitored signals.
- *
+ * @author Gee
  */
 void monitor::displaysignals (void)
 {
@@ -235,11 +221,9 @@ void monitor::displaysignals (void)
 }
 
 
-/***********************************************************************
+/** Gets the index of the monitor measuring the given signal
  *
- * Returns the index of the monitor measuring signal dev.pin, or -1 if
- * there is no monitor for that signal.
- *
+ * @author Diesel
  */
 int monitor::findmonitor (name dev, name pin, bool inclAlias) {
   for (int n = 0; n < mtab.size(); n++) {
@@ -255,11 +239,9 @@ int monitor::findmonitor (name dev, name pin, bool inclAlias) {
 }
 
 
-/***********************************************************************
+/** Initialises the monitors class
  *
- * Called to initialise the monitor module.
- * Remember the names of the shared names and network modules.
- *
+ * @author Gee
  */
 monitor::monitor (names* names_mod, network* network_mod)
 {
@@ -269,10 +251,9 @@ monitor::monitor (names* names_mod, network* network_mod)
 }
 
 
-/***********************************************************************
+/** Clears resources allocated by monitor
  *
- * Clears up resources used by monitor
- *
+ * @author Diesel
  */
 monitor::~monitor() {
 }
