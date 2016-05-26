@@ -65,7 +65,8 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     // file menu
     wxMenu *fileMenu = new wxMenu;
     fileMenu->Append(ID_FILEOPEN, "&Open\tCtrl+O");
-    fileMenu->Append(ID_ADDMONITOR, "Monitor Signal List");
+    addMonitorMenuBar = new wxMenuItem(fileMenu, ID_ADDMONITOR, "Monitor Signal List");
+    fileMenu->Append(addMonitorMenuBar);
     fileMenu->Append(wxID_ABOUT, "&About");
     fileMenu->Append(wxID_EXIT, "&Quit");
 
@@ -521,8 +522,10 @@ void MyFrame::toggleButtonsEnabled(bool enabled){
     btnUp->Enable(enabled);
     runbutton->Enable(enabled);
     spin->Enable(enabled);
-    // function only disables continuebutton
+    // function only disables and doesn't enable continuebutton
     if (!enabled) continuebutton->Enable(enabled);
+
+    addMonitorMenuBar->Enable(enabled);
 }
 
 

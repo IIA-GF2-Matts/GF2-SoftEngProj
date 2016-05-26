@@ -63,6 +63,9 @@ class MyFrame: public wxFrame
   bool fileOpen;
   wxString fname;
 
+  // Menu bar items which need to be kept to be enabled disabled...
+  wxMenuItem *addMonitorMenuBar;
+
   std::vector<devlink> switches;
   std::vector<outputsignal> signals;
   std::vector<bool> monitored;
