@@ -453,7 +453,14 @@ void MyFrame::openFile(wxString file) {
     }
 
     fscanner scan(nmz);
-    scan.open(std::string(file.mb_str()));
+
+    if (!scan.open(std::string(file.mb_str()))) { 
+        // file doesn't exist
+        wxMessageDialog err(this, "The file you attempted to open could not be found.\n\nPlease check you have entered the filepath correctly.",
+            "File not found", wxICON_ERROR | wxOK);
+        err.ShowModal();
+        return;
+    } 
 
     parser pmz(netz, dmz, mmz, &scan, nmz);
 
