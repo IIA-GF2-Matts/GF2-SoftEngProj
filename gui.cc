@@ -116,7 +116,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxStaticBox *run_box = new wxStaticBox(this, wxID_ANY, "Run controls");
     wxStaticBoxSizer *run_sizer = new wxStaticBoxSizer(run_box, wxVERTICAL);
     run_sizer->Add(cycle_sizer, 0, wxALL, 10);
-    run_sizer->Add(button_sizer, 0, wxALL, 10);
+    run_sizer->Add(button_sizer, 0, wxALL|wxALIGN_CENTER, 10);
 
     // Switches
     wxArrayString switchItems;
@@ -150,8 +150,10 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
 
     wxSizer * const sizerTop = new wxBoxSizer(wxVERTICAL);
-    sizerTop->Add(monitorlist, wxSizerFlags(1).Expand().Border(wxRIGHT));
-    sizerTop->Add(monitor_btns_sizer, wxSizerFlags(0).Centre().Border(wxLEFT));
+    sizerTop->Add(monitorlist, 1, wxALL|wxEXPAND, 0);
+    sizerTop->Add(monitor_btns_sizer, 0, wxALL|wxEXPAND, 0);
+    // sizerTop->Add(monitorlist, wxSizerFlags(1).Expand().Border(wxRIGHT));
+    // sizerTop->Add(monitor_btns_sizer, wxSizerFlags(0).Centre().Border(wxLEFT));
     listpanel->SetSizer(sizerTop);
 
     // wrap Diesel's monitor panel in a static box sizer.
@@ -162,15 +164,13 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
 
     controls_sizer = new wxBoxSizer(wxVERTICAL);
-    controls_sizer->Add(switch_sizer, 1, wxALL|wxALIGN_TOP|wxEXPAND, 0);
-    controls_sizer->Add(new wxStaticLine(this, wxID_ANY), 0, wxALL, 0);
-    controls_sizer->Add(monitor_sizer, 1, wxALL|wxALIGN_TOP|wxEXPAND, 0);
-    controls_sizer->Add(run_sizer, 0, wxALL|wxALIGN_BOTTOM, 0);
+    controls_sizer->Add(switch_sizer, 1, wxALL|wxEXPAND, 0);
+    controls_sizer->Add(monitor_sizer, 1, wxALL|wxEXPAND, 0);
+    controls_sizer->Add(run_sizer, 0, wxALL|wxEXPAND, 0);
 
     // Todo: controls sizer spans off bottom of page.
 
-    // button_sizer->Add(new wxTextCtrl(this, MY_TEXTCTRL_ID, "", wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER), 0 , wxALL, 10);
-    topsizer->Add(controls_sizer, 0, wxALIGN_CENTER|wxEXPAND);
+    topsizer->Add(controls_sizer, 0, wxALL|wxEXPAND, 10);
 
     SetSizeHints(800, 500);
     SetSizer(topsizer);

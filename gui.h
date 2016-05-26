@@ -8,7 +8,6 @@
 //#include <wx/rearrangectrl.h>
 #include "rearrangectrl_matt.h"
 #include <wx/arrstr.h>
-#include <wx/statline.h>
 #include <wx/statbox.h>
 // #include <wx/arrint.h>
 #include <vector>
