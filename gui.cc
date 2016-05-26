@@ -142,7 +142,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxButton * const btnUp = new wxButton(listpanel, wxID_UP);
     wxButton * const btnDown = new wxButton(listpanel, wxID_DOWN);
 
-    // redid Diesel's sizer because I didn't understand it enough to fix it.
     wxBoxSizer *monitor_btns_sizer = new wxBoxSizer(wxHORIZONTAL);
     monitor_btns_sizer->Add(btnAdd, 0, wxALL, 3);
     monitor_btns_sizer->Add(btnUp, 0, wxALL, 3);
@@ -152,8 +151,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxSizer * const sizerTop = new wxBoxSizer(wxVERTICAL);
     sizerTop->Add(monitorlist, 1, wxALL|wxEXPAND, 0);
     sizerTop->Add(monitor_btns_sizer, 0, wxALL|wxEXPAND, 0);
-    // sizerTop->Add(monitorlist, wxSizerFlags(1).Expand().Border(wxRIGHT));
-    // sizerTop->Add(monitor_btns_sizer, wxSizerFlags(0).Centre().Border(wxLEFT));
     listpanel->SetSizer(sizerTop);
 
     // wrap Diesel's monitor panel in a static box sizer.
@@ -167,8 +164,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     controls_sizer->Add(switch_sizer, 1, wxALL|wxEXPAND, 0);
     controls_sizer->Add(monitor_sizer, 1, wxALL|wxEXPAND, 0);
     controls_sizer->Add(run_sizer, 0, wxALL|wxEXPAND, 0);
-
-    // Todo: controls sizer spans off bottom of page.
 
     topsizer->Add(controls_sizer, 0, wxALL|wxEXPAND, 10);
 
