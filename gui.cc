@@ -303,16 +303,18 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
     if (!fileOpen) return;
     // Todo: is this a true reset?
     mmz->resetmonitor();
-    runnetwork(spin->GetValue());
-    canvas->Render(mmz->cycles());
-    continuebutton->Enable(true);
+    if (runnetwork(spin->GetValue())) {
+        canvas->Render(mmz->cycles());
+        continuebutton->Enable(true);
+    }
 }
 
 void MyFrame::OnContinueButton(wxCommandEvent &event) 
 {
     if (!fileOpen) return;
-    runnetwork(spin->GetValue());
-    canvas->Render(mmz->cycles());
+    if (runnetwork(spin->GetValue())) {
+        canvas->Render(mmz->cycles());
+    }
 }
 
 void MyFrame::OnSpin(wxSpinEvent &event)
@@ -363,7 +365,7 @@ void MyFrame::OnSwitchListEvent(wxCommandEvent &event)
     wxASSERT_MSG(ok, "A runtime error occurred; the switch could not be set");
 }
 
-void MyFrame::runnetwork(int ncycles)
+bool MyFrame::runnetwork(int ncycles)
     // Function to run the network, derived from corresponding function in userint.cc
 {
     bool ok = true;
@@ -378,6 +380,7 @@ void MyFrame::runnetwork(int ncycles)
             cout << "Error: network is oscillating" << endl;
     }
     if (!ok) mmz->resetmonitor();
+    return ok;
 }
 
 

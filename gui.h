@@ -67,7 +67,7 @@ class MyFrame: public wxFrame
   std::vector<bool> monitored;
   std::vector<int> monitorOrder;
 
-  void runnetwork(int ncycles);           // function to run the logic network
+  bool runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
   void OnAbout(wxCommandEvent& event);    // event handler for about menu item
   void OnOpen(wxCommandEvent& event);     // Event handler for file->Open
