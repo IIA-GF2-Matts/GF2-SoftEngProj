@@ -571,7 +571,7 @@ void devices::executedevices (bool& ok, bool tick)
         case xorgate:  execxorgate (d);          break;
         case dtype:    execdtype (d);            break;
 #ifdef EXPERIMENTAL
-        case aselect:   execselect(d, ok);        break;
+        case aselect:  execselect(d, ok);        break;
         case imported: execimported(d);          break;
 #endif
         default:       ok = false;               break;
@@ -583,6 +583,40 @@ void devices::executedevices (bool& ok, bool tick)
   if (debugging)
     cout << "End of execution cycle" << endl;
   ok = steadystate;
+}
+
+
+/***********************************************************************
+ *
+ * Resets devices in the network
+ *
+ */
+void devices::resetdevices(bool& ok) {
+  for (devlink d = netz->devicelist(); d; d = d->next) {
+    switch (d->kind) {
+      case aclock:
+        d->counter = 0;
+      case orgate:
+      case norgate:
+      case andgate:
+      case nandgate:
+        d->olist->sig = low;
+        break;
+
+      case dtype:
+        d->memory = low;
+        break;
+#ifdef EXPERIMENTAL
+      case imported:
+        d->device->dmz->resetdevices(ok);
+        break;
+      case select:
+        break;
+#endif
+      default:
+        break;
+    }
+  }
 }
 
 

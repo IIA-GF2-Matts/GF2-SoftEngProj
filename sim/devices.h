@@ -67,6 +67,9 @@ public:
     /* cycle. 'ok' is returned false if network fails to stabilise (i.e.   */
     /* it is oscillating). */
 
+  void resetdevices(bool& ok);
+    /* Resets the outputs of devices in the network to zero                */
+
   devicekind devkind (name id);
     /* Returns the kind of device corresponding to the given name.         */
     /* 'baddevice' is returned if the name is not a legal device.          */
