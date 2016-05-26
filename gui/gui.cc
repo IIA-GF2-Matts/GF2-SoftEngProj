@@ -302,7 +302,11 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
     // Event handler for the push button
 {
     if (!fileOpen) return;
-    // Todo: is this a true reset?
+
+    if (mmz->cycles()) {
+        // reset the network, start from scratch
+        dmz->resetdevices();
+    }
     mmz->resetmonitor();
     int spinValue = spin->GetValue();
     if (runnetwork(spinValue)) {
