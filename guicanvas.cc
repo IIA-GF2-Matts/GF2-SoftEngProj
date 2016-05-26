@@ -51,14 +51,14 @@ void MyGLCanvas::setNetwork(monitor* mons, names* nms) {
 
 void MyGLCanvas::Render(int cycles) {
   // Main function for drawing to the GUI GL Canvas
+  // cycles is the number of cycles run since last refresh, now independant from mmz->cycles()
 
   unsigned int j;
   asignal s;
 
   if (cycles >= 0) {
-    cyclesdisplayed = cycles;
-    cycle_no = cycles; // cycle_no follows actual number of cycles when array vector is full and cycles displayed const.
-    // Todo: implement for limit on data vector
+    cyclesdisplayed = mmz->cycles();
+    cycle_no += cycles; // cycle_no follows actual number of cycles when array vector is full and cycles displayed const.
   }
 
   SetCurrent(*context);
@@ -370,4 +370,8 @@ void MyGLCanvas::colourSelector(int colourInd) {
   for (i=0; i<3; i++) background_RGB[i] = backColours[colourInd][i];
 
   init = false;
+}
+
+void MyGLCanvas::resetCycles() {
+  cycle_no = 0;
 }

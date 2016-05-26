@@ -298,8 +298,10 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
     if (!fileOpen) return;
     // Todo: is this a true reset?
     mmz->resetmonitor();
-    if (runnetwork(spin->GetValue())) {
-        canvas->Render(mmz->cycles());
+    int spinValue = spin->GetValue();
+    if (runnetwork(spinValue)) {
+        canvas->resetCycles();
+        canvas->Render(spinValue);
         continuebutton->Enable(true);
     }
 }
@@ -307,8 +309,10 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
 void MyFrame::OnContinueButton(wxCommandEvent &event) 
 {
     if (!fileOpen) return;
-    if (runnetwork(spin->GetValue())) {
-        canvas->Render(mmz->cycles());
+
+    int spinValue = spin->GetValue();
+    if (runnetwork(spinValue)) {
+        canvas->Render(spinValue);
     }
 }
 

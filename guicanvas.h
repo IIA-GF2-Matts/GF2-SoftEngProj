@@ -21,6 +21,7 @@ class MyGLCanvas: public wxGLCanvas
   void zoomIn(double zoom_amount);
   void zoomOut(double zoom_amount, bool fully=false);
   void colourSelector(int colourInd);
+  void resetCycles();
   std::vector<int>& order;
   
 void setNetwork(monitor* mmz, names* nmz);

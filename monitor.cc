@@ -171,6 +171,9 @@ void monitor::recordsignals (void)
 {
   for (auto& m : mtab) {
     m.sig.push_back(getmonsignal(m));
+    // limit size to maxcycles by removing first values
+    if (m.sig.size() > maxcycles)
+      m.sig.erase(m.sig.begin());
   }
 }
 
