@@ -75,7 +75,7 @@ void MyGLCanvas::Render(int cycles) {
   // if any cycles have been run and at least one monitor display plots else display title screen.
   if ((cyclesdisplayed >= 0) && (mmz->moncount() > 0)) {
     // Assert to ensure that order is correct.
-    wxASSERT_MSG((mmz->moncount() > order.size()), "Number of monitors displayed more than number of existing monitors, this shouldn't happen.");
+    wxASSERT_MSG((mmz->moncount() >= order.size()), "Number of monitors displayed more than number of existing monitors, this shouldn't happen.");
 
     on_title = false;           // enables zoom and pan controls.
     if ((int)(cyclesdisplayed/zoom) == 0)
@@ -100,7 +100,7 @@ void MyGLCanvas::Render(int cycles) {
     zoomrange[1] = zoomrange[0] + cycles_on_screen;
 
     // x axis number spacing
-    int num_spacing = (1 + cycles_on_screen/20) * to_string(cycle_no).length()/2;
+    int num_spacing = (1 + cycles_on_screen/20) * std::ceil(to_string(cycle_no).length()/2.0);
 
     // draw each plot
     for (j = 0; j<order.size(); j++) {
