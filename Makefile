@@ -39,7 +39,7 @@ clisim: $(C_OBJECTS)
 
 
 clean:
-	rm -f *.o mattlab clisim scanner_unittest parser_unittest
+	rm -f cli/*.o gui/*.o com/*.o lang/*.o sim/*.o mattlab clisim scanner_unittest parser_unittest
 
 depend:
 	makedepend $(SRC) $(GUISRC) $(CLISRC)
