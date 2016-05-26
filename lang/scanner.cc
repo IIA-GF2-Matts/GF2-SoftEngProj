@@ -23,7 +23,7 @@ const std::map<namestring, devicekind> deviceTypes = {
     {"DTYPE", dtype},
     {"XOR", xorgate}
 #ifdef EXPERIMENTAL
-    ,{"SELECT", select}
+    ,{"SELECT", aselect}
 #endif
 };
 

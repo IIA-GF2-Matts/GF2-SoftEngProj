@@ -216,7 +216,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 return false;
             }
             break;
-        case select:
+        case aselect:
             if (!(keyTok.id == _devz->highpin || keyTok.id == _devz->lowpin || keyTok.id == _devz->swpin)) {
                 std::ostringstream oss;
                 oss << "SELECT device " << _nms->namestr(dvl->id) << " has no input pin "
@@ -263,7 +263,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case xorgate:
         case dtype:
         case imported:
-        case select:
+        case aselect:
         default: {
             // get the input link
             inplink il = _netz->findinput(dvl, keyTok.id);

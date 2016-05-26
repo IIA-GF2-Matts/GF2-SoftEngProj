@@ -151,7 +151,7 @@ void devices::makeselect(name id, int setting, bool& ok, SourcePos at)
 {
   devlink d;
 
-  netz->adddevice (select, id, d);
+  netz->adddevice (aselect, id, d);
 
   ok = d != NULL;
   if (ok) {
@@ -294,7 +294,7 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
       makedtype(did, ok, at);
       break;
 #ifdef EXPERIMENTAL
-    case select:
+    case aselect:
       makeselect (did, variant, ok, at);
       break;
     case imported:
@@ -571,7 +571,7 @@ void devices::executedevices (bool& ok, bool tick)
         case xorgate:  execxorgate (d);          break;
         case dtype:    execdtype (d);            break;
 #ifdef EXPERIMENTAL
-        case select:   execselect(d, ok);        break;
+        case aselect:   execselect(d, ok);        break;
         case imported: execimported(d);          break;
 #endif
         default:       ok = false;               break;

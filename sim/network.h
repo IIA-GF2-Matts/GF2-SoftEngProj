@@ -12,7 +12,7 @@ struct importeddevice;
 
 typedef enum {falling, low, rising, high, floating} asignal;
 typedef enum {aswitch, aclock, andgate, nandgate, orgate,
-	      norgate, xorgate, dtype, jk, siggen, select, imported, baddevice} devicekind;
+	      norgate, xorgate, dtype, jk, siggen, aselect, imported, baddevice} devicekind;
 
 struct outputsignal {
   name devicename;
