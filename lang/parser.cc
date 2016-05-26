@@ -153,7 +153,7 @@ void parser::parseImport(Token& tk) {
 
 // definedevice = "dev" , devicename , [ "=" , type ] , data ;
 // With extensions enabled:
-// type         = ( "import" , str ) | identifier
+// type         = string | identifier
 void parser::parseDefineDevice(Token& tk) {
     Token nameToken;
 

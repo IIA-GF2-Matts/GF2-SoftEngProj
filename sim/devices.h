@@ -36,12 +36,15 @@ public:
 #ifdef EXPERIMENTAL
   void makeimported(name id, std::string fname, errorcollector& errs, SourcePos at = SourcePos());
   void execimported(devlink d);
+  void makeselect (name id, int setting, bool& ok, SourcePos at = SourcePos());
+  void execselect(devlink d, bool& ok);
 #endif
 
   name        clkpin, datapin, setpin;
   name        clrpin, qpin, qbarpin;     /* Input and Output Pin names */
   name        initvalnm, periodnm;
   name        zero, one;
+  name        highpin, lowpin, swpin;
 
   void makedevice (devicekind dkind, name did, int variant, bool& ok, SourcePos at = SourcePos());
     /* Adds a device to the network of the specified kind and name.  The   */

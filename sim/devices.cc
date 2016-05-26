@@ -138,6 +138,33 @@ void devices::makeswitch (name id, int setting, bool& ok, SourcePos at)
   }
 }
 
+#ifdef EXPERIMENTAL
+
+/***********************************************************************
+ *
+ * Used to make new switch devices.
+ * Called by makedevice.
+ * Author: Diesel
+ *
+ */
+void devices::makeselect(name id, int setting, bool& ok, SourcePos at)
+{
+  devlink d;
+
+  netz->adddevice (select, id, d);
+
+  ok = d != NULL;
+  if (ok) {
+    d->definedAt = at;
+    netz->addoutput (d, blankname);
+    netz->addinput (d, highpin);
+    netz->addinput (d, lowpin);
+    netz->addinput (d, swpin);
+  }
+}
+
+#endif
+
 
 /***********************************************************************
  *
@@ -251,6 +278,9 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
     case aswitch:
       makeswitch (did, variant, ok, at);
       break;
+    case select:
+      makeselect (did, variant, ok, at);
+      break;
     case aclock:
       makeclock (did, variant, at);
       break;
@@ -327,6 +357,36 @@ void devices::execswitch (devlink d)
 {
   signalupdate (d->swstate, d->olist->sig);
 }
+
+
+#ifdef EXPERIMENTAL
+
+/***********************************************************************
+ *
+ * Used to simulate the operation of select devices.
+ * Called by executedevices.
+ * Author: Diesel
+ *
+ */
+void devices::execselect (devlink d, bool& ok)
+{
+  inplink il = netz->findinput(d, swpin);
+  ok = il;
+  if (ok) {
+    inplink conil;
+    if (il->connect->sig == high)
+      conil = netz->findinput(d, highpin);
+    else
+      conil = netz->findinput(d, lowpin);
+
+    ok = conil;
+    if (ok) {
+      signalupdate(conil->connect->sig, d->olist->sig);
+    }
+  }
+}
+
+#endif
 
 
 /***********************************************************************
@@ -417,12 +477,14 @@ void devices::execclock(devlink d)
   }
 }
 
+
 #ifdef EXPERIMENTAL
 
 /***********************************************************************
  *
  * Used to simulate the operation of an imported network.
  * Called by executedevices.
+ * Author: Diesel
  *
  */
 void devices::execimported(devlink d) {
@@ -507,6 +569,7 @@ void devices::executedevices (bool& ok, bool tick)
         case xorgate:  execxorgate (d);          break;
         case dtype:    execdtype (d);            break;
 #ifdef EXPERIMENTAL
+        case select:   execselect(d, ok);        break;
         case imported: execimported(d);          break;
 #endif
         default:       ok = false;               break;
@@ -597,6 +660,9 @@ devices::devices (names* names_mod, network* net_mod)
   clrpin  = nmz->lookup("CLEAR");
   qpin    = nmz->lookup("Q");
   qbarpin = nmz->lookup("QBAR");
+  highpin = nmz->lookup("HIGH");
+  lowpin = nmz->lookup("LOW");
+  swpin = nmz->lookup("SW");
 
   initvalnm = nmz->lookup("InitialValue");
   periodnm = nmz->lookup("Period");
