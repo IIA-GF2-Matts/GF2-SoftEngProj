@@ -591,7 +591,7 @@ void devices::executedevices (bool& ok, bool tick)
  * Resets devices in the network
  *
  */
-void devices::resetdevices(bool& ok) {
+void devices::resetdevices() {
   for (devlink d = netz->devicelist(); d; d = d->next) {
     switch (d->kind) {
       case aclock:
@@ -608,7 +608,7 @@ void devices::resetdevices(bool& ok) {
         break;
 #ifdef EXPERIMENTAL
       case imported:
-        d->device->dmz->resetdevices(ok);
+        d->device->dmz->resetdevices();
         break;
       case select:
         break;
