@@ -79,6 +79,9 @@ void MyGLCanvas::Render(int cycles) {
     // Assert to ensure that order is correct.
     wxASSERT_MSG((mmz->moncount() >= order.size()), "Number of monitors displayed more than number of existing monitors, this shouldn't happen.");
 
+    if (zoom < 1.0)
+      zoom = 1;
+
     on_title = false;           // enables zoom and pan controls.
     if ((int)(cyclesdisplayed/zoom) == 0)
       cycles_on_screen = 1;     // fix for floating point error with 1 cycle, high zoom.
