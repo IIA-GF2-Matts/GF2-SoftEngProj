@@ -86,12 +86,8 @@ class MyFrame: public wxFrame
   void OnMonitorUp(wxCommandEvent& event);
   void OnMonitorDown(wxCommandEvent& event);
   void RefreshMonitors();
-<<<<<<< 3c2e913bd380e85a5d1bb7dd3e25e1fcc1ed6760:gui.h
 
   void toggleButtonsEnabled(bool enabled);
-=======
-
->>>>>>> Reorganised project into folders.:gui/gui.h
 
   void colourChange(int index);
   void OnColourBlue(wxCommandEvent& event);
