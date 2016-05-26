@@ -30,7 +30,7 @@ enum {
   MY_CONTINUE_BUTTON_ID,
   MY_ZOOM_RESET_ID,
   MY_SWITCH_LIST_ID,
-
+  MONITOR_BOX_ID,
   BLUE_ID,
   GREEN_ID,
   BW_ID,
@@ -87,6 +87,7 @@ class MyFrame: public wxFrame
   void OnMonitorUp(wxCommandEvent& event);
   void OnMonitorDown(wxCommandEvent& event);
   void RefreshMonitors();
+  void MonitorSelectionChanged(wxCommandEvent &event);
  
   void toggleButtonsEnabled(bool enabled);
 

@@ -42,6 +42,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(wxID_ADD, MyFrame::OnAddMonitor)
     EVT_BUTTON(wxID_UP, MyFrame::OnMonitorUp)
     EVT_BUTTON(wxID_DOWN, MyFrame::OnMonitorDown)
+    EVT_CHECKLISTBOX(MONITOR_BOX_ID, MyFrame::MonitorSelectionChanged)
     
     
     EVT_CHECKLISTBOX(MY_SWITCH_LIST_ID, MyFrame::OnSwitchListEvent)
@@ -133,7 +134,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxPanel* listpanel = new wxPanel(this, wxID_ANY,
         wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, wxRearrangeListMattNameStr);
 
-    monitorlist = new wxRearrangeListMatt(listpanel, wxID_ANY,
+    monitorlist = new wxRearrangeListMatt(listpanel, MONITOR_BOX_ID,
                                  wxDefaultPosition, wxDefaultSize,
                                  monitorOrder, monitorItems,
                                  0, wxDefaultValidator);
@@ -286,6 +287,9 @@ void MyFrame::OnMonitorDown(wxCommandEvent &event) {
     canvas->Render();
 }
 
+void MyFrame::MonitorSelectionChanged(wxCommandEvent &event) {
+    
+}
 
 void MyFrame::OnAbout(wxCommandEvent &event)
     // Event handler for the about menu item
