@@ -1,5 +1,6 @@
-#ifndef devices_h
-#define devices_h
+
+#ifndef GF2_DEVICES_H
+#define GF2_DEVICES_H
 
 #include <string>
 
@@ -9,6 +10,11 @@
 #include "network.h"
 
 
+/** Devices Class
+ *  Used to create, manipulate and execute devices within a network.
+ *
+ *  @author Gee
+ */
 class devices{
   names* nmz;      // the version of the names module we use.
   network* netz;   // the version of the network module we use.
@@ -46,47 +52,95 @@ public:
   name        zero, one;
   name        highpin, lowpin, swpin;
 
+  /** Adds a device to the network of the specified kind and name.
+   *
+   * @param[in]  dkind    The type of the device.
+   * @param[in]  did      The id in the name table of the device.
+   * @param[in]  variant  The variant of device. The meaning depends on the
+   *                      type of device being created:
+   * @param      ok       Returns false if an error occured.
+   * @param[in]  at       The source position the device is being defined from
+   *                      for later error handling.
+   */
   void makedevice (devicekind dkind, name did, int variant, bool& ok, SourcePos at = SourcePos());
-    /* Adds a device to the network of the specified kind and name.  The   */
-    /* variant is used with such things as gates where it specifies the    */
-    /* number of inputs. 'ok' returns true if operation succeeds.          */
 
+  /** Sets the state of the named switch.
+   *
+   * @param[in]  sid    The id in the name table of the switch to be set
+   * @param[in]  level  The new output signal of the switch.
+   * @param      ok     Returns false if an error occured, i.e. the switch was
+   *                    not found.
+   * @param[in]  at     The source position the switch is being set from.
+   */
   void setswitch (name sid, asignal level, bool& ok, SourcePos at = SourcePos());
-    /* Sets the state of the named switch. 'ok' returns false if switch    */
-    /* not found.                                                          */
 
+  /** Sets the frequency of the named clock.
+   *
+   * @param[in]  sid        The id in the name table of the clock to be set
+   * @param[in]  frequency  The new period of the clock.
+   * @param      ok         Returns false if an error occured, i.e. the clock was
+   *                        not found.
+   * @param[in]  at         The source position the clock is being set from.
+   */
   void setclock (name sid, int frequency, bool& ok, SourcePos at = SourcePos());
-    /* Sets the frequency of the named clock. 'ok' returns false if clock  */
-    /* not found.                                                          */
 
+  /** Updates clocks in the network, represents one "tick" of the
+   *  simulation.
+   */
   void updateclocks (void);
-    /* Updates clocks in the network, represents one "tick" of the simulation */
 
+  /** Executes all devices in the network to simulate one complete clock
+   *  cycle.
+   *
+   * @param      ok    Returns false if an error occured, i.e. the network
+   *                   failed to stabilise.
+   * @param[in]  tick  If false, then clocks aren't updated at the start of
+   *                   execution.
+   */
   void executedevices (bool& ok, bool tick = true);
-    /* Executes all devices in the network to simulate one complete clock  */
-    /* cycle. 'ok' is returned false if network fails to stabilise (i.e.   */
-    /* it is oscillating). */
 
+  /** Resets the outputs of devices in the network to zero
+   */
   void resetdevices();
-    /* Resets the outputs of devices in the network to zero                */
 
+  /** Returns the kind of device corresponding to the given name.
+   *
+   * @param[in]  id    The identifier in the name table to search for
+   * @return     The devicekind corresponding to the id, or 'baddevice' if the
+   *             name is not a legal device.
+   */
   devicekind devkind (name id);
-    /* Returns the kind of device corresponding to the given name.         */
-    /* 'baddevice' is returned if the name is not a legal device.          */
 
+  /** Returns the name id of the given devicekind
+   *
+   * @param[in]  k     The device type.
+   * @return     The name id in the name table, or blankname if the devicekind
+   *             is invalid.
+   */
   name getname(devicekind k) const;
-    /* Returns the name id of the given devicekind                         */
 
+  /** Prints out the given device kind. [deprecated - use std::cout << *getname()]
+   *
+   * @param[in]  k     The device type value.
+   */
   void writedevice (devicekind k);
-    /* Prints out the given device kind.                                   */
 
+  /** Set the state of the internal debugging flag.
+   *
+   * @param on If true then debugging is enabled, otherwise debugging is disabled.
+   */
   void debug (bool on);
-    /* Used to set debugging switch.                                       */
 
+  /** Initialises the devices object
+   *
+   * @param      names_mod  The names class instance to use.
+   * @param      net_mod    The network class instance to use.
+   */
   devices (names* names_mod, network* net_mod);
-    /* Called to initialise module.                                        */
 
+  /** Clears up resources allocated by devices.
+   */
   ~devices();
 };
 
-#endif /* devices_h */
+#endif /* GF2_DEVICES_H */

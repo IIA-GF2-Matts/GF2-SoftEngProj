@@ -7,10 +7,9 @@
 
 using namespace std;
 
-/***********************************************************************
+/** Used to print out signal values for debugging in showdevice.
  *
- * Used to print out signal values for debugging in showdevice.
- *
+ * @author Gee
  */
 void devices::outsig (asignal s)
 {
@@ -24,11 +23,10 @@ void devices::outsig (asignal s)
 }
 
 
-/***********************************************************************
+/** Used to print out device details and signal values
+ *  for debugging in executedevices.
  *
- * Used to print out device details and signal values
- * for debugging in executedevices.
- *
+ * @author Gee
  */
 void devices::showdevice (devlink d)
 {
@@ -54,11 +52,10 @@ void devices::showdevice (devlink d)
 }
 
 
-/***********************************************************************
+/** Sets the state of the named switch. 'ok' returns false if switch
+ *  not found.
  *
- * Sets the state of the named switch. 'ok' returns false if switch
- * not found.
- *
+ * @author Gee
  */
 void devices::setswitch (name sid, asignal level, bool& ok, SourcePos at)
 {
@@ -77,11 +74,10 @@ void devices::setswitch (name sid, asignal level, bool& ok, SourcePos at)
 
 #ifdef EXPERIMENTAL
 
-/***********************************************************************
+/** Used to make new imported devices.
+ *  Called by makedevice().
  *
- * Used to make new switch devices.
- * Called by makedevice.
- *
+ * @author Diesel
  */
 void devices::makeimported(name id, std::string fname, errorcollector& errs, SourcePos at)
 {
@@ -111,11 +107,10 @@ void devices::makeimported(name id, std::string fname, errorcollector& errs, Sou
 #endif
 
 
-/***********************************************************************
+/** Used to make new switch devices.
+ *  Called by makedevice.
  *
- * Used to make new switch devices.
- * Called by makedevice.
- *
+ * @author Gee
  */
 void devices::makeswitch (name id, int setting, bool& ok, SourcePos at)
 {
@@ -140,12 +135,10 @@ void devices::makeswitch (name id, int setting, bool& ok, SourcePos at)
 
 #ifdef EXPERIMENTAL
 
-/***********************************************************************
+/** Used to make new switch devices.
+ *  Called by makedevice.
  *
- * Used to make new switch devices.
- * Called by makedevice.
- * Author: Diesel
- *
+ * @author Diesel
  */
 void devices::makeselect(name id, int setting, bool& ok, SourcePos at)
 {
@@ -166,11 +159,9 @@ void devices::makeselect(name id, int setting, bool& ok, SourcePos at)
 #endif
 
 
-/***********************************************************************
+/** Sets the frequency of the named clock.
  *
- * Sets the frequency of the named clock. 'ok' returns false if clock
- * not found.
- *
+ * @author Gee
  */
 void devices::setclock (name sid, int frequency, bool& ok, SourcePos at)
 {
@@ -187,11 +178,10 @@ void devices::setclock (name sid, int frequency, bool& ok, SourcePos at)
 }
 
 
-/***********************************************************************
+/** Used to make new clock devices.
+ *  Called by makedevice.
  *
- * Used to make new clock devices.
- * Called by makedevice.
- *
+ * @author Gee
  */
 void devices::makeclock (name id, int frequency, SourcePos at)
 {
@@ -204,11 +194,10 @@ void devices::makeclock (name id, int frequency, SourcePos at)
 }
 
 
-/***********************************************************************
+/** Used to make new AND, NAND, OR, NOR and XOR gates.
+ *  Called by makedevice.
  *
- * Used to make new AND, NAND, OR, NOR and XOR gates.
- * Called by makedevice.
- *
+ * @author Gee
  */
 void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok, SourcePos at)
 {
@@ -236,13 +225,12 @@ void devices::makegate (devicekind dkind, name did, int ninputs, bool& ok, Sourc
 }
 
 
-/***********************************************************************
+/** Used to make new D-type bistable devices.
+ *  Inputs: DATA, CLK, SET and CLR.
+ *  Outputs: Q, QBAR.
+ *  Called by makedevice.
  *
- * Used to make new D-type bistable devices.
- * Inputs: D, clock, preset and clear.
- * Outputs: Q, QBAR.
- * Called by makedevice.
- *
+ * @author Gee
  */
 void devices::makedtype (name id, bool& ok, SourcePos at)
 {
@@ -264,12 +252,9 @@ void devices::makedtype (name id, bool& ok, SourcePos at)
 }
 
 
-/***********************************************************************
+/** Adds a device to the network of the specified kind and name.
  *
- * Adds a device to the network of the specified kind and name.  The
- * variant is used with such things as gates where it specifies the
- * number of inputs. 'ok' returns true if operation succeeds.
- *
+ * @author Gee
  */
 void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, SourcePos at)
 {
@@ -310,11 +295,10 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
 }
 
 
-/***********************************************************************
+/** Update signal `sig' in the direction of signal `target'.
+ *  Set steadystate to false if this results in a change in sig.
  *
- * Update signal `sig' in the direction of signal `target'.
- * Set steadystate to false if this results in a change in sig.
- *
+ * @author Gee
  */
 void devices::signalupdate (asignal target, asignal& sig)
 {
@@ -338,10 +322,9 @@ void devices::signalupdate (asignal target, asignal& sig)
 }
 
 
-/***********************************************************************
+/** Returns the inverse of a signal.
  *
- * Returns the inverse of a signal.
- *
+ * @author Gee
  */
 asignal devices::inv (asignal s)
 {
@@ -349,11 +332,10 @@ asignal devices::inv (asignal s)
 }
 
 
-/***********************************************************************
+/** Used to simulate the operation of switch devices.
+ *  Called by executedevices.
  *
- * Used to simulate the operation of switch devices.
- * Called by executedevices.
- *
+ * @author Gee
  */
 void devices::execswitch (devlink d)
 {
@@ -363,12 +345,10 @@ void devices::execswitch (devlink d)
 
 #ifdef EXPERIMENTAL
 
-/***********************************************************************
+/** Used to simulate the operation of select devices.
+ *  Called by executedevices.
  *
- * Used to simulate the operation of select devices.
- * Called by executedevices.
- * Author: Diesel
- *
+ * @author Diesel
  */
 void devices::execselect (devlink d, bool& ok)
 {
@@ -391,12 +371,11 @@ void devices::execselect (devlink d, bool& ok)
 #endif
 
 
-/***********************************************************************
+/** Used to simulate the operation of AND, OR, NAND and NOR gates.
+ *  Called by executedevices.
+ *  Meaning of arguments: gate output is 'y' iff all inputs are 'x'
  *
- * Used to simulate the operation of AND, OR, NAND and NOR gates.
- * Called by executedevices.
- * Meaning of arguments: gate output is 'y' iff all inputs are 'x'
- *
+ * @author Gee
  */
 void devices::execgate (devlink d, asignal x, asignal y)
 {
@@ -413,11 +392,10 @@ void devices::execgate (devlink d, asignal x, asignal y)
 }
 
 
-/***********************************************************************
+/** Used to simulate the operation of exclusive or gates.
+ *  Called by executedevices.
  *
- * Used to simulate the operation of exclusive or gates.
- * Called by executedevices.
- *
+ * @author Gee
  */
 void devices::execxorgate(devlink d)
 {
@@ -430,14 +408,14 @@ void devices::execxorgate(devlink d)
 }
 
 
-/***********************************************************************
+/** Used to simulate the operation of D-type bistables.
  *
- * Used to simulate the operation of D-type bistables.
- * Called by executedevices. The signal on the data input
- * immediately BEFORE the clock edge is transferred to the
- * Q output. We are effectively assuming a negligible but
- * nonzero setup time, and a zero hold time.
+ *  Called by executedevices. The signal on the data input
+ *  immediately BEFORE the clock edge is transferred to the
+ *  Q output. We are effectively assuming a negligible but
+ *  nonzero setup time, and a zero hold time.
  *
+ * @author Gee
  */
 void devices::execdtype (devlink d)
 {
@@ -463,11 +441,10 @@ void devices::execdtype (devlink d)
 }
 
 
-/***********************************************************************
+/** Used to simulate the operation of clock devices.
+ *  Called by executedevices.
  *
- * Used to simulate the operation of clock devices.
- * Called by executedevices.
- *
+ * @author Gee
  */
 void devices::execclock(devlink d)
 {
@@ -482,12 +459,10 @@ void devices::execclock(devlink d)
 
 #ifdef EXPERIMENTAL
 
-/***********************************************************************
+/** Used to simulate the operation of an imported network.
+ *  Called by executedevices.
  *
- * Used to simulate the operation of an imported network.
- * Called by executedevices.
- * Author: Diesel
- *
+ * @author Diesel
  */
 void devices::execimported(devlink d) {
   // Update input pins
@@ -508,12 +483,11 @@ void devices::execimported(devlink d) {
 #endif
 
 
-/***********************************************************************
+/** Increment the counters in the clock devices and initiate changes
+ *  in their outputs when the end of their period is reached.
+ *  Called by executedevices.
  *
- * Increment the counters in the clock devices and initiate changes
- * in their outputs when the end of their period is reached.
- * Called by executedevices.
- *
+ * @author Gee
  */
 void devices::updateclocks (void)
 {
@@ -538,12 +512,10 @@ void devices::updateclocks (void)
 }
 
 
-/***********************************************************************
+/** Executes all devices in the network to simulate one complete clock
+ *  cycle.
  *
- * Executes all devices in the network to simulate one complete clock
- * cycle. 'ok' is returned false if network fails to stabilise (i.e.
- * it is oscillating).
- *
+ * @author Gee
  */
 void devices::executedevices (bool& ok, bool tick)
 {
@@ -586,10 +558,9 @@ void devices::executedevices (bool& ok, bool tick)
 }
 
 
-/***********************************************************************
+/** Resets devices in the network
  *
- * Resets devices in the network
- *
+ * @author Diesel
  */
 void devices::resetdevices() {
   for (devlink d = netz->devicelist(); d; d = d->next) {
@@ -620,10 +591,9 @@ void devices::resetdevices() {
 }
 
 
-/***********************************************************************
+/** Returns the name id of the given devicekind
  *
- * Returns the name of the device type.
- *
+ * @author Diesel
  */
 name devices::getname (devicekind k) const
 {
@@ -631,11 +601,10 @@ name devices::getname (devicekind k) const
 }
 
 
-/***********************************************************************
+/** Prints out the given device kind. [deprecated - use std::cout << *getname()]
+ *  Used by showdevice.
  *
- * Prints out the given device kind.
- * Used by showdevice.
- *
+ * @author Gee
  */
 void devices::writedevice (devicekind k)
 {
@@ -643,11 +612,9 @@ void devices::writedevice (devicekind k)
 }
 
 
-/***********************************************************************
+/** Returns the kind of device corresponding to the given name.
  *
- * Returns the kind of device corresponding to the given name.
- * 'baddevice' is returned if the name is not a legal device.
- *
+ * @author Gee
  */
 devicekind devices::devkind (name id)
 {
@@ -659,10 +626,9 @@ devicekind devices::devkind (name id)
 }
 
 
-/***********************************************************************
+/** Set the state of the internal debugging flag.
  *
- * Set the state of the internal debugging flag.
- *
+ * @author Gee
  */
 void devices::debug (bool on)
 {
@@ -670,11 +636,10 @@ void devices::debug (bool on)
 }
 
 
-/***********************************************************************
+/** Initialises the devices object
+ *  Registers the names of all the possible devices.
  *
- * Constructor for the devices class.
- * Registers the names of all the possible devices.
- *
+ * @author Gee
  */
 devices::devices (names* names_mod, network* net_mod)
 {
@@ -715,10 +680,7 @@ devices::devices (names* names_mod, network* net_mod)
 }
 
 
-/***********************************************************************
- *
- * Clears up resources allocated by devices
- *
+/** Clears up resources allocated by devices
  */
 devices::~devices() {
 }
