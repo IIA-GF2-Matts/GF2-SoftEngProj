@@ -42,7 +42,6 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_BUTTON(wxID_ADD, MyFrame::OnAddMonitor)
     EVT_BUTTON(wxID_UP, MyFrame::OnMonitorUp)
     EVT_BUTTON(wxID_DOWN, MyFrame::OnMonitorDown)
-    EVT_CHECKLISTBOX(MONITOR_BOX_ID, MyFrame::MonitorSelectionChanged)
     
     
     EVT_CHECKLISTBOX(MY_SWITCH_LIST_ID, MyFrame::OnSwitchListEvent)
@@ -285,10 +284,6 @@ void MyFrame::OnMonitorDown(wxCommandEvent &event) {
             monitorOrder.begin() + sel - 1);
     }
     canvas->Render();
-}
-
-void MyFrame::MonitorSelectionChanged(wxCommandEvent &event) {
-    
 }
 
 void MyFrame::OnAbout(wxCommandEvent &event)

@@ -87,7 +87,6 @@ class MyFrame: public wxFrame
   void OnMonitorUp(wxCommandEvent& event);
   void OnMonitorDown(wxCommandEvent& event);
   void RefreshMonitors();
-  void MonitorSelectionChanged(wxCommandEvent &event);
  
   void toggleButtonsEnabled(bool enabled);
 
