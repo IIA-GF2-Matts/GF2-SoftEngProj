@@ -32,11 +32,11 @@ clisim: $(C_OBJECTS)
 	$(CXX) $(FLAGS) -o clisim $(C_OBJECTS)
 
 clean:
-	rm -rf build mattlab clisim scanner_unittest parser_unittest
+	rm -rf build *.o mattlab clisim scanner_unittest parser_unittest
 
 depend:
 	makedepend $(SRC) $(GUISRC) $(CLISRC)
-	
+
 
 build:
 	mkdir -p build/cli/cli
@@ -90,14 +90,14 @@ gtest_main.a : gtest-all.o gtest_main.o
 scanner_unittest.o : lang/scanner_unittest.cpp lang/scanner.h
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c lang/scanner_unittest.cpp
 
-scanner_unittest : gtest_main.a scanner_unittest.o lang/scanner.o com/iposstream.o com/cistring.o com/names.o com/errorhandler.o sim/network.o sim/devices.o com/sourcepos.o
+scanner_unittest : gtest_main.a scanner_unittest.o build/cli/lang/scanner.o build/cli/com/iposstream.o build/cli/com/cistring.o build/cli/com/names.o build/cli/com/errorhandler.o build/cli/sim/network.o build/cli/sim/devices.o build/cli/com/sourcepos.o
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
 
 
 parser_unittest.o : lang/parser_unittest.cpp lang/parser.h
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -c lang/parser_unittest.cpp
 
-parser_unittest : gtest_main.a parser_unittest.o lang/parser.o com/errorhandler.o com/names.o com/autocorrect.o sim/network.o sim/devices.o sim/monitor.o com/cistring.o com/iposstream.o com/sourcepos.o
+parser_unittest : gtest_main.a parser_unittest.o build/cli/lang/parser.o build/cli/com/errorhandler.o build/cli/com/names.o build/cli/com/autocorrect.o build/cli/sim/network.o build/cli/sim/devices.o build/cli/sim/monitor.o build/cli/com/cistring.o build/cli/com/iposstream.o build/cli/com/sourcepos.o
 	$(CLICXX) $(FLAGS) $(GTEST_CPPFLAGS) $(GTEST_CXXFLAGS) -lpthread $^ -o $@
 
 
