@@ -1,0 +1,43 @@
+dev clk = clock {
+	period: 1;
+}
+
+// inputs
+dev j = switch {
+	initialvalue: 1;
+}
+
+dev k = switch {
+	initialvalue: 1;
+}
+
+// first gates
+dev g1 = nand {
+	I1: j;
+	I2: clk;
+}
+dev g2 = nand {
+	I1: k;
+	I2: clk;
+}
+
+// second gates
+dev g3 = nand;
+dev g4 = nand {
+	I1: g2;
+	I2: g3;
+}
+dev g3 {
+	I1: g1;
+	I2: g4;
+}
+
+// finish up connections
+dev g1 {
+	I3: g4;
+}
+dev g2 {
+	I3: g3;
+}
+
+monitor g3 as q, g4 as qbar;

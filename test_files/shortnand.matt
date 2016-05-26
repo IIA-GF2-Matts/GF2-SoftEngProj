@@ -1,0 +1,5 @@
+dev n = nand {
+	i1: n;
+}
+
+monitor n;

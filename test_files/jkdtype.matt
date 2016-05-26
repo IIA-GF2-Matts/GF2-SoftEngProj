@@ -1,0 +1,38 @@
+dev clk = clock {
+	period: 1;
+}
+
+dev j = switch {
+	initialvalue: 1;
+}
+
+dev k = switch {
+	initialvalue: 1;
+}
+
+dev d = dtype;
+
+dev g1 = and {
+	i1: j;
+	i2: d.qbar;
+}
+
+dev kbar = nand {
+	i1:k;
+}
+dev g2 = and {
+	i1: d.q;
+	i2: kbar;
+}
+
+dev g3 = or {
+	i1: g1;
+	i2: g2;
+}
+
+dev d {
+	data: g3;
+	clk: clk;
+}
+
+monitor d.q as q, d.qbar as qbar;
