@@ -108,7 +108,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxBoxSizer *cycle_sizer = new wxBoxSizer(wxHORIZONTAL);
     cycle_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles:"), 0, wxALL, 15);
     spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
-    spin->SetRange(1, 100);
+    spin->SetRange(1, 1000);
     cycle_sizer->Add(spin, 0 , wxALL, 10);
     // sizer for cycles and run buttons
 
