@@ -14,11 +14,20 @@ typedef enum {falling, low, rising, high, floating} asignal;
 typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 	      norgate, xorgate, dtype, jk, siggen, aselect, imported, baddevice} devicekind;
 
+/** Stores a signals deivce . outputpin pair
+ *
+ * @author Judge
+ */
 struct outputsignal {
   name devicename;
   name pinname;
 };
 
+
+/** List of output pins for a device
+ *
+ * @author Gee
+ */
 struct outputrec {
   name       id;
   SourcePos  definedAt;
@@ -27,6 +36,11 @@ struct outputrec {
 };
 typedef outputrec* outplink;
 
+
+/** List of input pins for a device
+ *
+ * @author Gee
+ */
 struct inputrec {
   name      id;
   SourcePos  definedAt;
@@ -36,6 +50,10 @@ struct inputrec {
 typedef inputrec* inplink;
 
 
+/** List of devices and their properties in a network
+ *
+ * @author Gee
+ */
 struct devicerec {
   name id;
   SourcePos  definedAt;
@@ -56,59 +74,119 @@ struct devicerec {
 };
 typedef devicerec* devlink;
 
+
+/** Stores a list of devices and provides methods for manipulating it.
+ *
+ * @author Gee
+ */
 class network {
   names* nmz;  // the instatiation of the names class that we are going to use.
 
  public:
+  /** Returns list of devices
+   *
+   * @return     The pointer to the first device in the list.
+   */
   devlink devicelist (void);
-    /* Returns list of devices                                             */
 
+  /** Finds the device that creates the output link ol
+   *
+   * @param[in]  ol    The outplink to search for
+   * @return     The devlink of the device owning ol, or NULL if it could not be
+   *             found.
+   */
   devlink findoutputdevice(const outplink ol);
-    /* Finds the device that creates the output link ol                    */
 
+  /** Returns the collection of switches in the network.
+   *
+   * @return     A vector containing the devlinks of all SWITCH devices in the
+   *             network.
+   */
   std::vector<devlink> findswitches();
-  // find all the user defined switches in the network
 
+  /** Find all the output signals
+   *
+   * @return     The vector of all the output signal names in the network
+   */
   std::vector<outputsignal> findoutputsignals();
-  // find all the output signals
 
+  /** Returns link to device with specified name.
+   *
+   * @param[in]  id    The name id of the device to search for.
+   * @return     The devlink of the device, or NULL if it could not be found.
+   */
   devlink finddevice (name id);
-   /* Returns link to device with specified name. Returns NULL if not      */
-   /* found.                                                               */
 
+  /** Returns the link to input of a device
+   *
+   * @param[in]  dev   The device name id
+   * @param[in]  id    The input pin name id
+   * @return     The inplink of the input on device dev, or NULL if no input
+   *             with that name exists.
+   */
   inplink findinput (devlink dev, name id);
-    /* Returns link to input of device pointed to by dev with specified    */
-    /* name.  Returns NULL if not found.                                    */
 
+  /** Returns the link to an ouput of a device
+   *
+   * @param[in]  dev   The device name id
+   * @param[in]  id    The output pin name id
+   * @return     The outplink to the output pin on device dev, or NULL if no
+   *             output with that name exists.
+   */
   outplink findoutput (devlink dev, name id);
-    /* Returns link to output of device pointed to by dev with specified   */
-    /* name.  Returns NULL if not found.                                    */
 
+  /** Adds a device to the device list with given name and returns a link to it
+   *
+   * @param[in]  dkind  The device type
+   * @param[in]  did    The device name id
+   * @param      dev    Returns the device link if successful.
+   * @param[in]  at     The source position the device is being added from.
+   */
   void adddevice (devicekind dkind, name did, devlink& dev, SourcePos at = SourcePos());
-    /* Adds a device to the device list with given name and returns a link */
-    /* to it via 'dev'.                                                    */
 
+  /** Adds an input to a device
+   *
+   * @param[in]  dev   The device name id
+   * @param[in]  iid   The input pin name id
+   * @param[in]  at    The source position the input is being defined from
+   */
   void addinput (devlink dev, name iid, SourcePos at = SourcePos());
-    /* Adds an input to the device pointed to by 'dev' with the specified  */
-    /* name.                                                               */
 
+  /** Adds an output to a device
+   *
+   * @param[in]  dev   The device name id
+   * @param[in]  oid   The output pin name id
+   * @param[in]  at    The source position the device is being defined from.
+   */
   void addoutput (devlink dev, name oid, SourcePos at = SourcePos());
-    /* Adds an output to the device pointed to by 'dev' with the specified */
-    /* name.                                                               */
 
+  /** Creates a connection to the input of one device, from the output of another.
+   *
+   * @param[in]  idev  The device name id whose input is to be connected
+   * @param[in]  inp   The idev input pin name id to be connected
+   * @param[in]  odev  The device name id whose output is to be connected
+   * @param[in]  outp  The odev output pin name id to be connected
+   * @param      ok    Returns true if the connection was made successfully.
+   */
   void makeconnection (name idev, name inp, name odev, name outp, bool& ok);
-    /* Makes a connection between the 'inp' input of device 'idev' and the */
-    /* 'outp' output of device 'odev'. 'ok' is set true if operation       */
-    /* succeeds.                                                           */
 
+  /** Checks a network for errors
+   *  This function checks for errors that can't be detected during parsing,
+   *  such as inputs left floating or properties left undefined.
+   *
+   * @param      col   A reference to the errorcollector to report errors to.
+   */
   void checknetwork (errorcollector& col);
-    /* Checks that all inputs are connected to an output.                  */
 
+  /** Initialises the network
+   *
+   * @param      names_mod  The names table instance to use.
+   */
   network (names* names_mod);
-  /* Called on system initialisation.                                      */
 
+  /** Clears resources allocated by network
+   */
   ~network();
-    /* Frees memory allocated by network                                   */
 
  private:
   devlink devs;          // the list of devices
