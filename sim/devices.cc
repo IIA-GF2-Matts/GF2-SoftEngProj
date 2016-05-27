@@ -307,10 +307,12 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
       ok = false;
       // Must call makeimported directly.
       break;
-    case siggen:
-      ok = false;
+    case siggen: {
+      std::vector<bool> b;
+      makesiggen(dkind, b, variant, ok, at);
       // must call makesiggen directly.
       break;
+    }
 #endif
     case baddevice:
     default:
