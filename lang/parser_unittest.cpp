@@ -1,3 +1,18 @@
+/* A unit tester framework for the parser
+ * inputs are provided by a stream of tokens
+ * the output is tested by a stream of expected actions to be 
+ * matched with the actual actions taken by the parser. The 
+ * scanner and network builder are simulated, with the inputs and 
+ * outputs monitored.
+ * 
+ * Tests pass if the expected actions match the actual
+ * actions taken by the parser on the input tokens.
+ * 
+ * Tests require the google test framework
+ * https://github.com/google/googletest
+ *
+ * @author     Judge
+ */
 
 #include "parser.h"
 #include "gtest/gtest.h"
@@ -105,6 +120,7 @@ bool operator==(const Action& a1, const Action& a2) {
 
 
 // parser test controller
+// @author   Judge
 class ParserTest : public ::testing::Test {
 
 protected:
@@ -175,6 +191,7 @@ std::vector<Token> ParserTest::_tkstream;
 
 
 /// Dummy network builder to accept parser output
+// @author   Judge
 networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc)
     : _netz(netz), _devz(devz), _mons(mons), _nms(nms), _errs(errc) {
 }
@@ -228,6 +245,7 @@ Token::Token(TokType t, int num)
 
 
 /// Dummy scanner to enter tokens to parser
+// @author   Judge
 scanner::scanner(names* nmz) {}
 scanner::~scanner(){}
 bool scanner::open(std::istream* is, std::string fname) {return true;}
@@ -286,7 +304,7 @@ Token scanner::readNext() {
 //       device name, device pin, alias name, alias pin
 
 
-
+// @author   Judge
 TEST_F(ParserTest, SetClockPeriod){
     // dev CLK = CLOCK {Period : 5;}
     testparserTokenStream({
@@ -307,7 +325,7 @@ TEST_F(ParserTest, SetClockPeriod){
     });
 }
 
-
+// @author   Judge
 TEST_F(ParserTest, CreateAndGateLooped){
     // dev G1 = AND {I1 : G1;}
     testparserTokenStream({
@@ -328,7 +346,7 @@ TEST_F(ParserTest, CreateAndGateLooped){
     });
 }
 
-
+// @author   Judge
 TEST_F(ParserTest, MonitorOrGat){
     // monitor G1 as ali.pin
     testparserTokenStream({
@@ -348,10 +366,9 @@ TEST_F(ParserTest, MonitorOrGat){
 
 
 // testing catching errors
-
+// @author   Judge
 TEST_F(ParserTest, ErrorneousDevDefine){
     // devf G1 = XOR;
-    // note: using testparserTokenStreamError
     testparserTokenStream({
         genToken(Identifier, "devf"),
         genToken(Identifier, "G1"),
@@ -366,7 +383,7 @@ TEST_F(ParserTest, ErrorneousDevDefine){
 
 
 // testing device type as name
-
+// @author   March
 TEST_F(ParserTest, DeviceTypeAsName){
     // dev NAND = NAND;
     testparserTokenStream({
@@ -383,6 +400,7 @@ TEST_F(ParserTest, DeviceTypeAsName){
 }
 
 // testing misspelt option
+// @author   March
 TEST_F(ParserTest, MisspeltOption){
     // dev CLK = CLOCK {Perod : 4; }
     testparserTokenStream({

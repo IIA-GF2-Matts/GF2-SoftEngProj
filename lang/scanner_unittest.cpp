@@ -1,3 +1,18 @@
+/* A unit tester framework for the scanner
+ * inputs are provided by strings 
+ * the output is tested by a stream of expected tokens to be 
+ * matched with the actual tokens output by the scanner.
+ * 
+ * Tests pass if the expected tokens match the actual
+ * tokens output by the scanner from the input strings.
+ * 
+ * Tests require the google test framework
+ * https://github.com/google/googletest
+ *
+ *
+ * @author     Judge
+ */
+
 
 #include "scanner.h"
 #include "gtest/gtest.h"
@@ -49,6 +64,8 @@ std::map<TokType, const char*> _tokMap = {
 };
 
 
+// Scanner test controller
+// @author   Judge
 class ScannerTest : public ::testing::Test {
     protected:
 
@@ -138,6 +155,7 @@ class ScannerTest : public ::testing::Test {
     }
 };
 
+// @author   Judge
 TEST_F(ScannerTest, PunctuationToken){
     testscannerToken("=", Equals);
     testscannerToken(":", Colon);
@@ -148,6 +166,7 @@ TEST_F(ScannerTest, PunctuationToken){
     testscannerToken(".", Dot);
 }
 
+// @author   Judge
 TEST_F(ScannerTest, DeviceTypeToken){
     testscannerToken("CLOCK",  DeviceType);
     testscannerToken("SWITCH", DeviceType);
@@ -159,6 +178,7 @@ TEST_F(ScannerTest, DeviceTypeToken){
     testscannerToken("XOR",    DeviceType);
 }
 
+// @author   Judge
 TEST_F(ScannerTest, CaseInsensitiveToken){
     testscannerToken("ClOcK",   DeviceType);
     testscannerToken("dEv",     DevKeyword);
@@ -168,36 +188,42 @@ TEST_F(ScannerTest, CaseInsensitiveToken){
 }
 
 
+// @author   Judge
 TEST_F(ScannerTest, KeywordToken){
     testscannerToken("dev",     DevKeyword);
     testscannerToken("monitor", MonitorKeyword);
     testscannerToken("as",      AsKeyword);
 }
 
+// @author   Judge
 TEST_F(ScannerTest, IdentifierToken){
     testscannerToken("G1",    Identifier);
     testscannerToken("SW1",   Identifier);
     testscannerToken("hello", Identifier);
 }
 
+// @author   Judge
 TEST_F(ScannerTest, IdentifierTokenUnderscore){
     testscannerToken("G_",    Identifier);
     testscannerToken("S_W1",   Identifier);
     testscannerToken("h1_", Identifier);
 }
 
+// @author   Judge
 TEST_F(ScannerTest, NumberToken){
     testscannerToken("1",   Number);
     testscannerToken("123", Number);
     testscannerToken("000", Number);
 }
 
+// @author   Judge
 TEST_F(ScannerTest, LineCommentToken){
     testscannerToken("// Testing dev\n// Another comment?\n123", Number);
     testscannerToken("// Testing clock\n123// Another comment?",   Number);
     testscannerToken("//*/dev\nas",   AsKeyword);
 }
 
+// @author   Judge
 TEST_F(ScannerTest, BlockCommentToken){
     testscannerToken("/* dev\n// Another comment?\nCLOCK*/dev", DevKeyword);
     testscannerToken("/*** dev\n// Another comment?\nCLOCK***/dev", DevKeyword);
@@ -215,7 +241,7 @@ TEST_F(ScannerTest, BlockCommentToken){
 
 
 // device definitions
-
+// @author   Judge
 TEST_F(ScannerTest, DeviceDefinitionTokenStream){
     testscannerTokenStream("dev D1 = DTYPE { I1 : 0; }", {
         genToken(DevKeyword),
@@ -232,6 +258,7 @@ TEST_F(ScannerTest, DeviceDefinitionTokenStream){
     });
 }
 
+// @author   Judge
 TEST_F(ScannerTest, DeviceTypeDefinitionTokenStream){
     testscannerTokenStream("dev D1 = DTYPE;", {
         genToken(DevKeyword),
@@ -243,6 +270,7 @@ TEST_F(ScannerTest, DeviceTypeDefinitionTokenStream){
     });
 }
 
+// @author   Judge
 TEST_F(ScannerTest, DeviceOptionsDefinitionTokenStream){
     testscannerTokenStream("dev D1 {key:value}", {
         genToken(DevKeyword),
@@ -256,6 +284,7 @@ TEST_F(ScannerTest, DeviceOptionsDefinitionTokenStream){
     });
 }
 
+// @author   Judge
 TEST_F(ScannerTest, PreceedingKeywordIdentifiersTokenStream){
     testscannerTokenStream("dev devdevdevid dev;", {
         genToken(DevKeyword),
@@ -266,6 +295,7 @@ TEST_F(ScannerTest, PreceedingKeywordIdentifiersTokenStream){
     });
 }
 
+// @author   Judge
 TEST_F(ScannerTest, IdentifiersDotTokenStream){
     testscannerTokenStream("G1.I1", {
         genToken(Identifier, "G1"),
@@ -283,6 +313,7 @@ TEST_F(ScannerTest, IdentifiersDotTokenStream){
 }
 
 
+// @author   Judge
 TEST_F(ScannerTest, LineCommentNewlinesTokenStream){
     testscannerTokenStream("monitor//. as //asdf \r\n 3", {
         genToken(MonitorKeyword),
@@ -297,6 +328,7 @@ TEST_F(ScannerTest, LineCommentNewlinesTokenStream){
     });
 }
 
+// @author   Judge
 TEST_F(ScannerTest, NestedLineCommentTokenStream){
     testscannerTokenStream("monitor//. as //asdf \n 3", {
         genToken(MonitorKeyword),
@@ -320,6 +352,7 @@ TEST_F(ScannerTest, NestedLineCommentTokenStream){
 
 }
 
+// @author   Judge
 TEST_F(ScannerTest, BlockCommentTokenStream){
     testscannerTokenStream("sadf/**/as", {
         genToken(Identifier, "sadf"),
@@ -346,11 +379,9 @@ TEST_F(ScannerTest, BlockCommentTokenStream){
         genToken(AsKeyword),
         genToken(EndOfFile)
     });
-
-
-
 }
 
+// @author   Judge
 TEST_F(ScannerTest, NumberTokenStream){
     testscannerTokenStream("1234.33", {
         genToken(Number, 1234),
@@ -366,14 +397,17 @@ TEST_F(ScannerTest, NumberTokenStream){
     });
 }
 
-// ERRORS
 
+
+// ERRORS
+// @author   Judge
 TEST_F(ScannerTest, ErrorUnderscore){
     testscannerError("_G_");
     testscannerError("_dev");
     testscannerError("_01");
 }
 
+// @author   Judge
 TEST_F(ScannerTest, ErrorIllegalCharacters){
     testscannerError("@");
     testscannerError("#");
@@ -385,15 +419,17 @@ TEST_F(ScannerTest, ErrorIllegalCharacters){
     testscannerError("-");
 }
 
+// @author   Judge
 TEST_F(ScannerTest, NestedBlockToken){
     testscannerError("asdf /*/* */*/as");
 }
 
+// @author   Judge
 TEST_F(ScannerTest, BigNumberToken){
     testscannerError("1234567891234567");
 }
 
-
+// @author   Judge
 TEST_F(ScannerTest, NegativeNumberToken){
     testscannerError("-1234");
 }
