@@ -5,26 +5,53 @@
 #include "sourcepos.h"
 
 
-#ifndef UTIL_IPOSSTREAM_H
-#define UTIL_IPOSSTREAM_H
+#ifndef GF2_IPOSSTREAM_H
+#define GF2_IPOSSTREAM_H
 
 
-// An input stream that also records character positions.
-// Todo: Make this into a fully featured stream class derived from std::istream
+/** Wraps an input character stream, whilst tracking source position.
+ *
+ * @author Diesel
+ */
 class iposstream {
 public:
+	/** Constructs a positional-stream
+	 */
 	iposstream();
 	iposstream( std::istream* );
 	iposstream( std::istream*, std::string fname );
+
+	/** Clears resources allocated by the iposstream
+	 */
 	~iposstream();
 
+	/** Returns the next character without extracting it
+	 *
+	 * @return     The next character in the stream
+	 */
 	int peek();
+
+	/** Extracts the next character from the stream, and increments the counters
+	 *
+	 * @return     The next character in the stream
+	 */
 	int get();
+
+	/** Checks the stream End of File flag
+	 * @return True if the stream is at the end of the file.
+	 */
 	bool eof() const;
 
-	void setStream(std::istream* );
-	void setStream(std::istream*, std::string fname );
+	/** Sets the base stream
+	 *
+	 * @param      is    The stream to base the positional stream on
+	 * @param      fname The file name
+	 */
+	void setStream(std::istream* is);
+	void setStream(std::istream* is, std::string fname );
 
+	/** The current position of the stream
+	 */
 	SourcePos Pos;
 	int TabWidth;
 
@@ -35,4 +62,4 @@ private:
 };
 
 
-#endif
+#endif // GF2_IPOSSTREAM_H

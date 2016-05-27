@@ -8,13 +8,19 @@
 
 // class iposstream
 
-// Creates an uninitialised positional stream
+
+/** Creates an uninitialised positional stream
+ *
+ * @author Diesel
+ */
 iposstream::iposstream()
 	: Pos( ), TabWidth( 1 ), _open(false), next( "", 1, 1, 1 ) {
 }
 
-
-// Creates a positional stream based on an input stream.
+/** Creates a positional stream based on an input stream.
+ *
+ * @author Diesel
+ */
 iposstream::iposstream( std::istream* base )
 	: Pos( ), TabWidth( 1 ), _open(true), basestream( base ), next( "", 1, 1, 1 ) {
 }
@@ -23,17 +29,30 @@ iposstream::iposstream( std::istream* base, std::string fname )
 	: Pos( fname, 0, 0, 0 ), TabWidth( 1 ), _open(true), basestream( base ), next( fname, 1, 1, 1 ) {
 }
 
+/** Clears resources allocated by the iposstream
+ *
+ * @author Diesel
+ */
 iposstream::~iposstream() {
 }
 
-// reads the next character without extracting it
+
+/** Returns the next character without extracting it
+ *
+ * @author Diesel
+ */
 int iposstream::peek() {
 	return( basestream->peek() );
 }
 
-// Extracts the next character from the stream, and increments the counters.
-// Regardless of operating system, this function will return '\n' for a line
-// ending.
+
+/** Extracts the next character from the stream, and increments the counters
+ *
+ * Regardless of operating system, this function will return '\n' for a line
+ * ending.
+ *
+ * @author Diesel
+ */
 int iposstream::get() {
 	this->Pos = next;
 
@@ -73,13 +92,20 @@ int iposstream::get() {
 	return( ret );
 }
 
-// checks if end-of-file has been reached
+
+/** Checks the stream End of File flag
+ *
+ * @author Diesel
+ */
 bool iposstream::eof() const {
 	return( basestream->eof() );
 }
 
 
-// Set the base stream
+/** Sets the base stream
+ *
+ * @author Diesel
+ */
 void iposstream::setStream(std::istream* is) {
 	basestream = is;
 	_open = true;
