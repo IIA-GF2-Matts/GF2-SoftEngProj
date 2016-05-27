@@ -1,0 +1,11 @@
+dev sig1 = SIGGEN {
+	Period : 1;
+	Sig : $01;
+}
+
+dev sig2 = SIGGEN {
+	Period : 1;
+	Sig : $001010001;
+}
+
+monitor sig1, sig2;
