@@ -277,19 +277,21 @@ void parser::parseOption(Token& tk, Token& devName) {
 }
 
 
-// value = signalname | number ;
+// value = signalname | number | bitstream ;
 void parser::parseValue(Token& tk, Token& devName, Token& keyTok) {
     Token valuetk = tk;
 
     if (valuetk.type == TokType::Identifier) {
         // a signal
         Signal sig = parseSignalName(tk);
-
         netbuild.setInputSignal(devName, keyTok, sig);
-    } else if (valuetk.type == TokType::Number) {
-        netbuild.setInputValue(devName, keyTok, valuetk);
 
+    } else if (valuetk.type == TokType::Number
+        || valuetk.type == TokType::Bitstream) {
+
+        netbuild.setInputValue(devName, keyTok, valuetk);
         stepAndPeek(tk);
+
     } else {
         throw mattsyntaxerror("Expected an Identifier or Number", valuetk.at);
     }
