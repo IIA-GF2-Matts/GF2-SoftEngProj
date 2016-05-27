@@ -309,7 +309,7 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
       break;
     case siggen: {
       std::vector<bool> b;
-      makesiggen(dkind, b, variant, ok, at);
+      makesiggen(did, b, variant, ok, at);
       // must call makesiggen directly.
       break;
     }
