@@ -667,6 +667,7 @@ devices::devices (names* names_mod, network* net_mod)
 
   initvalnm = nmz->lookup("InitialValue");
   periodnm = nmz->lookup("Period");
+  signm = nmz->lookup("SIG");
 
   // Note: Doesn't match name requirement for user.
   // so cannot be overwritten/reused in user code.

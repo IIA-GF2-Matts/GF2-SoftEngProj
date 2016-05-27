@@ -48,7 +48,7 @@ public:
 
   name        clkpin, datapin, setpin;
   name        clrpin, qpin, qbarpin;     /* Input and Output Pin names */
-  name        initvalnm, periodnm;
+  name        initvalnm, periodnm, signm;
   name        zero, one;
   name        highpin, lowpin, swpin;
 
