@@ -228,7 +228,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                     || keyTok.id == _devz->setpin || keyTok.id == _devz->clrpin)) {
                 std::ostringstream oss;
                 oss << "DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. ";
-                getClosestMatchError(_nms->namestr(keyTok.id), dtypeoutset, oss);
+                getClosestMatchError(_nms->namestr(keyTok.id), dtypeinset, oss);
                 _errs.report(mattsemanticerror(oss.str(), keyTok.at));
                 return false;
             }
