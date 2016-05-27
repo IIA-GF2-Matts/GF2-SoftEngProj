@@ -557,7 +557,9 @@ void devices::updateclocks (void)
         if (++(d->bitstrpos) >= d->bitstr.size()) {
           d->bitstrpos = 0;
         }
-        signalupdate(d->bitstr[d->bitstrpos] ? high : low, d->olist->sig);
+        if (d->bitstr[d->bitstrpos] ? high : low != d->olist->sig) {
+          d->olist->sig = d->bitstr[d->bitstrpos] ? rising : falling;
+        }
       }
       (d->counter)++;
     }
@@ -599,6 +601,7 @@ void devices::executedevices (bool& ok, bool tick)
 #ifdef EXPERIMENTAL
         case aselect:  execselect(d, ok);        break;
         case imported: execimported(d);          break;
+        case siggen:   execsiggen(d);            break;
 #endif
         default:       ok = false;               break;
       }
