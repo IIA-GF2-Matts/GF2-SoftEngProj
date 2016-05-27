@@ -29,8 +29,11 @@ const std::map<namestring, devicekind> deviceTypes = {
 
 
 // struct Token
-  inplink ilist;
 
+/** Constructs a new Token.
+ *
+ * @author Diesel
+ */
 Token::Token()
     : type(TokType::EndOfFile)
 {
@@ -58,14 +61,24 @@ Token::Token(TokType t, int num)
 
 
 
-
 // class scanner
 
+/** Read the next character from the input character stream
+ *
+ * @author Diesel
+ */
 int scanner::readChar() {
     return _ips.get();
 }
 
 
+/** Analyse the next set of characters to find the next token in the stream
+ *
+ * The Mattlang lexical elements can all be identified by the first character after
+ * trimming leading whitespace.
+ *
+ * @author Diesel
+ */
 Token scanner::readNext() {
     Token ret;
 
@@ -217,6 +230,12 @@ Token scanner::readNext() {
 }
 
 
+/** Consume characters while they match a name
+ *
+ * identifier     = letter , { alphanum } ;
+ *
+ * @author Diesel
+ */
 name scanner::readName(int c1) {
     std::basic_ostringstream<char, namestring::traits_type> oss;
     oss << char(c1);
@@ -229,6 +248,12 @@ name scanner::readName(int c1) {
 }
 
 
+/** Consume characters while they match a number
+ *
+ * number         = digit , { digit } ;
+ *
+ * @author Diesel
+ */
 int scanner::readNumber(int c1) {
     int ret = c1 - '0';
 
@@ -249,11 +274,16 @@ int scanner::readNumber(int c1) {
     return ret;
 }
 
+
 #ifdef EXPERIMENTAL
 
-// string = "..."
-// To use include quotes in the string, double them up:
-//     "this is ""A Test""" -> this is "A Test"
+/** Consumes characters matching a string literal
+ *
+ * stringliteral = string , stringliteral ;
+ * string = '"' , { all characters - '"' } , '"' ;
+ *
+ * @author Diesel
+ */
 std::string scanner::readString(int c1) {
     std::ostringstream oss;
 
@@ -282,6 +312,11 @@ std::string scanner::readString(int c1) {
 #endif
 
 
+/** Initialises a new scanner
+ *  Sets the name ids of keywords for use in comparisons
+ *
+ * @author Diesel
+ */
 scanner::scanner(names* nmz)
         : _open(false), _hasNext(false), _nmz(nmz), parent(NULL) {
 
@@ -292,6 +327,20 @@ scanner::scanner(names* nmz)
 }
 
 
+/** Clears resources allocated by the scanner
+ *
+ * @author Diesel
+ */
+scanner::~scanner() {
+}
+
+
+/** Open an input character stream with the given file name.
+ *  Note: Streams should be opened as binary in order to prevent issues with
+ *  changing EoL characters.
+ *
+ * @author Diesel
+ */
 bool scanner::open(std::istream* is, std::string fname) {
     if (is->good()) {
         _ips.setStream(is, fname);
@@ -304,10 +353,11 @@ bool scanner::open(std::istream* is, std::string fname) {
     return _open;
 }
 
-scanner::~scanner() {
-}
 
-
+/** Steps forwards in the stream to the next token.
+ *
+ * @author Diesel
+ */
 Token scanner::step() {
     Token ret = peek();
     _hasNext = false;
@@ -316,6 +366,10 @@ Token scanner::step() {
 }
 
 
+/** Peeks at the next token in the stream.
+ *
+ * @author Diesel
+ */
 Token scanner::peek() {
     if (!_hasNext) {
         _next = readNext();
@@ -325,6 +379,10 @@ Token scanner::peek() {
 }
 
 
+/** Gets the name of the file currently being scanned
+ *
+ * @author Diesel
+ */
 std::string scanner::getFile() const {
     return _file;
 }
@@ -332,11 +390,26 @@ std::string scanner::getFile() const {
 
 // class fscanner
 
+/** Initialises the file scanner
+ *
+ * @author Diesel
+ */
 fscanner::fscanner(names* nmz) : scanner(nmz) {
 }
 
+
+/** Clears resources allocated by the file scanner.
+ *
+ * @author Diesel
+ */
 fscanner::~fscanner() {}
 
+/** Opens a file, and then sets that as the base for the scanner.
+ *  Note: Streams should be opened as binary in order to prevent issues with
+ *  changing EoL characters.
+ *
+ * @author Diesel
+ */
 bool fscanner::open(std::string fname) {
     _ifs.open(fname, std::ifstream::in | std::ifstream::binary);
 
@@ -346,6 +419,10 @@ bool fscanner::open(std::string fname) {
 
 // class strscanner
 
+/** Creates the string scanner, and opens the string.
+ *
+ * @author Diesel
+ */
 strscanner::strscanner(names* nmz, std::string str)
         : scanner(nmz), _iss(std::ifstream::in | std::ifstream::binary) {
 
