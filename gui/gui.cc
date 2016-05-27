@@ -216,6 +216,15 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
                     // Todo: Error message
                 }
             }
+        } else {
+            x = mmz->findmonitor(signals[i].devicename, signals[i].pinname);
+            if (x != -1) {
+                mmz->remmonitor(signals[i].devicename, signals[i].pinname, ok);
+                //std::cout << "Created monitor " << oss.str() << std::endl;
+                if (!ok) {
+                    // Todo: Error message
+                }
+            }
         }
     }
     RefreshMonitors();
