@@ -53,7 +53,7 @@ public:
     int number; ///< If type == TokType::Number, this is the integer value.
     devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
 #ifdef EXPERIMENTAL
-    std::string str;
+    std::string str; ///< If type == TokType::String, this is the string
 #endif
 
     /** Constructs a new Token.
