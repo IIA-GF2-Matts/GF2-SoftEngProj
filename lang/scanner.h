@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <vector>
 
 #include "../com/iposstream.h" // SourcePos
 #include "../com/names.h" // names, namestring, name
@@ -33,7 +34,8 @@ enum TokType {
     Identifier,
     DeviceType,
     ImportKeyword,
-    String
+    String,
+    Bitstream
 };
 
 extern const std::map<namestring, devicekind> deviceTypes;
@@ -54,6 +56,7 @@ public:
     devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
 #ifdef EXPERIMENTAL
     std::string str; ///< If type == TokType::String, this is the string
+    std::vector<bool> bitstr; ///< If type == TokType::Bitstream, this is the bit stream.
 #endif
 
     /** Constructs a new Token.
@@ -116,9 +119,16 @@ protected:
     /** Consumes characters matching a string literal
      *
      * @param[in]  c1    The previous character pulled from the stream
-     * @return     The string literal read from the string.
+     * @return     The string literal read from the stream.
      */
     std::string readString(int c1);
+
+    /** Consumes characters matching a bitstream literal
+     *
+     * @param[in]  c1    The previous character pulled from the stream
+     * @return     The bitstream literal read from the stream
+     */
+    std::vector<bool> readBitstream(int c1);
 #endif
 
 public:

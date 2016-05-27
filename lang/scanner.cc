@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "../com/names.h"
 #include "../com/iposstream.h"
@@ -24,6 +25,7 @@ const std::map<namestring, devicekind> deviceTypes = {
     {"XOR", xorgate}
 #ifdef EXPERIMENTAL
     ,{"SELECT", aselect}
+    ,{"SIGGEN", aselect}
 #endif
 };
 
@@ -164,6 +166,10 @@ Token scanner::readNext() {
         case '"':
             ret.type = TokType::String;
             ret.str = readString(c);
+            break;
+        case '$':
+            ret.type = TokType::Bitstream;
+            ret.bitstr = readBitstream(c);
             break;
 #endif
         default:
@@ -307,6 +313,29 @@ std::string scanner::readString(int c1) {
     }
 
     return oss.str();
+}
+
+
+/** Consumes characters matching a bitstram literal
+ *
+ * bitstream = '$' , { "1" | "0" } ;
+ *
+ * @author Diesel
+ */
+std::vector<bool> scanner::readBitstream(int c1) {
+    std::vector<bool> ret;
+
+    SourcePos start = _ips.Pos;
+
+    while(_ips.peek() == '0' || _ips.peek() == '0') {
+        ret.push_back(_ips.get() == '1');
+    }
+
+    if (ret.size() == 0) {
+        throw mattsyntaxerror("Was expecting a binary digit, empty bitstreams not allowed.", start);
+    }
+
+    return ret;
 }
 
 #endif
