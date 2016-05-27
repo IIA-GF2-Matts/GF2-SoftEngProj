@@ -18,7 +18,11 @@
 #include "networkbuilder.h"
 
 
-
+/** Checks if a name follows the correct format for a gate input (I##, 
+ *  where ## is 1-maxn)
+ *
+ * @author Judge
+ */
 bool networkbuilder::isLegalGateInputNamestring(name n, int maxn) {
     namestring s = _nms->namestr(n);
     if (s.length() < 2
@@ -38,6 +42,10 @@ bool networkbuilder::isLegalGateInputNamestring(name n, int maxn) {
 }
 
 
+/** Method to generate the error message when a signal pin has not been defined
+ *
+ * @author Judge
+ */
 void networkbuilder::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
     devicekind dkind = _netz->finddevice(sig.device.id)->kind;
 
@@ -55,6 +63,11 @@ void networkbuilder::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
         oss << " Use Q or Qbar.";
 }
 
+/** Method to generate the error message when a signal pin has not been defined
+ *  Provides error and note messages (including details on the previous definition)
+ *
+ * @author Judge
+ */
 template<typename T>
 void networkbuilder::getPredefinedError(devlink dvl, name key, T prevval, std::ostream& warnoss, std::ostream& noteoss) {
     warnoss << "Attempt to redefine " //<< *_devz->getname(dvl->kind)
@@ -65,7 +78,10 @@ void networkbuilder::getPredefinedError(devlink dvl, name key, T prevval, std::o
 
 
 
-
+/** Network builder constructor
+ *
+ * @author Judge
+ */
 networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc)
     : _netz(netz), _devz(devz), _mons(mons), _nms(nms), _errs(errc) {
         //_devz->debug(true);
@@ -74,7 +90,10 @@ networkbuilder::networkbuilder(network* netz, devices* devz, monitor* mons, name
 networkbuilder::~networkbuilder() {
 }
 
-
+/** Defines and adds a new device to the network if determined to be a legal action
+ *
+ * @author Judge
+ */
 void networkbuilder::defineDevice(Token& devName, Token& type) {
     // Semantic check: has devicename been defined before?
     devlink dl = _netz->finddevice(devName.id);
@@ -103,7 +122,6 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
 
     if (!success) {
         // Shouldn't ever reach here
-        // TODO: Better error message?
         _errs.report(mattruntimeerror(
             "Unable to add device to the network.", type.at));
         return;
@@ -113,6 +131,10 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
 
 #ifdef EXPERIMENTAL
 
+ /** Imports and adds a new device to the network from a secondary file if determined to be a legal action
+ *
+ * @author Diesel
+ */
 void networkbuilder::importDevice(Token& devName, Token& fileStr) {
     // Todo: Merge with defineDevice to avoid duplication
     devlink dl = _netz->finddevice(devName.id);
@@ -134,7 +156,12 @@ void networkbuilder::importDevice(Token& devName, Token& fileStr) {
 
 #endif
 
-
+/** Checks if a given key is legal for a device
+ *   Checks if it's legal for the device type, then checks if it's been
+ *     predefined.
+ *
+ * @author Judge
+ */
 bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
     // Todo: Merge key check switches
 
@@ -297,7 +324,10 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
 }
 
 
-
+/** Sets an input property value of a device if determined to be a legal action
+ *
+ * @author Judge
+ */
 void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok) {
 
     devlink dvl = _netz->finddevice(devName.id);
@@ -322,7 +352,10 @@ void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok)
     }
 }
 
-
+/** Sets an input pin of a device to a signal if determined to be a legal action
+ *
+ * @author Judge
+ */
 void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSig) {
 
     devlink dvl = _netz->finddevice(devName.id);
@@ -350,7 +383,11 @@ void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSi
     }
 }
 
-
+/** Creates a network link between a devices input pin and a signal output
+ *  Checks the legality of such a connection prior to linking
+ *
+ * @author Judge
+ */
 void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
     // Ensure signal exists
     signal_legality badSignal = isBadSignal(sig);
@@ -385,6 +422,11 @@ void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
     }
 }
 
+/** Assigns a value to a device's property
+ *  Checks and reports invalid values
+ *
+ * @author Judge
+ */
 void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
     bool success = false;
     if (dvl->kind == aswitch) {
@@ -420,12 +462,21 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
     }
 }
 
-
+/** Creates a new monitor point (with no alias) if determined to be a
+ *  legal action
+ *
+ * @author Judge
+ */
 void networkbuilder::defineMonitor(Signal& monSig) {
     Signal aliSig;
 	defineMonitor(monSig, aliSig);
 }
 
+/** Creates a new monitor point if determined to be a
+ *  legal action
+ *
+ * @author Judge
+ */
 void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
     // Ensure signal exists
     signal_legality badSignal = isBadSignal(monSig);
@@ -482,7 +533,10 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
     }
 }
 
-
+/** Checks if a signal already exists (whether the device and pin of a signal are defined)
+ *
+ * @author Judge
+ */
 signal_legality networkbuilder::isBadSignal(Signal& sig) {
     devlink dvlnk = _netz->finddevice(sig.device.id);
     if (dvlnk == NULL)
@@ -492,7 +546,11 @@ signal_legality networkbuilder::isBadSignal(Signal& sig) {
     return LEGAL_SIGNAL;
 }
 
-
+/** Determine if a given property key is legal for a given device
+ * does not check if the key has been previously assigned to
+ *
+ * @author Judge
+ */
 bool networkbuilder::isLegalProperty(devlink dvl, name keyname) {
     return ( (dvl->kind == aclock && keyname == _devz->periodnm)
             || (dvl->kind == aswitch && keyname == _devz->initvalnm));
