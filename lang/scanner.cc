@@ -328,7 +328,7 @@ std::vector<bool> scanner::readBitstream(int c1) {
 
     SourcePos start = _ips.Pos;
 
-    while(_ips.peek() == '0' || _ips.peek() == '0') {
+    while(_ips.peek() == '0' || _ips.peek() == '1') {
         ret.push_back(_ips.get() == '1');
     }
 
