@@ -3,6 +3,7 @@
 #define GF2_DEVICES_H
 
 #include <string>
+#include <vector>
 
 #include "../com/names.h"
 #include "../com/sourcepos.h"
@@ -44,6 +45,8 @@ public:
   void execimported(devlink d);
   void makeselect (name id, int setting, bool& ok, SourcePos at = SourcePos());
   void execselect(devlink d, bool& ok);
+  void makesiggen(name id, std::vector<bool> bits, int period, bool& ok, SourcePos at = SourcePos());
+  void execsiggen(devlink d);
 #endif
 
   name        clkpin, datapin, setpin;

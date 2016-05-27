@@ -156,6 +156,26 @@ void devices::makeselect(name id, int setting, bool& ok, SourcePos at)
   }
 }
 
+
+/** Used to make new signal generators.
+ *
+ * @author Diesel
+ */
+void devices::makesiggen(name id, std::vector<bool> bits, int period, bool& ok, SourcePos at)
+{
+  devlink d;
+
+  netz->adddevice (siggen, id, d);
+  ok = d != NULL;
+  if (ok) {
+    d->definedAt = at;
+    netz->addoutput (d, blankname);
+    d->bitstr = bits;
+    d->frequency = period;
+  }
+}
+
+
 #endif
 
 
@@ -169,7 +189,7 @@ void devices::setclock (name sid, int frequency, bool& ok, SourcePos at)
   d = netz->finddevice (sid);
   ok = (d != NULL);
   if (ok) {
-    ok = (d->kind == aclock);
+    ok = (d->kind == aclock  || d->kind == siggen);
     if (ok) {
       d->frequency = frequency;
       d->setAt = at;
@@ -286,6 +306,10 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
       ok = false;
       // Must call makeimported directly.
       break;
+    case siggen:
+      ok = false;
+      // must call makesiggen directly.
+      break;
 #endif
     case baddevice:
     default:
@@ -367,6 +391,23 @@ void devices::execselect (devlink d, bool& ok)
     }
   }
 }
+
+
+/** Used to simulate the operation of siggen devices.
+ *  Called by executedevices.
+ *
+ * @author Diesel
+ */
+void devices::execsiggen(devlink d)
+{
+  if (d->olist->sig == rising)
+    signalupdate (high, d->olist->sig);
+  else {
+    if (d->olist->sig == falling)
+      signalupdate (low, d->olist->sig);
+  }
+}
+
 
 #endif
 
@@ -507,6 +548,16 @@ void devices::updateclocks (void)
     else if (d->kind == imported) {
       d->device->tick();
     }
+    else if (d->kind == siggen) {
+      if (d->frequency == 0 || d->counter == d->frequency) {
+        d->counter = 0;
+        if (++(d->bitstrpos) >= d->bitstr.size()) {
+          d->bitstrpos = 0;
+        }
+        signalupdate(d->bitstr[d->bitstrpos] ? high : low, d->olist->sig);
+      }
+      (d->counter)++;
+    }
 #endif
   }
 }
@@ -581,7 +632,11 @@ void devices::resetdevices() {
       case imported:
         d->device->dmz->resetdevices();
         break;
-      case select:
+      case aselect:
+        break;
+      case siggen:
+        d->counter = 0;
+        d->olist->sig = d->bitstr[0] ? high : low;
         break;
 #endif
       default:
