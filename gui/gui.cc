@@ -279,6 +279,8 @@ void MyFrame::OnMonitorUp(wxCommandEvent &event) {
         // swap new position and old one in monitor order
         std::iter_swap(monitorOrder.begin() + sel,
             monitorOrder.begin() + sel + 1);
+        std::iter_swap(monitorDisplayed.begin() + sel,
+            monitorDisplayed.begin() + sel + 1);
     }
     canvas->Render();
 }
@@ -290,6 +292,8 @@ void MyFrame::OnMonitorDown(wxCommandEvent &event) {
         // swap new position and old one in monitor order
         std::iter_swap(monitorOrder.begin() + sel,
             monitorOrder.begin() + sel - 1);
+        std::iter_swap(monitorDisplayed.begin() + sel,
+            monitorDisplayed.begin() + sel - 1);
     }
     canvas->Render();
 }
