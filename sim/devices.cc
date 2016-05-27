@@ -170,6 +170,7 @@ void devices::makesiggen(name id, std::vector<bool> bits, int period, bool& ok, 
   if (ok) {
     d->definedAt = at;
     netz->addoutput (d, blankname);
+    d->bitstrpos = 0;
     d->bitstr = bits;
     d->frequency = period;
   }
