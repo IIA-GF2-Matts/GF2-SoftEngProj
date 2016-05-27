@@ -318,7 +318,8 @@ std::string scanner::readString(int c1) {
 
 /** Consumes characters matching a bitstram literal
  *
- * bitstream = '$' , { "1" | "0" } ;
+ * bitstream = '$' , bit , { bit } ;
+ * bit       = "0" | "1" ;
  *
  * @author Diesel
  */
