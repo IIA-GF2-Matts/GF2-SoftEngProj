@@ -183,6 +183,15 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
             }
 
             break;
+        case siggen:
+            if (keyTok.id != _devz->periodnm
+                && keyTok.id != _devz->signm) {
+                _errs.report(mattsemanticerror(
+                    "Signal generators may only have SIG or Period attributes.", keyTok.at));
+                return false;
+            }
+
+            break;
         case andgate:
             if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
@@ -282,6 +291,33 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 _errs.report(mattnote(noteoss.str(), dvl->definedAt));
                 return false;
             }
+            break;
+        case siggen:
+            if (keyTok.id == _devz->periodnm) {
+                // initially set to 0
+                if (dvl->frequency != 0) {
+                    std::ostringstream warnoss, noteoss;
+                    getPredefinedError(dvl, keyTok.id, dvl->frequency, warnoss, noteoss);
+                    _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
+                    _errs.report(mattnote(noteoss.str(), dvl->definedAt));
+                    return false;
+                }
+            } else if (keyTok.id == _devz->signm) {
+                // initially set empty
+                if (dvl->bitstr.size() != 0) {
+                    std::ostringstream warnoss, noteoss;
+                    // todo: print actual bitstream value
+                    getPredefinedError(dvl, keyTok.id, "a bitstream", warnoss, noteoss);
+                    _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
+                    _errs.report(mattnote(noteoss.str(), dvl->definedAt));
+                    return false;
+                }                
+            } else {
+                _errs.report(mattsemanticerror(
+                    "Signal generators may only have SIG or Period attributes.", keyTok.at));
+                return false;
+            }
+            
             break;
         case andgate:
         case nandgate:
@@ -459,7 +495,29 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
             _errs.report(mattruntimeerror("Could not set clock period", valTok.at));
             return;
         }
-    }
+    } else if (dvl->kind == siggen) {
+        // Signal generator
+        // check key value pairs
+        // already know key is okay
+        if (keytk.id == _devz->periodnm) {
+            if (valTok.type != TokType::Number 
+                || valTok.number < 1 
+                || valTok.number > 32767) {
+                    _errs.report(mattsemanticerror(
+                        "Signal generator periods must be integers between 1 and 32767", valTok.at));
+                    return;
+            }
+            dvl->frequency = valTok.number;
+        } else if (keytk.id == _devz->signm) {
+            if (valTok.type != TokType::Bitstream
+                || valTok.bitstr.size() <= 0) {
+                _errs.report(mattsemanticerror(
+                    "Signal generator SIG inputs must be bitstreams longer than zero bits", valTok.at));
+                return;
+            }
+            dvl->bitstr = valTok.bitstr;
+        } 
+    } 
 }
 
 /** Creates a new monitor point (with no alias) if determined to be a
@@ -553,5 +611,7 @@ signal_legality networkbuilder::isBadSignal(Signal& sig) {
  */
 bool networkbuilder::isLegalProperty(devlink dvl, name keyname) {
     return ( (dvl->kind == aclock && keyname == _devz->periodnm)
-            || (dvl->kind == aswitch && keyname == _devz->initvalnm));
+            || (dvl->kind == aswitch && keyname == _devz->initvalnm)
+            || (dvl->kind == siggen && keyname == _devz->periodnm)
+            || (dvl->kind == siggen && keyname == _devz->signm));
 }
