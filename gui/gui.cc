@@ -57,6 +57,22 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
     // using sizers
 {
+    m_locale = new wxLocale(wxLANGUAGE_DEFAULT);
+    if (m_locale->IsOk()) {
+        std::cout << "It worked!" << std::endl;
+        if (m_locale->AddCatalog(wxT("messages"))) {
+            std::cout << "Loaded catalog!" << std::endl;
+        }
+        else {
+            std::cout << "Not found catalog!" << std::endl;
+        }
+    }
+    else {
+        std::cout << "Locale not working or recognised!?!?" << std::endl;
+    }
+
+
+
     SetIcon(wxIcon(logo32));
 
     hasNetwork = false;
@@ -65,32 +81,32 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
     // file menu
     wxMenu *fileMenu = new wxMenu;
-    fileMenu->Append(ID_FILEOPEN, "&Open\tCtrl+O");
-    addMonitorMenuBar = new wxMenuItem(fileMenu, ID_ADDMONITOR, "Monitor Signal List");
+    fileMenu->Append(ID_FILEOPEN, _("&Open\tCtrl+O"));
+    addMonitorMenuBar = new wxMenuItem(fileMenu, ID_ADDMONITOR, _("Monitor Signal List"));
     fileMenu->Append(addMonitorMenuBar);
-    fileMenu->Append(wxID_ABOUT, "&About");
-    fileMenu->Append(wxID_EXIT, "&Quit");
+    fileMenu->Append(wxID_ABOUT, _("&About"));
+    fileMenu->Append(wxID_EXIT, _("&Quit"));
 
     // view menu
     wxMenu *viewMenu = new wxMenu;
     // colour menu
     wxMenu *colourMenu = new wxMenu;
-    colourMenu->AppendRadioItem(BLUE_ID, "Cool Blue");
-    colourMenu->AppendRadioItem(GREEN_ID, "Retro Green");
-    colourMenu->AppendRadioItem(BW_ID, "Simple B+W");
-    colourMenu->AppendRadioItem(PINK_ID, "Candy Pink");
-    viewMenu->Append(wxID_ANY, "Colour Theme", colourMenu);
+    colourMenu->AppendRadioItem(BLUE_ID, _("Cool Blue"));
+    colourMenu->AppendRadioItem(GREEN_ID, _("Retro Green"));
+    colourMenu->AppendRadioItem(BW_ID, _("Simple B+W"));
+    colourMenu->AppendRadioItem(PINK_ID, _("Candy Pink"));
+    viewMenu->Append(wxID_ANY, _("Colour Theme"), colourMenu);
 
     // zoom section
     viewMenu->AppendSeparator();
-    viewMenu->Append(wxID_ZOOM_IN, "&Zoom in\tCtrl+=");
-    viewMenu->Append(wxID_ZOOM_OUT, "&Zoom out\tCtrl+-");
-    viewMenu->Append(MY_ZOOM_RESET_ID, "&Reset zoom\tCtrl+0");
+    viewMenu->Append(wxID_ZOOM_IN, _("&Zoom in\tCtrl+="));
+    viewMenu->Append(wxID_ZOOM_OUT, _("&Zoom out\tCtrl+-"));
+    viewMenu->Append(MY_ZOOM_RESET_ID, _("&Reset zoom\tCtrl+0"));
 
     // top level menu
     wxMenuBar *menuBar = new wxMenuBar;
-    menuBar->Append(fileMenu, "&File");
-    menuBar->Append(viewMenu, "&View");
+    menuBar->Append(fileMenu, _("&File"));
+    menuBar->Append(viewMenu, _("&View"));
     SetMenuBar(menuBar);
 
     // top level sizer
@@ -103,21 +119,21 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
     // run and continue buttons
     wxBoxSizer *button_sizer = new wxBoxSizer(wxHORIZONTAL);
-    runbutton = new wxButton(this, MY_RUN_BUTTON_ID, "Run");
+    runbutton = new wxButton(this, MY_RUN_BUTTON_ID, _("Run"));
     runbutton->Enable(false);
     button_sizer->Add(runbutton, 0, wxALL, 10);
-    continuebutton = new wxButton(this, MY_CONTINUE_BUTTON_ID, "Continue");
+    continuebutton = new wxButton(this, MY_CONTINUE_BUTTON_ID, _("Continue"));
     button_sizer->Add(continuebutton, 0, wxALL, 10);
 
     // sizer for cycle selector
     wxBoxSizer *cycle_sizer = new wxBoxSizer(wxHORIZONTAL);
-    cycle_sizer->Add(new wxStaticText(this, wxID_ANY, "Cycles:"), 0, wxALL, 15);
+    cycle_sizer->Add(new wxStaticText(this, wxID_ANY, _("Cycles:")), 0, wxALL, 15);
     spin = new wxSpinCtrl(this, MY_SPINCNTRL_ID, wxString("10"));
     spin->SetRange(1, 1000);
     cycle_sizer->Add(spin, 0 , wxALL, 10);
     // sizer for cycles and run buttons
 
-    wxStaticBox *run_box = new wxStaticBox(this, wxID_ANY, "Run controls");
+    wxStaticBox *run_box = new wxStaticBox(this, wxID_ANY, _("Run controls"));
     wxStaticBoxSizer *run_sizer = new wxStaticBoxSizer(run_box, wxVERTICAL);
     run_sizer->Add(cycle_sizer, 0, wxALL, 10);
     run_sizer->Add(button_sizer, 0, wxALL|wxALIGN_CENTER, 10);
@@ -126,7 +142,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     wxArrayString switchItems;
     switchlist = new wxCheckListBox(this, MY_SWITCH_LIST_ID, wxDefaultPosition, wxDefaultSize, switchItems);
     // switch sizer
-    wxStaticBox *switch_box = new wxStaticBox(this, wxID_ANY, "Switches");
+    wxStaticBox *switch_box = new wxStaticBox(this, wxID_ANY, _("Switches"));
     wxStaticBoxSizer *switch_sizer = new wxStaticBoxSizer(switch_box, wxVERTICAL);
     switch_sizer->Add(switchlist, 1, wxALL|wxEXPAND, 10);
 
@@ -157,7 +173,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     listpanel->SetSizer(sizerTop);
 
     // wrap Diesel's monitor panel in a static box sizer.
-    wxStaticBox *monitor_box = new wxStaticBox(this, wxID_ANY, "Monitors");
+    wxStaticBox *monitor_box = new wxStaticBox(this, wxID_ANY, _("Monitors"));
     wxStaticBoxSizer *monitor_sizer = new wxStaticBoxSizer(monitor_box, wxVERTICAL);
     monitor_sizer->Add(listpanel, 1, wxALL, 10);
 
@@ -175,6 +191,7 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
 
     SetSizeHints(800, 500);
     SetSizer(topsizer);
+
 }
 
 void MyFrame::OnExit(wxCommandEvent &event)
@@ -310,9 +327,9 @@ void MyFrame::OnMonitorDown(wxCommandEvent &event) {
 void MyFrame::OnAbout(wxCommandEvent &event)
     // Event handler for the about menu item
 {
-    wxMessageDialog about(this, "Mattlab Digital Logic Simulator\n\n"
+    wxMessageDialog about(this, _("Mattlab Digital Logic Simulator\n\n"
         "Produced for Engineering IIA project GF2 2016 by:\n"
-        "Matt March (mdm46)\nMatt Judge (mcj33)\nMatt Diesel (md639)", "About Mattlab", wxICON_INFORMATION | wxOK);
+        "Matt March (mdm46)\nMatt Judge (mcj33)\nMatt Diesel (md639)"), _("About Mattlab"), wxICON_INFORMATION | wxOK);
     about.ShowModal();
 }
 

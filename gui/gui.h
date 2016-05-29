@@ -7,7 +7,7 @@
 #include <wx/checklst.h>
 #include <wx/arrstr.h>
 #include <wx/statbox.h>
-// #include <wx/arrint.h>
+#include <wx/intl.h>
 #include <vector>
 
 #include "../com/names.h"
@@ -71,6 +71,8 @@ class MyFrame: public wxFrame
   std::vector<bool> monitored;
   std::vector<bool> monitorDisplayed;
   std::vector<int> monitorOrder;
+
+  wxLocale *m_locale; // locale for translations
 
   bool runnetwork(int ncycles);           // function to run the logic network
   void OnExit(wxCommandEvent& event);     // event handler for exit menu item
