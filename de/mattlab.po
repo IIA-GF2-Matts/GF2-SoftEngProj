@@ -31,7 +31,7 @@ msgstr "&Über"
 
 #: gui/gui.cc:72
 msgid "&Quit"
-msgstr ""
+msgstr "Schließen"
 
 #: gui/gui.cc:78
 msgid "Cool Blue"
