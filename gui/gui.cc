@@ -57,21 +57,6 @@ MyFrame::MyFrame(wxWindow *parent, const wxPoint& pos, const wxSize& size, long 
     // Constructor - initialises pointers to names, devices and monitor classes, lays out widgets
     // using sizers
 {
-    m_locale = new wxLocale(wxLANGUAGE_DEFAULT);
-    if (m_locale->IsOk()) {
-        std::cout << "It worked!" << std::endl;
-        if (m_locale->AddCatalog(wxT("messages"))) {
-            std::cout << "Loaded catalog!" << std::endl;
-        }
-        else {
-            std::cout << "Not found catalog!" << std::endl;
-        }
-    }
-    else {
-        std::cout << "Locale not working or recognised!?!?" << std::endl;
-    }
-
-
 
     SetIcon(wxIcon(logo32));
 
