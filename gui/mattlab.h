@@ -24,6 +24,8 @@ private:
   monitor *mmz;  // pointer to the monitor class
   fscanner *smz;  // The scanner class
   parser *pmz;   // pointer to the parser class
+  
+  wxLocale *m_locale; // locale for translations
 };
 
 
