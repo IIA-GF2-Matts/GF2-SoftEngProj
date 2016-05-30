@@ -16,25 +16,22 @@ bool MyApp::OnInit()
     char **tmp1; int tmp2 = 0; glutInit(&tmp2, tmp1);
 
     // sort out locale for translations before GUI contructed.
-    m_locale = new wxLocale(wxLANGUAGE_DEFAULT);
-    if (m_locale->IsOk()) {
-        m_locale->AddCatalogLookupPathPrefix(wxPathOnly(argv[0]));
-        if (m_locale->AddCatalog(wxT("mattlab"))) {
-            std::cout << "Loaded catalog!" << std::endl;
-        }
-        else {
-            std::cout << "Not found catalog!" << std::endl;
-        }
-    }
-    else {
-        std::cout << "Locale not working or recognised!?!?" << std::endl;
-    }
+    m_locale = new wxLocale(wxLANGUAGE_DEFAULT, wxLOCALE_DONT_LOAD_DEFAULT);
+    m_locale->AddCatalogLookupPathPrefix(wxPathOnly(argv[0]));
+    bool translationSuccess = !m_locale->AddCatalog(wxT("mattlab"));
 
 
     // Construct the GUI
     MyFrame *frame = new MyFrame(NULL, wxDefaultPosition,  wxSize(800, 600));
 
     frame->Show(true);
+
+    // Todo: There must be a way of checking if Locale is any English dialect rather than the current
+    // loading of a blank translation file for english.
+    if (translationSuccess) {
+        wxMessageBox(wxT("No translations available for current language. Reverting to English."),
+            wxT("Language not available"), wxOK|wxCENTRE, frame);
+    }
 
     if (argc >= 2) {
       frame->openFile(argv[1]);
