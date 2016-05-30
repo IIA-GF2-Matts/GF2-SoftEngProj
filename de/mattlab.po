@@ -1,0 +1,121 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-29 19:07+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: gui/gui.cc:68
+msgid "&Open\tCtrl+O"
+msgstr "Öffnen\tCtrl+O"
+
+#: gui/gui.cc:69
+msgid "Monitor Signal List"
+msgstr "Liste der Monitorsignale"
+
+#: gui/gui.cc:71
+msgid "&About"
+msgstr "&Über"
+
+#: gui/gui.cc:72
+msgid "&Quit"
+msgstr ""
+
+#: gui/gui.cc:78
+msgid "Cool Blue"
+msgstr "Kühles Blau"
+
+#: gui/gui.cc:79
+msgid "Retro Green"
+msgstr "Retro-grün"
+
+#: gui/gui.cc:80
+msgid "Simple B+W"
+msgstr "Einfache Schwarz-Weiß"
+
+#: gui/gui.cc:81
+msgid "Candy Pink"
+msgstr "Süße Rosa"
+
+#: gui/gui.cc:82
+msgid "Colour Theme"
+msgstr "Farbthema"
+
+#: gui/gui.cc:86
+msgid "&Zoom in\tCtrl+="
+msgstr "Hineinzoomen"
+
+#: gui/gui.cc:87
+msgid "&Zoom out\tCtrl+-"
+msgstr "Rauszoomen\tCtrl+="
+
+#: gui/gui.cc:88
+msgid "&Reset zoom\tCtrl+0"
+msgstr "Zoom zurücksetzen\tCtrl+0"
+
+#: gui/gui.cc:92
+msgid "&File"
+msgstr ""
+
+#: gui/gui.cc:93
+msgid "&View"
+msgstr "Blick"
+
+#: gui/gui.cc:106
+msgid "Run"
+msgstr "Laufen"
+
+#: gui/gui.cc:109
+msgid "Continue"
+msgstr "Fortsetzen"
+
+#: gui/gui.cc:114
+msgid "Cycles:"
+msgstr "Zyklen:"
+
+#: gui/gui.cc:120
+msgid "Run controls"
+msgstr "Laufen Kontrolen"
+
+#: gui/gui.cc:129
+msgid "Switches"
+msgstr "Schalter"
+
+#: gui/gui.cc:160
+msgid "Monitors"
+msgstr "Monitore"
+
+#: gui/gui.cc:191
+msgid "Open Mattlab file"
+msgstr "Öffne Mattlab Datei"
+
+#: gui/gui.cc:315
+msgid ""
+"Mattlab Digital Logic Simulator\n"
+"\n"
+"Produced for Engineering IIA project GF2 2016 by:\n"
+"Matt March (mdm46)\n"
+"Matt Judge (mcj33)\n"
+"Matt Diesel (md639)"
+msgstr ""
+"Mattlab Digitale LogikSimulator\n"
+"für das Engineering IIA Projekt GF2 Produziert"
+"Matt March (mdm46)\n"
+"Matt Judge (mcj33)\n"
+"Matt Diesel (md639)"
+
+#: gui/gui.cc:317
+msgid "About Mattlab"
+msgstr "Über Mattlab"
