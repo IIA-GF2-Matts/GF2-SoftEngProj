@@ -19,19 +19,31 @@ SRC = $(COMSRC) $(LANGSRC) $(SIMSRC)
 G_OBJECTS = $(patsubst %.cc,build/gui/%.o,$(GUISRC) $(SRC))
 C_OBJECTS = $(patsubst %.cc,build/cli/%.o,$(CLISRC) $(SRC))
 
+
+# internationalisation
+LANGS = $(wildcard intl/*/mattlab.po)
+LANGS_O = $(LANGS:.po=.mo)
+
+%.mo: %.po
+	msgfmt -o $@ $<
+
+
+mattlab: $(G_OBJECTS) $(LANGS_O)
+	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
+
 # implementation
 
 .SUFFIXES:	.o .cc
 
 
-mattlab: $(G_OBJECTS)
-	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
+#mattlab: $(G_OBJECTS)
+#	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
 
 clisim: $(C_OBJECTS)
 	$(CXX) $(FLAGS) -o clisim $(C_OBJECTS)
 
 clean:
-	rm -rf build *.o mattlab clisim scanner_unittest parser_unittest
+	rm -rf build $(LANGS_O) *.o mattlab clisim scanner_unittest parser_unittest
 
 depend:
 	makedepend $(SRC) $(GUISRC) $(CLISRC)
