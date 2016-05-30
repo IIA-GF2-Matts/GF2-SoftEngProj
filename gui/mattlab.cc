@@ -17,7 +17,7 @@ bool MyApp::OnInit()
 
     // sort out locale for translations before GUI contructed.
     m_locale = new wxLocale(wxLANGUAGE_DEFAULT, wxLOCALE_DONT_LOAD_DEFAULT);
-    m_locale->AddCatalogLookupPathPrefix(wxPathOnly(argv[0]));
+    m_locale->AddCatalogLookupPathPrefix(wxPathOnly(argv[0]) + "/intl");
     bool translationSuccess = !m_locale->AddCatalog(wxT("mattlab"));
 
 
