@@ -11,8 +11,9 @@ MonitorDialog::MonitorDialog(wxWindow* parent,
         wxWindowID id,
         names* nms,
         const std::vector<outputsignal>& signals,
-        std::vector<bool>& monitored)
-    : wxDialog(parent, id, _("Add/Remove Monitors"),
+        std::vector<bool>& monitored,
+        wxString title)
+    : wxDialog(parent, id, title,
             wxDefaultPosition, wxSize(720, 400)), _nmz(nms), _signals(signals), _monitor(monitored) {
 
 

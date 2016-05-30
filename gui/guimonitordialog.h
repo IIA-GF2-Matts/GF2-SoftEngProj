@@ -12,7 +12,7 @@
 class MonitorDialog: public wxDialog {
 public:
     MonitorDialog(wxWindow* parent, wxWindowID id, names* nmz,
-    	const std::vector<outputsignal>& signals, std::vector<bool>& monitored);
+    	const std::vector<outputsignal>& signals, std::vector<bool>& monitored, wxString title = _("Add/Remove Monitors"));
     virtual ~MonitorDialog();
     void onOk(wxCommandEvent& pEvent);
 
