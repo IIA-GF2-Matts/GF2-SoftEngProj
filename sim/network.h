@@ -66,11 +66,9 @@ struct devicerec {
   int frequency;        // used when kind == aclock
   int counter;          // used when kind == aclock
   asignal memory;       // used when kind == dtype
-#ifdef EXPERIMENTAL
   importeddevice* device;  // used when kind == imported
   int bitstrpos;           // used when kind == siggen
   std::vector<bool> bitstr; // used when kind == siggen
-#endif
 
   SourcePos setAt;
 };

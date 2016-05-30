@@ -48,10 +48,8 @@ private:
     /// statement = definedevice | definemonitor ;
     void parseStatement(Token& tk);
 
-#ifdef EXPERIMENTAL
     /// include = "include" , string , ";" ;
     void parseImport(Token& tk);
-#endif
 
     /// definedevice = "dev" , devicename , [ "=" , type ] , data ;
     void parseDefineDevice(Token& tk);

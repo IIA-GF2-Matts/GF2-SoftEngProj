@@ -22,11 +22,9 @@ const std::map<namestring, devicekind> deviceTypes = {
     {"OR", orgate},
     {"NOR", norgate},
     {"DTYPE", dtype},
-    {"XOR", xorgate}
-#ifdef EXPERIMENTAL
-    ,{"SELECT", aselect}
-    ,{"SIGGEN", siggen}
-#endif
+    {"XOR", xorgate} ,
+    {"SELECT", aselect},
+    {"SIGGEN", siggen}
 };
 
 
@@ -162,7 +160,6 @@ Token scanner::readNext() {
         case '.':
             ret.type = TokType::Dot;
             break;
-#ifdef EXPERIMENTAL
         case '"':
             ret.type = TokType::String;
             ret.str = readString(c);
@@ -171,7 +168,6 @@ Token scanner::readNext() {
             ret.type = TokType::Bitstream;
             ret.bitstr = readBitstream(c);
             break;
-#endif
         default:
             if (std::isdigit(c)) {
                 ret.type = TokType::Number;
@@ -196,11 +192,9 @@ Token scanner::readNext() {
                 else if (ret.id == kwordAs) {
                     ret.type = TokType::AsKeyword;
                 }
-#ifdef EXPERIMENTAL
                 else if (ret.id == kwordImport) {
                     ret.type = TokType::ImportKeyword;
                 }
-#endif
                 else { // Check for device types
                     auto it = deviceTypes.find(*ret.id);
                     if (it != deviceTypes.end()) {
@@ -281,8 +275,6 @@ int scanner::readNumber(int c1) {
 }
 
 
-#ifdef EXPERIMENTAL
-
 /** Consumes characters matching a string literal
  *
  * stringliteral = string , stringliteral ;
@@ -338,8 +330,6 @@ std::vector<bool> scanner::readBitstream(int c1) {
 
     return ret;
 }
-
-#endif
 
 
 /** Initialises a new scanner

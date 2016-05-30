@@ -314,11 +314,9 @@ void delDevList(devicerec* dr) {
   delDevList(dr->next);
   dr->next = NULL;
 
-#ifdef EXPERIMENTAL
   if (dr->kind == imported) {
     delete dr->device;
   }
-#endif
 
   delInpList(dr->ilist);
   delOutpList(dr->olist);

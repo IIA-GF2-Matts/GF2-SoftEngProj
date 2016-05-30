@@ -18,7 +18,7 @@
 #include "networkbuilder.h"
 
 
-/** Checks if a name follows the correct format for a gate input (I##, 
+/** Checks if a name follows the correct format for a gate input (I##,
  *  where ## is 1-maxn)
  *
  * @author Judge
@@ -129,8 +129,6 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
 }
 
 
-#ifdef EXPERIMENTAL
-
  /** Imports and adds a new device to the network from a secondary file if determined to be a legal action
  *
  * @author Diesel
@@ -154,7 +152,6 @@ void networkbuilder::importDevice(Token& devName, Token& fileStr) {
     _devz->makeimported(devName.id, fileStr.str, _errs, devName.at);
 }
 
-#endif
 
 /** Checks if a given key is legal for a device
  *   Checks if it's legal for the device type, then checks if it's been
@@ -242,7 +239,6 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 return false;
             }
             break;
-#ifdef EXPERIMENTAL
         case imported:
             if (!dvl->device->hasInput(keyTok.id)) {
                 std::ostringstream oss;
@@ -261,7 +257,6 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 return false;
             }
             break;
-#endif
         case baddevice:
         default:
             // Should never reach here
@@ -311,13 +306,13 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                     _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
                     _errs.report(mattnote(noteoss.str(), dvl->definedAt));
                     return false;
-                }                
+                }
             } else {
                 _errs.report(mattsemanticerror(
                     "Signal generators may only have SIG or Period attributes.", keyTok.at));
                 return false;
             }
-            
+
             break;
         case andgate:
         case nandgate:
@@ -500,8 +495,8 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
         // check key value pairs
         // already know key is okay
         if (keytk.id == _devz->periodnm) {
-            if (valTok.type != TokType::Number 
-                || valTok.number < 1 
+            if (valTok.type != TokType::Number
+                || valTok.number < 1
                 || valTok.number > 32767) {
                     _errs.report(mattsemanticerror(
                         "Signal generator periods must be integers between 1 and 32767", valTok.at));
@@ -516,8 +511,8 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
                 return;
             }
             dvl->bitstr = valTok.bitstr;
-        } 
-    } 
+        }
+    }
 }
 
 /** Creates a new monitor point (with no alias) if determined to be a

@@ -105,19 +105,15 @@ void parser::parseStatement(Token& tk) {
             parseDefineMonitor(tk);
 
             break;
-#ifdef EXPERIMENTAL
         case TokType::ImportKeyword:
             stepAndPeek(tk);
             parseImport(tk);
             break;
-#endif
         default:
             throw mattsyntaxerror("Unexpected token type. Expected a device or monitor definition (beginning with dev or monitor keywords).", tk.at);
     }
 }
 
-
-#ifdef EXPERIMENTAL
 
 /// import = "import" , string , ";" ;
 void parser::parseImport(Token& tk) {
@@ -148,8 +144,6 @@ void parser::parseImport(Token& tk) {
     tk = _scan->peek();
 }
 
-#endif
-
 
 // definedevice = "dev" , devicename , [ "=" , type ] , data ;
 // With extensions enabled:
@@ -171,7 +165,6 @@ void parser::parseDefineDevice(Token& tk) {
 
         stepAndPeek(tk);
 
-#ifdef EXPERIMENTAL
         if (tk.type == TokType::String) {
             // dev DN = "file";
 
@@ -180,7 +173,6 @@ void parser::parseDefineDevice(Token& tk) {
             stepAndPeek(tk);
         }
         else {
-#endif
             if (tk.type != TokType::DeviceType) {
                 std::ostringstream oss;
                 oss << "Expected device type";
@@ -198,9 +190,7 @@ void parser::parseDefineDevice(Token& tk) {
             netbuild.defineDevice(nameToken, tk);
 
             stepAndPeek(tk);
-#ifdef EXPERIMENTAL
         }
-#endif
     }
 
     parseData(tk, nameToken);

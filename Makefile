@@ -3,7 +3,6 @@ OPENGL_LIBS = -lglut -lGL -lGLU
 GUICXX = $(shell wx-config --version=3.0 --cxx)
 CLICXX = g++
 
-#-DEXPERIMENTAL
 FLAGS = -std=c++11 -g
 GUIFLAGS = -DUSE_GUI `wx-config --version=3.0 --cxxflags`
 GUILINKFLAGS = `wx-config --version=3.0 --libs --gl_libs` $(OPENGL_LIBS)

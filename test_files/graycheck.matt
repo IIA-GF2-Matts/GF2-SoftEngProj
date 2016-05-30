@@ -50,7 +50,6 @@ monitor G0, G1, G2;
 
 dev CK1Bar = NAND {
     I1 : CK1;
-    I2 : CK1;
 }
 
 dev G0D = DTYPE {
@@ -96,15 +95,12 @@ monitor G0C, G1C, G2C;
 
 dev G0CBar = NAND {
     I1 : G0C;
-    I2 : G0C;
 }
 dev G1CBar = NAND {
     I1 : G1C;
-    I2 : G1C;
 }
 dev G2CBar = NAND {
     I1 : G2C;
-    I2 : G2C;
 }
 
 // monitor G0CBar, G1CBar, G2CBar;
@@ -131,12 +127,16 @@ dev sop3 = AND {
 // monitor sop1, sop2, sop3;
 
 
-dev Invalid = NOR {
+dev InvalidFlag = NOR {
     I1 : sop1;
     I2 : sop2;
     I3 : sop3;
-    I4 : CK1Bar;
 }
 
-monitor Invalid;
+dev Invalid = DTYPE {
+    DATA : InvalidFlag;
+    CLK : CK1Bar;
+}
+
+monitor Invalid.Q;
 

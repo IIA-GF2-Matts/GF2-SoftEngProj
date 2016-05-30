@@ -54,10 +54,8 @@ public:
     name id; ///< If type == TokType::Identifier, this is the string name
     int number; ///< If type == TokType::Number, this is the integer value.
     devicekind devtype; ///< If type == TokType::DeviceType, this is the devicekind.
-#ifdef EXPERIMENTAL
     std::string str; ///< If type == TokType::String, this is the string
     std::vector<bool> bitstr; ///< If type == TokType::Bitstream, this is the bit stream.
-#endif
 
     /** Constructs a new Token.
      */
@@ -115,7 +113,6 @@ protected:
      */
     int readNumber(int c1);
 
-#ifdef EXPERIMENTAL
     /** Consumes characters matching a string literal
      *
      * @param[in]  c1    The previous character pulled from the stream
@@ -129,7 +126,6 @@ protected:
      * @return     The bitstream literal read from the stream
      */
     std::vector<bool> readBitstream(int c1);
-#endif
 
 public:
     scanner* parent;

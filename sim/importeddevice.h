@@ -1,5 +1,4 @@
 
-#ifdef EXPERIMENTAL
 #ifndef GF2_IMPORTEDDEVICE_H
 #define GF2_IMPORTEDDEVICE_H
 
@@ -93,4 +92,3 @@ typedef importeddevice* importedlink;
 
 
 #endif // GF2_IMPORTEDDEVICE_H
-#endif // EXPERIMENTAL

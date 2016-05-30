@@ -1,6 +1,4 @@
 
-#ifdef EXPERIMENTAL
-
 #include <map>
 #include <string>
 
@@ -160,6 +158,3 @@ bool importeddevice::getOutput(name mon, asignal& value) {
     }
     return false;
 }
-
-
-#endif // EXPERIMENTAL

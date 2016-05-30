@@ -28,7 +28,7 @@ typedef enum {
 
 /** Network Builder
  *
- * This is responsible for applying semantic checks on parser output, 
+ * This is responsible for applying semantic checks on parser output,
  * and subsequently adding devices to the network.
  *
  * @author Judge
@@ -51,7 +51,7 @@ private:
      * @param      warnoss  The stream to write the error message to
      * @param      noteoss  The stream to write the note message to, including details of the previous assignment
      *
-     * @return    
+     * @return
      */
     template<typename T>
     void getPredefinedError(devlink dvl, name key, T prevval, std::ostream& warnoss, std::ostream& noteoss);
@@ -62,7 +62,7 @@ private:
      * @param[in]  sig      The signal with the unknown pin
      * @param      oss      The stream to write the error message to
      *
-     * @return    
+     * @return
      */
     void getUnknownPinError(Signal& sig, std::ostringstream& oss);
 
@@ -85,7 +85,7 @@ private:
      * @param[in]  keytk    The token to the key representing the input pin
      * @param[in]  signal   The signal to which the input pin is to be connected
      *
-     * @return    
+     * @return
      */
     void assignPin(devlink dvl, Token keytk, Signal sig);
 
@@ -98,7 +98,7 @@ private:
      * @param[in]  keytk    The token to the key of the property
      * @param[in]  valuetk  The token to the value of the property
      *
-     * @return    
+     * @return
      */
     void assignProperty(devlink dvl, Token keytk, Token valuetk);
 
@@ -143,7 +143,7 @@ public:
      * @return    an instance of network builder
      */
     networkbuilder(network* netz, devices* devz, monitor* mons, names* nms, errorcollector& errc);
-    
+
 
     /** The destructor for the network builder
      */
@@ -156,7 +156,7 @@ public:
      * @param[in]  devName  Token to the device name
      * @param[in]  type     Token to the device type
      *
-     * @return    
+     * @return
      */
 	void defineDevice(Token& devName, Token& type);
 
@@ -167,7 +167,7 @@ public:
      * @param[in]  keyTok   Token to the key of the property
      * @param[in]  valTok   Token to the value of the property
      *
-     * @return    
+     * @return
      */
     void setInputValue(Token& devName, Token& keyTok, Token& valTok);
 
@@ -178,7 +178,7 @@ public:
      * @param[in]  keyTok   Token to the key of the property
      * @param[in]  valSig   Signal to which the input pin should be connected
      *
-     * @return    
+     * @return
      */
     void setInputSignal(Token& devName, Token& keyTok, Signal& valSig);
 
@@ -188,7 +188,7 @@ public:
      *
      * @param[in]  monSig   Signal to be monitored
      *
-     * @return    
+     * @return
      */
     void defineMonitor(Signal& monSig);
 
@@ -198,22 +198,19 @@ public:
      * @param[in]  monSig   Signal to be monitored
      * @param[in]  aliSig   How the signal should be represented to the user
      *
-     * @return    
+     * @return
      */
     void defineMonitor(Signal& monSig, Signal& aliSig);
 
-#ifdef EXPERIMENTAL
     /** Imports and adds a new device to the network from a secondary file if determined to be a legal action
      *  Reports errors to the error collector if determined to be illegal
      *
      * @param[in]  devName  Token to the device name
      * @param[in]  fileStr  Token to the file in which the device is defined
      *
-     * @return    
+     * @return
      */
     void importDevice(Token& devName, Token& fileStr);
-#endif
-
 };
 
 

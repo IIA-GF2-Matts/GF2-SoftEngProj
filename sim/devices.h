@@ -40,14 +40,13 @@ class devices{
   void outsig (asignal s);
 
 public:
-#ifdef EXPERIMENTAL
+  // Todo: Do these need to be public?
   void makeimported(name id, std::string fname, errorcollector& errs, SourcePos at = SourcePos());
   void execimported(devlink d);
   void makeselect (name id, int setting, bool& ok, SourcePos at = SourcePos());
   void execselect(devlink d, bool& ok);
   void makesiggen(name id, std::vector<bool> bits, int period, bool& ok, SourcePos at = SourcePos());
   void execsiggen(devlink d);
-#endif
 
   name        clkpin, datapin, setpin;
   name        clrpin, qpin, qbarpin;     /* Input and Output Pin names */

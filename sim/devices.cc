@@ -72,8 +72,6 @@ void devices::setswitch (name sid, asignal level, bool& ok, SourcePos at)
 }
 
 
-#ifdef EXPERIMENTAL
-
 /** Used to make new imported devices.
  *  Called by makedevice().
  *
@@ -104,8 +102,6 @@ void devices::makeimported(name id, std::string fname, errorcollector& errs, Sou
   }
 }
 
-#endif
-
 
 /** Used to make new switch devices.
  *  Called by makedevice.
@@ -133,7 +129,6 @@ void devices::makeswitch (name id, int setting, bool& ok, SourcePos at)
   }
 }
 
-#ifdef EXPERIMENTAL
 
 /** Used to make new switch devices.
  *  Called by makedevice.
@@ -175,9 +170,6 @@ void devices::makesiggen(name id, std::vector<bool> bits, int period, bool& ok, 
     d->frequency = period;
   }
 }
-
-
-#endif
 
 
 /** Sets the frequency of the named clock.
@@ -299,7 +291,6 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
     case dtype:
       makedtype(did, ok, at);
       break;
-#ifdef EXPERIMENTAL
     case aselect:
       makeselect (did, variant, ok, at);
       break;
@@ -313,7 +304,6 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
       // must call makesiggen directly.
       break;
     }
-#endif
     case baddevice:
     default:
       ok = false;
@@ -370,8 +360,6 @@ void devices::execswitch (devlink d)
 }
 
 
-#ifdef EXPERIMENTAL
-
 /** Used to simulate the operation of select devices.
  *  Called by executedevices.
  *
@@ -410,9 +398,6 @@ void devices::execsiggen(devlink d)
       signalupdate (low, d->olist->sig);
   }
 }
-
-
-#endif
 
 
 /** Used to simulate the operation of AND, OR, NAND and NOR gates.
@@ -501,8 +486,6 @@ void devices::execclock(devlink d)
 }
 
 
-#ifdef EXPERIMENTAL
-
 /** Used to simulate the operation of an imported network.
  *  Called by executedevices.
  *
@@ -523,8 +506,6 @@ void devices::execimported(devlink d) {
     signalupdate(s, ol->sig);
   }
 }
-
-#endif
 
 
 /** Increment the counters in the clock devices and initiate changes
@@ -547,7 +528,6 @@ void devices::updateclocks (void)
       }
       (d->counter)++;
     }
-#ifdef EXPERIMENTAL
     else if (d->kind == imported) {
       d->device->tick();
     }
@@ -563,7 +543,6 @@ void devices::updateclocks (void)
       }
       (d->counter)++;
     }
-#endif
   }
 }
 
@@ -598,11 +577,9 @@ void devices::executedevices (bool& ok, bool tick)
         case nandgate: execgate (d, high, low);  break;
         case xorgate:  execxorgate (d);          break;
         case dtype:    execdtype (d);            break;
-#ifdef EXPERIMENTAL
         case aselect:  execselect(d, ok);        break;
         case imported: execimported(d);          break;
         case siggen:   execsiggen(d);            break;
-#endif
         default:       ok = false;               break;
       }
       if (debugging)
@@ -630,11 +607,9 @@ void devices::resetdevices() {
       case nandgate:
         d->olist->sig = low;
         break;
-
       case dtype:
         d->memory = low;
         break;
-#ifdef EXPERIMENTAL
       case imported:
         d->device->dmz->resetdevices();
         break;
@@ -644,7 +619,6 @@ void devices::resetdevices() {
         d->counter = 0;
         d->olist->sig = d->bitstr[0] ? high : low;
         break;
-#endif
       default:
         break;
     }
