@@ -8,13 +8,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-29 19:07+0100\n"
+"POT-Creation-Date: 2016-05-30 11:55+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: gui/gui.cc:68
@@ -67,7 +67,7 @@ msgstr "Zoom zurücksetzen\tCtrl+0"
 
 #: gui/gui.cc:92
 msgid "&File"
-msgstr ""
+msgstr "Datei"
 
 #: gui/gui.cc:93
 msgid "&View"
@@ -110,12 +110,47 @@ msgid ""
 "Matt Judge (mcj33)\n"
 "Matt Diesel (md639)"
 msgstr ""
-"Mattlab Digitale LogikSimulator\n"
-"für das Engineering IIA Projekt GF2 Produziert"
-"Matt March (mdm46)\n"
+"Mattlab Digitale Logiksimulator\n"
+"für das Engineering IIA Projekt GF2 ProduziertMatt March (mdm46)\n"
 "Matt Judge (mcj33)\n"
 "Matt Diesel (md639)"
 
 #: gui/gui.cc:317
 msgid "About Mattlab"
 msgstr "Über Mattlab"
+
+#: gui/guicanvas.inc:135
+msgid ""
+"No monitors selected for simulator. \n"
+"Select or add a monitor to view output."
+msgstr ""
+"Keine Monitore für Simulator Ausgewählt\n"
+"Wählen oder einen Monitor Hinzufügen Ausgabe Anzuzeigen"
+
+#: gui/guicanvas.inc:143
+msgid "Select 'file' -> 'open' to begin..."
+msgstr "Aussuchen 'Datei' -> 'Öffnen' zu beginnen"
+
+#: gui/guicanvas.inc:332
+msgid "Welcome to MattLab Logic Simulator"
+msgstr "Willkommen zu Mattlab Logiksimulator"
+
+#: gui/guimonitordialog.cc:15
+msgid "Add/Remove Monitors"
+msgstr "Hinzufügen/Entfernen von Monitoren"
+
+#: gui/guierrordialog.cc:16
+msgid "ERROR! YOU IDIOT!"
+msgstr "Ach Nein! Es ist kaput!"
+
+#: gui/guierrordialog.cc:40
+msgid "There were "
+msgstr "Es gab "
+
+#: gui/guierrordialog.cc:40
+msgid " errors and "
+msgstr "Fehler und"
+
+#: gui/guierrordialog.cc:41
+msgid " warnings processing the input file."
+msgstr "Warnungen, die Verarbeitung der Engabedatei."
