@@ -132,15 +132,15 @@ void MyGLCanvas::Render(int cycles) {
   } else if ((cyclesdisplayed >= 0)) {
     on_title = true;
     pan_y = 0;
-    titleScreen("No monitors selected for simulator. \n"
-      "Select or add a monitor to view output.");
+    titleScreen(_("No monitors selected for simulator. \n"
+      "Select or add a monitor to view output."));
   }
 
 
   else { // draw title screen
     on_title = true;
     pan_y = 0;
-    titleScreen("Select 'file' -> 'open' to begin...");
+    titleScreen(_("Select 'file' -> 'open' to begin..."));
   }
 
   // We've been drawing to the back buffer, flush the graphics pipeline and swap the back buffer to the front
@@ -303,7 +303,7 @@ void MyGLCanvas::OnMouse(wxMouseEvent& event)
 
 // Function to zoom in. Note that zoom in requires a negative value.
 void MyGLCanvas::zoomIn(double zoom_amount){
-  wxASSERT_MSG((zoom_amount < 0), "Input to zoomIn must be a negative amount.");
+  wxASSERT_MSG((zoom_amount < 0), "Input to zoomIn must be a negative amount. This shouldn't happen.");
   zoom = zoom * (1 - zoom_amount);
   if (zoom > cyclesdisplayed/2) zoom = cyclesdisplayed/2; // Max zoom
   Render();
@@ -311,7 +311,7 @@ void MyGLCanvas::zoomIn(double zoom_amount){
 
 // Function to zoom out. This requires a positive value. Fully is true to zoom out completely (defaults to false)
 void MyGLCanvas::zoomOut(double zoom_amount, bool fully){
-  wxASSERT_MSG((zoom_amount >= 0), "Input to zoomOut must be a positive value.");
+  wxASSERT_MSG((zoom_amount >= 0), "Input to zoomOut must be a positive value. This shouldn't happen.");
   double new_zoom = zoom / (1.0 + zoom_amount);
   if (fully || zoom < 1)
     zoom = 1;
@@ -329,7 +329,7 @@ void MyGLCanvas::titleScreen(wxString message_text){
   setLineColour(trace_RGB);
 
   // Draw title
-  wxString title_text = "Welcome to MattLab Logic Simulator";
+  wxString title_text = _("Welcome to MattLab Logic Simulator");
   drawText(title_text, label_width/2, h-plot_height, GLUT_BITMAP_HELVETICA_18);
 
   // Draw logo

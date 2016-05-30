@@ -13,7 +13,7 @@
 ErrorDialog::ErrorDialog(wxWindow* parent,
         wxWindowID id,
         const errorcollector& errc)
-    : wxDialog(parent, id, "ERROR! YOU IDIOT!",
+    : wxDialog(parent, id, _("ERROR! YOU IDIOT!"),
             wxDefaultPosition, wxSize(720, 400)), errs(errc) {
 
 
@@ -37,8 +37,8 @@ ErrorDialog::ErrorDialog(wxWindow* parent,
     wxButton* okButton = new wxButton(rpanel, wxID_ANY, "Ok");
 
     std::ostringstream msgText;
-    msgText << "There were " << errs.errCount() << " errors and " <<  errs.warnCount()
-            << " warnings processing the input file.";
+    msgText << _("There were ") << errs.errCount() << _(" errors and "_) <<  errs.warnCount()
+            << _(" warnings processing the input file.");
 
     wxStaticText* errorMessage = new wxStaticText(rpanel, wxID_ANY, msgText.str());
 
