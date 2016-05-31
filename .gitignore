@@ -2,7 +2,9 @@
 *~
 *.so
 *.a
-logsim
-guitest
 *_unittest
 *.exe
+mattlab
+clisim
+*.out
+*.mo
