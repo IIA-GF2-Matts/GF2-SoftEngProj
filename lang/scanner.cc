@@ -9,6 +9,7 @@
 #include "../com/names.h"
 #include "../com/iposstream.h"
 #include "../com/errorhandler.h"
+#include "../com/formatstring.h"
 #include "../sim/network.h"
 
 #include "scanner.h"
@@ -205,21 +206,21 @@ Token scanner::readNext() {
             }
             else {
                 // Lexer error: Illegal Character
-                std::ostringstream oss;
+                std::string errmsg;
 
                 if (std::isprint(c)) {
-                    oss << "Illegal Character '" << char(c) << "' in file.";
+                    errmsg = formatString("Illegal Character '{0}' in file.",
+                        char(c));
                 }
                 else if (c == '\0') {
-                    oss << "Null byte in file. Note only ISO 8859 encoding is accepted";
+                    errmsg = "Null byte in file. Note only ISO 8859 encoding is accepted";
                 }
                 else {
-                    oss << "Illegal non-printing character, code "
-                        << std::hex << int(c)
-                        << " in file. ";
+                    errmsg = formatString("Illegal non-printing character, code {0} in file.",
+                        int(c));
                 }
 
-                throw mattsyntaxerror(oss.str(), ret.at);
+                throw mattsyntaxerror(errmsg, ret.at);
             }
 
             break;
