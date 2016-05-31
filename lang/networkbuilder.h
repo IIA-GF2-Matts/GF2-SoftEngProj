@@ -64,7 +64,7 @@ private:
      *
      * @return
      */
-    void getUnknownPinError(Signal& sig, std::ostringstream& oss);
+    std::string getUnknownPinError(Signal& sig);
 
 
     /** Determine if a given property key is legal for a given device

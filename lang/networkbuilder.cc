@@ -7,6 +7,7 @@
 #include "../com/names.h"
 #include "../com/errorhandler.h"
 #include "../com/autocorrect.h"
+#include "../com/formatstring.h"
 #include "../sim/network.h"
 #include "../sim/devices.h"
 #include "../sim/monitor.h"
@@ -46,21 +47,24 @@ bool networkbuilder::isLegalGateInputNamestring(name n, int maxn) {
  *
  * @author Judge
  */
-void networkbuilder::getUnknownPinError(Signal& sig, std::ostringstream& oss) {
+std::string networkbuilder::getUnknownPinError(Signal& sig) {
     devicekind dkind = _netz->finddevice(sig.device.id)->kind;
-
-    oss << _nms->namestr(sig.device.id) << " (of type "
-        << _nms->namestr(_devz->getname(dkind))
-        << ") ";
+    std::string ret;
 
     if (sig.pin.id == blankname) {
-        oss << "has no default output pin.";
+        ret = formatString("{0} (of type {1}) has no default output pin.",
+            _nms->namestr(sig.device.id),
+            _nms->namestr(_devz->getname(dkind)));
     } else {
-        oss << "has no output pin " << _nms->namestr(sig.pin.id) << ".";
+        ret = formatString("{0} (of type {1}) has no output pin {2}.",
+            _nms->namestr(sig.device.id),
+            _nms->namestr(_devz->getname(dkind)),
+            _nms->namestr(sig.pin.id));
     }
 
     if (dkind == dtype)
-        oss << " Use Q or Qbar.";
+        return ret + " Use Q or Qbar.";
+    return ret;
 }
 
 /** Method to generate the error message when a signal pin has not been defined
@@ -427,10 +431,8 @@ void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
             _errs.report(mattsemanticerror("Devices must be defined before being referenced", sig.device.at));
         } else {
             // ILLEGAL_PIN
-            std::ostringstream oss;
-            oss << "Unable to set input pin. ";
-            getUnknownPinError(sig, oss);
-            _errs.report(mattsemanticerror(oss.str(), sig.device.at));
+            _errs.report(mattsemanticerror(
+                "Unable to set input pin. " + getUnknownPinError(sig), sig.device.at));
         }
         return;
     }
@@ -539,10 +541,9 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
             return;
         } else {
             // ILLEGAL_PIN
-            std::ostringstream oss;
-            oss << "Unable to set monitor point. ";
-            getUnknownPinError(monSig, oss);
-            _errs.report(mattruntimeerror(oss.str(), monSig.device.at));
+            _errs.report(mattsemanticerror(
+                "Unable to set monitor point. " + getUnknownPinError(monSig),
+                monSig.device.at));
             return;
         }
     }
