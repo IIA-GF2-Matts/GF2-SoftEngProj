@@ -336,6 +336,10 @@ void devices::signalupdate (asignal target, asignal& sig)
     case floating:
       sig = (target == high) ? rising : falling;
       break;
+    case indet:
+    default:
+      sig = target;
+      break;
   }
   if (sig != oldsig)
     steadystate = false;
@@ -558,9 +562,12 @@ void devices::updateclocks (void)
         if (++(d->bitstrpos) >= d->bitstr.size()) {
           d->bitstrpos = 0;
         }
-        if (d->bitstr[d->bitstrpos] ? high : low != d->olist->sig) {
-          d->olist->sig = d->bitstr[d->bitstrpos] ? rising : falling;
+
+        asignal newSig = d->bitstr[d->bitstrpos] ? high : low;
+        if (newSig != d->olist->sig) {
+          signalupdate(newSig, d->olist->sig);
         }
+
       }
       (d->counter)++;
     }
