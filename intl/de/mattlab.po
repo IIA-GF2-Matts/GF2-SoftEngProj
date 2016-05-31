@@ -111,7 +111,8 @@ msgid ""
 "Matt Diesel (md639)"
 msgstr ""
 "Mattlab Digitale Logiksimulator\n"
-"für das Engineering IIA Projekt GF2 ProduziertMatt March (mdm46)\n"
+"Für das Engineering IIA Projekt GF2 Produziert von:\n"
+"Matt March (mdm46)\n"
 "Matt Judge (mcj33)\n"
 "Matt Diesel (md639)"
 
@@ -149,8 +150,8 @@ msgstr "Es gab "
 
 #: gui/guierrordialog.cc:40
 msgid " errors and "
-msgstr "Fehler und"
+msgstr " Fehler und "
 
 #: gui/guierrordialog.cc:41
 msgid " warnings processing the input file."
-msgstr "Warnungen, die Verarbeitung der Engabedatei."
+msgstr " Warnungen, die Verarbeitung der Engabedatei."
