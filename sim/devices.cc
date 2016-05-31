@@ -381,6 +381,10 @@ void devices::execselect (devlink d, bool& ok)
     inplink conil;
     if (il->connect->sig == high)
       conil = netz->findinput(d, highpin);
+    else if (il->connect->sig == indet) {
+      signalupdate(indet, d->olist->sig);
+      return;
+    }
     else
       conil = netz->findinput(d, lowpin);
 
@@ -420,9 +424,12 @@ void devices::execgate (devlink d, asignal x, asignal y)
   inplink inp = d->ilist;
   outplink outp = d->olist;
   newoutp = y;
-  while ((inp != NULL) && (newoutp == y)) {
+  while ((inp != NULL) && ((newoutp == y) || newoutp == indet)) {
     if (inp->connect->sig == inv (x))
       newoutp = inv (y);
+    else if (inp->connect->sig == indet)
+      newoutp = indet;
+
     inp = inp->next;
   }
   signalupdate (newoutp, outp->sig);
@@ -437,6 +444,8 @@ void devices::execgate (devlink d, asignal x, asignal y)
 void devices::execxorgate(devlink d)
 {
   asignal newoutp;
+  if (d->ilist->connect->sig == indet || d->ilist->next->connect->sig == indet)
+    newoutp = indet;
   if (d->ilist->connect->sig == d->ilist->next->connect->sig)
     newoutp = low;
   else
@@ -479,7 +488,8 @@ void devices::execdtype (devlink d)
   qout = netz->findoutput (d, qpin);
   qbarout = netz->findoutput (d, qbarpin);
 
-
+  if (clkinput == indet || setinput == indet || clrinput == indet)
+    d->memory = indet;
   if ((clkinput == rising) && ((datainput == falling) || (datainput == rising)))
     d->memory = indet;
   if ((clkinput == rising) && (datainput == high))
