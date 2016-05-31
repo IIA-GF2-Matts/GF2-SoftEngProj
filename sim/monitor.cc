@@ -75,7 +75,7 @@ void monitor::remmonitor (name dev, name outp, bool& ok)
          (mtab[i].op->id == outp));
     ok = found;
     if (found) { // Remove the monitor
-      mtab.erase(mtab.begin() + i);
+      mtab.erase(mtab.begin() + i - 1);
     }
   }
 }
