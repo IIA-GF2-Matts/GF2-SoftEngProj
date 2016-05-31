@@ -3,6 +3,7 @@
 #include <GL/glut.h>
 #include "mattlab.h"
 #include <wx/intl.h>
+#include "../com/localestrings.h"
 
 
 IMPLEMENT_APP(MyApp)
@@ -19,6 +20,9 @@ bool MyApp::OnInit()
     m_locale = new wxLocale(wxLANGUAGE_DEFAULT, wxLOCALE_DONT_LOAD_DEFAULT);
     m_locale->AddCatalogLookupPathPrefix(wxPathOnly(argv[0]) + "/intl");
     bool translationFailed = !m_locale->AddCatalog(wxT("mattlab"));
+
+    // Load mattlang translations
+    LocaleStrings::AddTranslations("", "mattlang");
 
     // Construct the GUI
     MyFrame *frame = new MyFrame(NULL, wxDefaultPosition,  wxSize(800, 600));
