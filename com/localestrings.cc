@@ -287,7 +287,7 @@ LocaleStrings::LocaleStrings(const LocaleStrings& ls)
  * @author Diesel
  */
 LocaleStrings::~LocaleStrings() {
-    if (!--*_ref) {
+    if (_ref && !--*_ref) {
         delete[] _data;
         delete _ref;
     }
