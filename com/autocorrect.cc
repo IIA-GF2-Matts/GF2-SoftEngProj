@@ -1,8 +1,10 @@
 #include <set>
 #include <algorithm>
 #include <list>
+#include <string>
 #include <ostream>
 #include "names.h"
+#include "formatstring.h"
 
 #include "autocorrect.h"
 
@@ -82,7 +84,7 @@ int closestMatchesT(T s, const std::set<T> &candidates, std::list<T> &matches) {
  *
  *  @author  Judge   
  */
-void getClosestMatchError(namestring nm, std::set<namestring> candidates, std::ostream& oss) {
+std::string getClosestMatchError(namestring nm, std::set<namestring> candidates) {
     std::list<namestring> matches;
     int dist = closestMatches(nm, candidates, matches);
 
@@ -90,12 +92,21 @@ void getClosestMatchError(namestring nm, std::set<namestring> candidates, std::o
     if (dist < 3 && matches.size() > 0) {
         auto i = matches.begin();
 
-        oss << "Did you mean";
+        std::ostringstream oss;
         for (; i != std::prev(matches.end()); ++i) {
             oss << " " << *i;
         }
-        if (matches.size() > 1)
-            oss << " or";
-        oss << " " << *std::prev(matches.end()) << "?";
+        
+        if (matches.size() > 1) {
+            return formatString(
+                "Did you mean {0} or {1}?", oss.str(), *std::prev(matches.end()));
+
+        } else if (matches.size() == 1) {
+            return formatString(
+                "Did you mean {0}?", oss.str(), *std::prev(matches.end()));
+
+        } else {
+            return "";
+        }
     }
 }

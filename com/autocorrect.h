@@ -6,7 +6,7 @@
 
 #include <set>
 #include <list>
-#include <ostream>
+#include <string>
 #include "names.h"
 
 /** Candidate set of device types
@@ -57,8 +57,7 @@ constexpr auto closestMatches = &closestMatchesT<namestring>;
  *
  * @param[in]  nm          The input to match
  * @param[in]  candidates  Set of candidates to match to the input
- * @param      oss         Stream into which the error message will be placed
  * 
  * @return     
  */
-void getClosestMatchError(namestring nm, std::set<namestring> candidates, std::ostream& oss);
+std::string getClosestMatchError(namestring nm, std::set<namestring> candidates);

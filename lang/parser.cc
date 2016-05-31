@@ -174,17 +174,16 @@ void parser::parseDefineDevice(Token& tk) {
         }
         else {
             if (tk.type != TokType::DeviceType) {
-                std::ostringstream oss;
-                oss << "Expected device type";
+                std::string errmsg;
                 if (tk.type == TokType::Identifier) {
                     // get the closest match input and display a suggestion
-                    oss << ". ";
-                    getClosestMatchError(_nms->namestr(tk.id), devicesset, oss);
+                    errmsg = "Expected a device type. "
+                        + getClosestMatchError(_nms->namestr(tk.id), devicesset);
                 } else {
                     // user got it hopelessly wrong
-                    oss << " such as CLOCK, SWITCH, NAND or others (see documentation).";
+                    errmsg = "Expected a device type such as CLOCK, SWITCH, NAND or others (see documentation).";
                 }
-                throw mattsyntaxerror(oss.str(), tk.at);
+                throw mattsyntaxerror(errmsg, tk.at);
             }
 
             netbuild.defineDevice(nameToken, tk);
