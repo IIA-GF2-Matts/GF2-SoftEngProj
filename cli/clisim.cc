@@ -1,6 +1,7 @@
 
 #include <iostream>
 
+#include "../com/localestrings.h"
 #include "../com/names.h"
 #include "../sim/network.h"
 #include "../sim/devices.h"
@@ -11,12 +12,16 @@
 #include "userint.h"
 
 
+
 int main(int argc, char const *argv[]) {
+    LocaleStrings::SetLocale("");
+
     if (argc != 2) { // check we have one command line argument
-        std::cout << "Usage:      " << argv[0] << " [filename]" << std::endl;
-        exit(1);
+        std::cout << t("Usage") << ":      " << argv[0] << " [filename]" << std::endl;
+        return 1;
     }
 
+    int ret = 0;
     names* nmz = new names();
     network* netz = new network(nmz);
     devices* dmz = new devices(nmz, netz);
@@ -33,15 +38,15 @@ int main(int argc, char const *argv[]) {
 
         delete pmz;
     } else {
-        std::cerr << "File not found:      " << argv[1] << std::endl;
-        exit(1);
+        std::cerr << t("File not found") <<  ":      " << argv[1] << std::endl;
+        ret = 1;
     }
 
-    // delete smz;
+    delete smz;
     delete mmz;
     delete dmz;
     delete netz;
     delete nmz;
 
-    return 0;
+    return ret;
 }
