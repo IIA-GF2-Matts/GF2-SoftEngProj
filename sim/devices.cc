@@ -20,6 +20,7 @@ void devices::outsig (asignal s)
     case rising:  cout << t("rising");  break;
     case falling: cout << t("falling"); break;
     case floating: cout << t("floating"); break;
+    case indet:   cout << t("indeterminate"); break;
   }
 }
 
@@ -313,6 +314,14 @@ void devices::makedevice (devicekind dkind, name did, int variant, bool& ok, Sou
  */
 void devices::signalupdate (asignal target, asignal& sig)
 {
+  if (target == indet) {
+    if (sig != indet) {
+      sig = indet;
+      steadystate = false;
+    }
+    return;
+  }
+
   asignal oldsig;
   oldsig = sig;
   switch (sig) {
@@ -339,6 +348,7 @@ void devices::signalupdate (asignal target, asignal& sig)
  */
 asignal devices::inv (asignal s)
 {
+  if (s == indet) return indet;
   return ((s == high) ? low : high);
 }
 
@@ -461,11 +471,16 @@ void devices::execdtype (devlink d)
   else
     setinput  = i->connect->sig;
 
+
   qout = netz->findoutput (d, qpin);
   qbarout = netz->findoutput (d, qbarpin);
-  if ((clkinput == rising) && ((datainput == high) || (datainput == falling)))
+
+
+  if ((clkinput == rising) && ((datainput == falling) || (datainput == rising)))
+    d->memory = indet;
+  if ((clkinput == rising) && (datainput == high))
     d->memory = high;
-  if ((clkinput == rising) && ((datainput == low) || (datainput == rising)))
+  if ((clkinput == rising) && (datainput == low))
     d->memory = low;
   if (setinput == high)
     d->memory = high;

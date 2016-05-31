@@ -10,7 +10,7 @@ struct importeddevice;
 
 /* Network specification */
 
-typedef enum {falling, low, rising, high, floating} asignal;
+typedef enum {falling, low, rising, high, floating, indet} asignal;
 typedef enum {aswitch, aclock, andgate, nandgate, orgate,
 	      norgate, xorgate, dtype, jk, siggen, aselect, imported, baddevice} devicekind;
 

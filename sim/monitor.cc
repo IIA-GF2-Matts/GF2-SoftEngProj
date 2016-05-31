@@ -214,6 +214,7 @@ void monitor::displaysignals (void)
         case rising:  cout << "/"; break;
         case falling: cout << "\\"; break;
         case floating: cout << "?"; break;
+        case indet: cout << "~"; break;
       }
     }
     cout << endl;
