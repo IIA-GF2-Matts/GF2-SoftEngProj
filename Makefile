@@ -132,7 +132,7 @@ build/cli/com/sourcepos.o: com/sourcepos.h
 build/cli/com/autocorrect.o: com/names.h com/cistring.h com/autocorrect.h
 build/cli/lang/networkbuilder.o: lang/parser.h com/names.h com/cistring.h lang/scanner.h com/iposstream.h
 build/cli/lang/networkbuilder.o: com/sourcepos.h sim/network.h com/errorhandler.h sim/devices.h sim/monitor.h
-build/cli/lang/networkbuilder.o: lang/networkbuilder.h com/autocorrect.h
+build/cli/lang/networkbuilder.o: lang/networkbuilder.h com/autocorrect.h com/formatstring.h
 build/cli/cli/userint.o: cli/userint.h com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h
 build/cli/cli/userint.o: sim/devices.h sim/monitor.h lang/scanner.h com/iposstream.h
 build/cli/cli/clisim.o: com/names.h com/cistring.h sim/network.h com/sourcepos.h com/errorhandler.h sim/devices.h
@@ -156,7 +156,7 @@ build/gui/com/sourcepos.o: com/sourcepos.h
 build/gui/com/autocorrect.o: com/names.h com/cistring.h com/autocorrect.h
 build/gui/sim/networkbuilder.o: lang/parser.h com/names.h com/cistring.h lang/scanner.h com/iposstream.h
 build/gui/sim/networkbuilder.o: com/sourcepos.h sim/network.h com/errorhandler.h sim/devices.h sim/monitor.h
-build/gui/sim/networkbuilder.o: lang/networkbuilder.h com/autocorrect.h
+build/gui/sim/networkbuilder.o: lang/networkbuilder.h com/autocorrect.h com/formatstring.h
 build/gui/gui/gui.o: gui/gui.h gui/rearrangectrl_matt.h com/names.h com/cistring.h sim/devices.h sim/network.h
 build/gui/gui/gui.o: com/sourcepos.h com/errorhandler.h sim/monitor.h gui/guicanvas.h lang/scanner.h
 build/gui/gui/gui.o: com/iposstream.h lang/parser.h lang/networkbuilder.h gui/guierrordialog.h
