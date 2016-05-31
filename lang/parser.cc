@@ -7,6 +7,7 @@
 #include "../com/errorhandler.h"
 #include "../com/names.h"
 #include "../com/autocorrect.h"
+#include "../com/formatstring.h"
 
 #include "scanner.h"
 
@@ -50,9 +51,11 @@ bool parser::readin() {
 
     errs.print(std::cout);
 
-    std::cout << "File parsed with "
-            << errs.errCount() << " errors and "
-            << errs.warnCount() << " warnings." << std::endl;
+    std::cout << formatString(
+        "File parsed with {0} errors and {1} warnings.",
+            errs.errCount(),
+            errs.warnCount())
+        << std::endl;
 
     return errs.errCount() == 0;
 }
