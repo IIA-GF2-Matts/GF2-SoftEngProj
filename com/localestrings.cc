@@ -264,10 +264,9 @@ bool LocaleStrings::open(const char* file) {
  *
  * @author Diesel
  */
-LocaleStrings::LocaleStrings() {
+LocaleStrings::LocaleStrings() : _ref(0) {
 }
 
-#include <iostream>
 
 /** The LocaleStrings copy constructor
  *
