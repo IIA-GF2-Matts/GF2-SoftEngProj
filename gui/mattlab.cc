@@ -25,9 +25,8 @@ bool MyApp::OnInit()
 
     frame->Show(true);
 
-    // Todo: There must be a way of checking if Locale is any English dialect rather than the current
-    // loading of a blank translation file for english.
-    // Create error message if language catalog was not found.
+
+    // Create error message if language catalog was not found and locale is not english.
     if (translationFailed && m_locale->GetName().substr(0,2) != "en") {
         wxMessageBox(wxT("No translations available for current language. Reverting to English."),
             wxT("Language not available"), wxOK|wxCENTRE, frame);
