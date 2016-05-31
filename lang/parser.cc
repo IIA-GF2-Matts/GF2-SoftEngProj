@@ -8,6 +8,7 @@
 #include "../com/names.h"
 #include "../com/autocorrect.h"
 #include "../com/formatstring.h"
+#include "../com/localestrings.h"
 
 #include "scanner.h"
 
@@ -52,7 +53,7 @@ bool parser::readin() {
     errs.print(std::cout);
 
     std::cout << formatString(
-        "File parsed with {0} errors and {1} warnings.",
+        t("File parsed with {0} errors and {1} warnings."),
             errs.errCount(),
             errs.warnCount())
         << std::endl;
@@ -139,7 +140,7 @@ void parser::parseImport(Token& tk) {
     if (!f->open(incStr.str)) {
         delete f;
 
-        throw mattruntimeerror("Unable to read import file.", incStr.at);
+        throw mattruntimeerror(t("Unable to read import file."), incStr.at);
     }
 
     f->parent = _scan;
@@ -155,7 +156,7 @@ void parser::parseDefineDevice(Token& tk) {
     Token nameToken;
 
     if (tk.type != TokType::Identifier) {
-        throw mattsyntaxerror("Expected a device name.", tk.at);
+        throw mattsyntaxerror(t("Expected a device name."), tk.at);
     }
     // dev, as, monitor are handled by the scanner and made *Keywords
     // device types are handled by the scanner and made DeviceTypes
@@ -180,11 +181,11 @@ void parser::parseDefineDevice(Token& tk) {
                 std::string errmsg;
                 if (tk.type == TokType::Identifier) {
                     // get the closest match input and display a suggestion
-                    errmsg = "Expected a device type. "
+                    errmsg = t("Expected a device type. ")
                         + getClosestMatchError(_nms->namestr(tk.id), devicesset);
                 } else {
                     // user got it hopelessly wrong
-                    errmsg = "Expected a device type such as CLOCK, SWITCH, NAND or others (see documentation).";
+                    errmsg = t("Expected a device type such as CLOCK, SWITCH, NAND or others (see documentation).");
                 }
                 throw mattsyntaxerror(errmsg, tk.at);
             }
@@ -210,7 +211,7 @@ void parser::parseData(Token& tk, Token& devName) {
         parseOptionSet(tk, devName);
     }
     else {
-        throw mattsyntaxerror("Unexpected token. Expecting ; (if the end of the statement), or { (if beginning an option block).", tk.at);
+        throw mattsyntaxerror(t("Unexpected token. Expecting ; (if the end of the statement), or { (if beginning an option block)."), tk.at);
     }
 }
 
@@ -219,7 +220,7 @@ void parser::parseData(Token& tk, Token& devName) {
 void parser::parseOptionSet(Token& tk, Token& devName) {
     while (tk.type != TokType::CloseBrace) {
         if (tk.type == TokType::EndOfFile) {
-            throw mattsyntaxerror("Unterminated braces.", tk.at);
+            throw mattsyntaxerror(t("Unterminated braces."), tk.at);
         }
 
         try {
@@ -248,7 +249,7 @@ void parser::parseOption(Token& tk, Token& devName) {
     Token keytk, valuetk;
 
     if (tk.type != TokType::Identifier) {
-        throw mattsyntaxerror("Expected a key.", tk.at);
+        throw mattsyntaxerror(t("Expected a key."), tk.at);
     }
 
     keytk = tk;
@@ -256,14 +257,14 @@ void parser::parseOption(Token& tk, Token& devName) {
     stepAndPeek(tk);
 
     if (tk.type != TokType::Colon) {
-        throw mattsyntaxerror("Expected colon.", tk.at);
+        throw mattsyntaxerror(t("Expected colon."), tk.at);
     }
 
     stepAndPeek(tk);
     parseValue(tk, devName, keytk);
 
     if (tk.type != TokType::SemiColon) {
-        throw mattsyntaxerror("Missing a semicolon on the end.", tk.at);
+        throw mattsyntaxerror(t("Missing a semicolon on the end."), tk.at);
     }
     stepAndPeek(tk);
 }
@@ -285,7 +286,7 @@ void parser::parseValue(Token& tk, Token& devName, Token& keyTok) {
         stepAndPeek(tk);
 
     } else {
-        throw mattsyntaxerror("Expected an Identifier or Number", valuetk.at);
+        throw mattsyntaxerror(t("Expected an Identifier or Number"), valuetk.at);
     }
 }
 
@@ -300,7 +301,7 @@ void parser::parseDefineMonitor(Token& tk) {
             break;
         }
         else if (tk.type != TokType::Comma) {
-            throw mattsyntaxerror("Expected a comma in the monitor list.", tk.at);
+            throw mattsyntaxerror(t("Expected a comma in the monitor list."), tk.at);
         }
         stepAndPeek(tk);
     }
@@ -329,7 +330,7 @@ Signal parser::parseSignalName(Token& tk) {
     Signal ret;
 
     if (tk.type != TokType::Identifier) {
-        throw mattsyntaxerror("Expected a signal name.", tk.at);
+        throw mattsyntaxerror(t("Expected a signal name."), tk.at);
     }
 
     ret.device = tk;
@@ -340,7 +341,7 @@ Signal parser::parseSignalName(Token& tk) {
         stepAndPeek(tk);
 
         if (tk.type != TokType::Identifier) {
-            throw mattsyntaxerror("Expected a pin name.", tk.at);
+            throw mattsyntaxerror(t("Expected a pin name."), tk.at);
         }
 
         ret.pin = tk;
