@@ -622,6 +622,7 @@ void devices::resetdevices() {
         break;
       case siggen:
         d->counter = 0;
+        d->bitstrpos = 0;
         d->olist->sig = d->bitstr[0] ? high : low;
         break;
       default:
