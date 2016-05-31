@@ -254,19 +254,21 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
             break;
         case imported:
             if (!dvl->device->hasInput(keyTok.id)) {
-                std::ostringstream oss;
-                oss << "Imported device " << _nms->namestr(dvl->id) << " has no input pin "
-                    << _nms->namestr(keyTok.id);
-                _errs.report(mattsemanticerror(oss.str(), keyTok.at));
+                _errs.report(mattsemanticerror(
+                    formatString("Imported device {0} has no input pin {1}.",
+                        _nms->namestr(dvl->id),
+                        _nms->namestr(keyTok.id)),
+                    keyTok.at));
                 return false;
             }
             break;
         case aselect:
             if (!(keyTok.id == _devz->highpin || keyTok.id == _devz->lowpin || keyTok.id == _devz->swpin)) {
-                std::ostringstream oss;
-                oss << "SELECT device " << _nms->namestr(dvl->id) << " has no input pin "
-                    << _nms->namestr(keyTok.id) << ". Correct pins are SW, HIGH and LOW";
-                _errs.report(mattsemanticerror(oss.str(), keyTok.at));
+                _errs.report(mattsemanticerror(
+                    formatString("SELECT device {0} has no input pin {1}. Correct pins are SW, HIGH and LOW.",
+                        _nms->namestr(dvl->id),
+                        _nms->namestr(keyTok.id)),
+                    keyTok.at));
                 return false;
             }
             break;
@@ -575,13 +577,16 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
         if (aliSig.device.id == monSig.device.id
             && aliSig.pin.id == monSig.pin.id) {
             // monitoring a signal as itself
-            std::ostringstream oss;
-            oss << "The 'as "
-                << _nms->namestr(aliSig.device.id);
-            if (aliSig.pin.id != blankname)
-                oss << "." << _nms->namestr(aliSig.pin.id);
-            oss << "' is not required in this case";
-            _errs.report(mattnote(oss.str(), aliSig.device.at));
+            std::string errmsg;
+            if (aliSig.pin.id == blankname) {
+                errmsg = formatString("The 'as {0}' is not required in this case.",
+                    _nms->namestr(aliSig.device.id));
+            } else {
+                errmsg = formatString("The 'as {0}.{1}' is not required in this case.",
+                    _nms->namestr(aliSig.device.id),
+                    _nms->namestr(aliSig.pin.id));
+            }
+            _errs.report(mattnote(errmsg, aliSig.device.at));
 
         // Warn if signal exists
         } else if (!isBadSignal(aliSig)) {
