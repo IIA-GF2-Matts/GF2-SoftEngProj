@@ -2,8 +2,9 @@
 #include <iostream>
 #include <cctype>
 
+#include "../com/localestrings.h"
+#include "../com/formatstring.h"
 #include "../lang/scanner.h"
-#include "../com/errorhandler.h"
 
 #include "userint.h"
 
@@ -72,7 +73,7 @@ void userint::rdcmd (char& cmd, charset valid)
       cmd = curch;
       getch ();
     } else
-      cout << "Illegal command - try 'h' for help" << endl;
+      cout << t("Illegal command - try 'h' for help") << endl;
   }
 }
 
@@ -94,10 +95,10 @@ void userint::rdnumber (int& n, int lo, int hi)
     } while (isdigit (curch));
     if ((n < lo) || (n > hi)) {
       cmdok = false;
-      cout << "Error: number out of range" << endl;
+      cout << t("Error: number out of range") << endl;
     }
   } else
-    cout << "Error: number wanted" << endl;
+    cout << t("Error: number wanted") << endl;
 }
 
 
@@ -111,13 +112,13 @@ void userint::rdname (name& n)
   try {
     strscanner scan(nmz, &cmdline[cmdpos]);
 
-    Token t = scan.step();
+    Token tk = scan.step();
 
-    if (t.type != TokType::Identifier) {
-      throw matterror("Expecting identifer.", SourcePos(1, cmdpos));
+    if (tk.type != TokType::Identifier) {
+      throw mattsemanticerror(t("Expecting identifer."), SourcePos(1, cmdpos));
     }
 
-    n = t.id;
+    n = tk.id;
 
     cmdpos += scan.peek().at.Abs - 2;
   }
@@ -138,25 +139,25 @@ void userint::rdqualname (name& prefix, name& suffix)
   try {
     strscanner scan(nmz, &cmdline[cmdpos]);
 
-    Token t = scan.step();
+    Token tk = scan.step();
 
-    if (t.type != TokType::Identifier) {
-      throw matterror("Expecting identifer.", SourcePos(1, cmdpos, cmdpos));
+    if (tk.type != TokType::Identifier) {
+      throw mattsemanticerror(t("Expecting identifer."), SourcePos(1, cmdpos, cmdpos));
     }
 
-    prefix = t.id;
+    prefix = tk.id;
 
-    t = scan.peek();
+    tk = scan.peek();
 
-    if (t.type == TokType::Dot) {
+    if (tk.type == TokType::Dot) {
       scan.step();
-      t = scan.step();
+      tk = scan.step();
 
-      if (t.type != TokType::Identifier) {
-        throw matterror("Expecting pin identifer.", SourcePos(1, cmdpos, cmdpos));
+      if (tk.type != TokType::Identifier) {
+        throw mattsemanticerror(t("Expecting pin identifer."), SourcePos(1, cmdpos, cmdpos));
       }
 
-      suffix = t.id;
+      suffix = tk.id;
     }
     else {
       suffix = blankname;
@@ -190,7 +191,7 @@ void userint::setswcmd (void)
       else
         dmz->setswitch (swid, high, cmdok);
       if (! cmdok)
-        cout << "Error: unknown switch" << endl;
+        cout << t("Error: unknown switch") << endl;
     }
   }
 }
@@ -212,7 +213,7 @@ void userint::runnetwork (int ncycles)
       n--;
       mmz->recordsignals ();
     } else
-      cout << "Error: network is oscillating" << endl;
+      cout << t("Error: network is oscillating") << endl;
   }
   if (ok) {
     mmz->displaysignals ();
@@ -237,7 +238,7 @@ void userint::runcmd (void)
     dmz->resetdevices();
     if (cmdok) {
       mmz->resetmonitor ();
-      cout << "Running for " << ncycles << " cycles" << endl;
+      cout << formatString(t("Running for {0} cycles"), ncycles) << endl;
       runnetwork(ncycles);
     }
   }
@@ -258,10 +259,10 @@ void userint::continuecmd (void)
     if (cyclescompleted > 0) {
       if ((ncycles + cyclescompleted) > maxcycles)
         ncycles = maxcycles - cyclescompleted;
-      cout << "Continuing for " << ncycles << " cycles" << endl;
+      cout << formatString(t("Continuing for {0} cycles"), ncycles) << endl;
       runnetwork (ncycles);
     } else {
-      cout << "Error: nothing to continue!" << endl;
+      cout << t("Error: nothing to continue!") << endl;
     }
   }
 }
@@ -281,7 +282,7 @@ void userint::setmoncmd (void)
   if (cmdok)
     cyclescompleted = 0;
   else
-    cout << "Error: unable to set monitor point" << endl;
+    cout << t("Error: unable to set monitor point") << endl;
 }
 
 
@@ -300,7 +301,7 @@ void userint::zapmoncmd (void)
     if (cmdok)
       cyclescompleted = 0;
     else
-      cout << "Error: unable to zap monitor point" << endl;
+      cout << t("Error: unable to zap monitor point") << endl;
   }
 }
 
@@ -318,7 +319,10 @@ void userint::debugcmd (void)
   if (cmdok) {
     bool dbs = (n == 1);
     dmz->debug (dbs);
-    cout << "Debugging is " << (dbs ? "on" : "off") << endl;
+    if (dbs)
+      cout << t("Debugging is on") << endl;
+    else
+      cout << t("Debugging is off") << endl;
   }
 }
 
@@ -332,16 +336,16 @@ void userint::debugcmd (void)
 void userint::helpcmd (void)
 {
   cout << endl;
-  cout << "User commands -" << endl;
+  cout << t("User commands") << " -" << endl;
   cout << endl;
-  cout << "r N       - run the simulation for N cycles" << endl;
-  cout << "c N       - continue simulation for N cycles" << endl;
-  cout << "s X N     - set switch X to N (0 or 1)" << endl;
-  cout << "m X       - set a monitor on signal X" << endl;
-  cout << "z X       - zap the monitor on signal X" << endl;
-  cout << "d N       - set debugging on (N=1) or off (N=0)" << endl;
-  cout << "h         - help (this command)" << endl;
-  cout << "q         - quit the program" << endl;
+  cout << "r N       - " << t("run the simulation for N cycles") << endl;
+  cout << "c N       - " << t("continue simulation for N cycles") << endl;
+  cout << "s X N     - " << t("set switch X to N (0 or 1)") << endl;
+  cout << "m X       - " << t("set a monitor on signal X") << endl;
+  cout << "z X       - " << t("zap the monitor on signal X") << endl;
+  cout << "d N       - " << t("set debugging on (N=1) or off (N=0)") << endl;
+  cout << "h         - " << t("help (this command)") << endl;
+  cout << "q         - " << t("quit the program") << endl;
   cout << endl;
 }
 
@@ -354,7 +358,7 @@ void userint::helpcmd (void)
  */
 void userint::userinterface (void)
 {
-  cout << "Logic Simulator: interactive command interface" << endl;
+  cout << t("Logic Simulator: interactive command interface") << endl;
   cyclescompleted = 0;
   do {
     readline ();
@@ -376,7 +380,7 @@ void userint::userinterface (void)
       case 'q':                 break;
       }
   } while (cmd != 'q');
-  cout << "Logic Simulator: terminating." << endl;
+  cout << t("Logic Simulator: terminating.") << endl;
 }
 
 
