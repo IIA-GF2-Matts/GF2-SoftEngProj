@@ -10,6 +10,7 @@
 #include "../com/iposstream.h"
 #include "../com/errorhandler.h"
 #include "../com/formatstring.h"
+#include "../com/localestrings.h"
 #include "../sim/network.h"
 
 #include "scanner.h"
@@ -113,7 +114,7 @@ Token scanner::readNext() {
                 c = readChar();
 
                 if (_ips.eof()) {
-                    throw mattsyntaxerror("Unterminated block comment.", p);
+                    throw mattsyntaxerror(t("Unterminated block comment."), p);
                 }
 
                 if (hadStar && c == '/') {
@@ -124,7 +125,7 @@ Token scanner::readNext() {
             }
 	    }
         else {
-        	throw mattsyntaxerror("Illegal character sequence '/' in file.", p);
+        	throw mattsyntaxerror(t("Illegal character sequence '/' in file."), p);
         }
 
         if (_ips.eof()) {
@@ -175,7 +176,7 @@ Token scanner::readNext() {
                 ret.number = readNumber(c);
 
                 if (ret.number < 0) {
-                    throw mattsyntaxerror("Number is too large to be represented in Mattlab.", ret.at);
+                    throw mattsyntaxerror(t("Number is too large to be represented in Mattlab."), ret.at);
                 }
             }
             else if (std::isalpha(c)) {
@@ -209,14 +210,14 @@ Token scanner::readNext() {
                 std::string errmsg;
 
                 if (std::isprint(c)) {
-                    errmsg = formatString("Illegal Character '{0}' in file.",
+                    errmsg = formatString(t("Illegal Character '{0}' in file."),
                         char(c));
                 }
                 else if (c == '\0') {
-                    errmsg = "Null byte in file. Note only ISO 8859 encoding is accepted";
+                    errmsg = t("Null byte in file. Note only ISO 8859 encoding is accepted");
                 }
                 else {
-                    errmsg = formatString("Illegal non-printing character, code {0} in file.",
+                    errmsg = formatString(t("Illegal non-printing character, code {0} in file."),
                         int(c));
                 }
 
@@ -299,7 +300,7 @@ std::string scanner::readString(int c1) {
         }
 
         if (_ips.eof()) {
-            throw mattsyntaxerror("Unterminated string.", start);
+            throw mattsyntaxerror(t("Unterminated string."), start);
         }
 
         oss << char(c);
@@ -326,7 +327,7 @@ std::vector<bool> scanner::readBitstream(int c1) {
     }
 
     if (ret.size() == 0) {
-        throw mattsyntaxerror("Was expecting a binary digit, empty bitstreams not allowed.", start);
+        throw mattsyntaxerror(t("Was expecting a binary digit, empty bitstreams not allowed."), start);
     }
 
     return ret;
