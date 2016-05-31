@@ -234,6 +234,7 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
     canvas->Render();
 
     continuebutton->Enable(false);
+    runbutton->SetDefault();
 }
 
 
