@@ -2,11 +2,8 @@
 
 
 #include <string>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
-
-#include "formatstring.h"
 
 
 /** Prints the Nth argument of a packed parameter list.
@@ -49,7 +46,6 @@ std::string formatString(std::string f, TA... pargs) {
 	std::string::size_type c = 0, p, n;
 	for (;c < f.length();) {
 		p = f.find('{', c);
-		std::cout << c << "," << p << std::endl;
 
 		if (p == std::string::npos) {
 			oss << f.substr(c);

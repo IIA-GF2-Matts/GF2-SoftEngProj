@@ -23,4 +23,7 @@ template<class ...TA>
 std::string formatString(std::string f, TA... pargs);
 
 
+#include "formatstring.inc"
+
+
 #endif
