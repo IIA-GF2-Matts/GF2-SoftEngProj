@@ -67,16 +67,25 @@ std::string networkbuilder::getUnknownPinError(Signal& sig) {
     return ret;
 }
 
-/** Method to generate the error message when a signal pin has not been defined
- *  Provides error and note messages (including details on the previous definition)
+/** Method to generate the error message when a signal pin has been predefined
+ *
+ * @author Judge
+ */
+std::string networkbuilder::getPredefinedError(devlink dvl, name key) {
+    return formatString("Attempt to redefine {0}.{1}.",
+        _nms->namestr(dvl->id),
+        _nms->namestr(key));
+}
+
+
+/** Method to generate the note message referring to the previous definition
+ *  when a signal pin has been predefined
  *
  * @author Judge
  */
 template<typename T>
-void networkbuilder::getPredefinedError(devlink dvl, name key, T prevval, std::ostream& warnoss, std::ostream& noteoss) {
-    warnoss << "Attempt to redefine " //<< *_devz->getname(dvl->kind)
-        << _nms->namestr(dvl->id) << "." << _nms->namestr(key);
-    noteoss << "Previously defined as " << prevval << " here";
+std::string networkbuilder::getPredefinedNote(T prevval) {
+    return formatString("Previously defined as {0} here.", prevval);
 }
 
 
@@ -274,20 +283,20 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case aswitch:
             // initially set to floating
             if (dvl->swstate != floating) {
-                std::ostringstream warnoss, noteoss;
-                getPredefinedError(dvl, keyTok.id, dvl->swstate == high ? 1 : 0, warnoss, noteoss);
-                _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
-                _errs.report(mattnote(noteoss.str(), dvl->definedAt));
+                _errs.report(mattsemanticerror(
+                    getPredefinedError(dvl, keyTok.id), keyTok.at));
+                _errs.report(mattnote(
+                    getPredefinedNote(dvl->swstate == high ? 1 : 0), dvl->definedAt));
                 return false;
             }
             break;
         case aclock:
             // initially set to 0
             if (dvl->frequency != 0) {
-                std::ostringstream warnoss, noteoss;
-                getPredefinedError(dvl, keyTok.id, dvl->frequency, warnoss, noteoss);
-                _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
-                _errs.report(mattnote(noteoss.str(), dvl->definedAt));
+                _errs.report(mattsemanticerror(
+                    getPredefinedError(dvl, keyTok.id), keyTok.at));
+                _errs.report(mattnote(
+                    getPredefinedNote(dvl->frequency), dvl->definedAt));
                 return false;
             }
             break;
@@ -295,20 +304,19 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
             if (keyTok.id == _devz->periodnm) {
                 // initially set to 0
                 if (dvl->frequency != 0) {
-                    std::ostringstream warnoss, noteoss;
-                    getPredefinedError(dvl, keyTok.id, dvl->frequency, warnoss, noteoss);
-                    _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
-                    _errs.report(mattnote(noteoss.str(), dvl->definedAt));
+                    _errs.report(mattsemanticerror(
+                        getPredefinedError(dvl, keyTok.id), keyTok.at));
+                    _errs.report(mattnote(
+                        getPredefinedNote(dvl->frequency), dvl->definedAt));
                     return false;
                 }
             } else if (keyTok.id == _devz->signm) {
                 // initially set empty
                 if (dvl->bitstr.size() != 0) {
-                    std::ostringstream warnoss, noteoss;
-                    // todo: print actual bitstream value
-                    getPredefinedError(dvl, keyTok.id, "a bitstream", warnoss, noteoss);
-                    _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
-                    _errs.report(mattnote(noteoss.str(), dvl->definedAt));
+                    _errs.report(mattsemanticerror(
+                        getPredefinedError(dvl, keyTok.id), keyTok.at));
+                    _errs.report(mattnote(
+                        "Previously defined as a bitstream here.", dvl->definedAt));
                     return false;
                 }
             } else {
@@ -343,13 +351,21 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                     return false;
                 }
 
-                prevval << *dl->id;
 
-                if (ol->id != blankname)
-                    prevval << "." << *ol->id;
-                getPredefinedError(dvl, keyTok.id, prevval.str(), warnoss, noteoss);
-                _errs.report(mattsemanticerror(warnoss.str(), keyTok.at));
-                _errs.report(mattnote(noteoss.str(), il->definedAt));
+                _errs.report(mattsemanticerror(
+                    getPredefinedError(dvl, keyTok.id), keyTok.at));
+
+                std::string errmsg;
+
+                if (ol->id == blankname)
+                    errmsg = getPredefinedNote(_nms->namestr(dl->id));
+                else
+                    errmsg = formatString(
+                        "Previously defined as {0}.{1} here.", 
+                        _nms->namestr(dl->id),
+                        _nms->namestr(ol->id));
+
+                _errs.report(mattnote(errmsg, il->definedAt));
                 return false;
             }
             break;

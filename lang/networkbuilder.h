@@ -43,26 +43,31 @@ private:
     errorcollector& _errs; ///< The error collector to which errors will be reported
 
 
-    /** Method to generate the error message when a pin / property has been predefined
+     /** Method to generate the error message when a pin / property has been predefined
      *
      * @param[in]  dvl      The devlink to the device owning the property being assigned to
      * @param[in]  key      The key of the property
-     * @param[in]  prevval  The token to the previous assignment of the property
-     * @param      warnoss  The stream to write the error message to
-     * @param      noteoss  The stream to write the note message to, including details of the previous assignment
      *
-     * @return
+     * @return              The error message string
+     */
+    std::string getPredefinedError(devlink dvl, name key);
+
+
+    /** Method to generate the note message when a pin / property has been predefined
+     *
+     * @param[in]  prevval  The token to the previous assignment of the property
+     *
+     * @return              The note message string
      */
     template<typename T>
-    void getPredefinedError(devlink dvl, name key, T prevval, std::ostream& warnoss, std::ostream& noteoss);
+    std::string getPredefinedNote(T prevval);
 
 
     /** Method to generate the error message when a signal pin has not been defined
      *
      * @param[in]  sig      The signal with the unknown pin
-     * @param      oss      The stream to write the error message to
      *
-     * @return
+     * @return     The error message
      */
     std::string getUnknownPinError(Signal& sig);
 
