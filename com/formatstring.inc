@@ -16,7 +16,7 @@ bool fmtprint(std::ostream& os, int N, T first, Args... args) {
 		os << first;
 		return true;
 	}
-	return print(os, N-1, args...);
+	return fmtprint(os, N-1, args...);
 }
 
 
