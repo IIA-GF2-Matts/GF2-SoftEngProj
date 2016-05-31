@@ -1,0 +1,17 @@
+// Test of setup and hold time with DTYPE data signal changing on clock edge.
+
+dev CL = CLOCK {
+	Period : 1;
+}
+
+dev SIG = SIGGEN {
+	Period : 1;
+	Sig : $0110;
+}
+
+dev D = DTYPE {
+	Data : SIG;
+	CLK : CL;
+}
+
+monitor CL as clk, SIG as data, D.Q as D_out;
