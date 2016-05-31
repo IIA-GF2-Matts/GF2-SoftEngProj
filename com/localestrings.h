@@ -3,6 +3,16 @@
 #ifndef GF2_LOCALESTRINGS_H
 #define GF2_LOCALESTRINGS_H
 
+#include <string>
+
+/** Translate a string using the current locale.
+ *
+ * @param s    The string to translate
+ * @return     The translated string, or the string passed to it
+ *             if no translation was available.
+ */
+const char* t(const char* s);
+
 
 /** Stores a string-translation table
  *
@@ -26,6 +36,13 @@ private:
     int getIndex(const char* str, int l, int h) const;
 
 public:
+    /** Sets the current locale used for translations with t(...)
+     *
+     * @param loc  The locale name, or a blank string to use the user's locale.
+     * @return     True if the locale was set correctly, false otherwise.
+     */
+    static bool SetLocale(const char* loc);
+
     /** Looks up the string in the table
      *
      * @param i    The index in the table

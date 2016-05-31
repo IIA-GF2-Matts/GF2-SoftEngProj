@@ -55,8 +55,48 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 */
 
 #include <fstream>
+#include <sstream>
 #include <string>
 #include "localestrings.h"
+
+/// The currently used localestring table.
+LocaleStrings g_langTable;
+
+
+/** 
+ *
+ * @author Diesel
+ */
+bool LocaleStrings::SetLocale(const char* locstr) {
+    std::locale loc(locstr);
+    std::string lname = loc.name();
+
+    // Try open the language file.
+    std::ostringstream fname;
+    fname << "./intl/";
+
+    int i = lname.find('_');
+    if (i != -1) {
+        fname << lname.substr(0, i);
+    }
+    else {
+        // Todo: Is this the most sensible approach?
+        fname << lname;
+    }
+
+    fname << "/clisim.mo";
+
+    return g_langTable.open(fname.str().c_str());
+}
+
+
+/** Translate a string using the current locale.
+ *
+ * @author Diesel
+ */
+const char* t(const char* s) {
+    return g_langTable.translate(s);
+}
 
 
 /** Retrieves an integer from the data block.
@@ -129,7 +169,7 @@ bool LocaleStrings::readDataHeader() {
  * @author Diesel
  */
 const char* LocaleStrings::get(int i) const {
-    if (i > _N) return nullptr;
+    if (!_N || i > _N) return nullptr;
 
     int addr = _O + 8*i + 4;
     int str = intAt(addr);
@@ -143,7 +183,7 @@ const char* LocaleStrings::get(int i) const {
  * @author Diesel
  */
 const char* LocaleStrings::getTranslated(int i) const {
-    if (i > _N) return nullptr;
+    if (!_N || i > _N) return nullptr;
     
     int addr = _T + 8*i + 4;
     int str = intAt(addr);
@@ -157,6 +197,7 @@ const char* LocaleStrings::getTranslated(int i) const {
  * @author Diesel
  */
 int LocaleStrings::getIndex(const char* str) const {
+    if (!_N) return -1;
     return getIndex(str, 0, _N);
 }
 
