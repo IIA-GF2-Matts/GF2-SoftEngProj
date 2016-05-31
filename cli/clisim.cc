@@ -14,7 +14,7 @@
 
 
 int main(int argc, char const *argv[]) {
-    LocaleStrings::SetLocale("");
+    LocaleStrings::AddTranslations("", "clisim");
 
     if (argc != 2) { // check we have one command line argument
         std::cout << t("Usage") << ":      " << argv[0] << " [filename]" << std::endl;
