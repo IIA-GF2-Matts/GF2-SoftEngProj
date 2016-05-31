@@ -195,6 +195,7 @@ void MyFrame::OnOpen(wxCommandEvent &event)
         return;
 
     openFile(openFileDialog.GetPath());
+    canvas->Render();
 }
 
 void MyFrame::OnAddMonitor(wxCommandEvent &event)
