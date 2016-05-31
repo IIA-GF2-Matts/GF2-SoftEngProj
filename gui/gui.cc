@@ -230,6 +230,7 @@ void MyFrame::OnAddMonitor(wxCommandEvent &event)
         }
     }
     RefreshMonitors();
+    canvas->Render();
 
     continuebutton->Enable(false);
 }
@@ -280,7 +281,6 @@ void MyFrame::RefreshMonitors() {
     for ( int i = 0; i < mmz->moncount(); i++ ) {
         monitorlist->Check(i, true);
     }
-    canvas->Render();
 }
 
 void MyFrame::OnMonitorUp(wxCommandEvent &event) {
