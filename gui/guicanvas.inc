@@ -188,6 +188,7 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int mon_num, int zoomrange[2]
     if (mmz->getsignaltrace(order[mon_num], i, s)) {
       if (s==low) signal_y = y;
       if (s==high) signal_y = y + 2*dy;
+      if (s==indet) signal_y = y + dy;
       glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
       glVertex2f(dx*(i-zoomrange[0]+1) + label_width, signal_y);
     }
