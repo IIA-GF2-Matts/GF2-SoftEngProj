@@ -251,17 +251,10 @@ void devices::makedtype (name id, bool& ok, SourcePos at)
   netz->adddevice (dtype, id, d);
   netz->addinput (d, datapin);
   netz->addinput (d, clkpin);
-  netz->addinput (d, setpin);
-  netz->addinput (d, clrpin);
   netz->addoutput (d, qpin);
   netz->addoutput (d, qbarpin);
   d->memory = low;
   d->definedAt = at;
-
-  // Default SET and CLR to zero
-  netz->makeconnection(id, setpin, zero, blankname, ok);
-  if (!ok) return;
-  netz->makeconnection(id, clrpin, zero, blankname, ok);
 }
 
 
@@ -453,8 +446,20 @@ void devices::execdtype (devlink d)
   outplink qout, qbarout;
   i = netz->findinput (d, datapin); datainput = i->connect->sig;
   i = netz->findinput (d, clkpin);  clkinput  = i->connect->sig;
-  i = netz->findinput (d, clrpin);  clrinput  = i->connect->sig;
-  i = netz->findinput (d, setpin);  setinput  = i->connect->sig;
+
+  // SET and CLEAR default to low if not specified.
+  i = netz->findinput (d, clrpin);
+  if (!i)
+    clrinput = low;
+  else
+    clrinput  = i->connect->sig;
+
+  i = netz->findinput (d, setpin);
+  if (!i)
+    setinput = low;
+  else
+    setinput  = i->connect->sig;
+
   qout = netz->findoutput (d, qpin);
   qbarout = netz->findoutput (d, qbarpin);
   if ((clkinput == rising) && ((datainput == high) || (datainput == falling)))
