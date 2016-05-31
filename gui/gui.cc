@@ -333,6 +333,7 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
         canvas->resetCycles();
         canvas->Render(spinValue);
         continuebutton->Enable(true);
+        continuebutton->SetDefault();
     }
 }
 
@@ -509,6 +510,7 @@ void MyFrame::openFile(wxString file) {
 
     // Update controls
     toggleButtonsEnabled(true);
+    runbutton->SetDefault();
 
     // Add monitors to list
     RefreshMonitors();
