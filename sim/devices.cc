@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <string>
+#include "../com/localestrings.h"
 #include "../com/names.h"
 #include "importeddevice.h"
 #include "devices.h"
@@ -14,11 +15,11 @@ using namespace std;
 void devices::outsig (asignal s)
 {
   switch (s) {
-    case high:    cout << "high";    break;
-    case low:     cout << "low";     break;
-    case rising:  cout << "rising";  break;
-    case falling: cout << "falling"; break;
-    case floating: cout << "floating"; break;
+    case high:    cout << t("high");    break;
+    case low:     cout << t("low");     break;
+    case rising:  cout << t("rising");  break;
+    case falling: cout << t("falling"); break;
+    case floating: cout << t("floating"); break;
   }
 }
 
@@ -32,17 +33,17 @@ void devices::showdevice (devlink d)
 {
   inplink  i;
   outplink o;
-  cout << "   Device: " << nmz->namestr(d->id);
-  cout << "  Kind: ";
+  cout << "   " << t("Device") << ": " << nmz->namestr(d->id);
+  cout << "   " << t("Kind") << ": ";
   writedevice (d->kind);
   cout << endl;
-  cout << "   Inputs:" << endl;
+  cout << "   " << t("Inputs") << ":" << endl;
   for (i = d->ilist; i != NULL; i = i->next) {
     cout << "      " << nmz->namestr(i->id) << " ";
     outsig (i->connect->sig);
     cout << endl;
   }
-  cout << "   Outputs:";
+  cout << "   " << t("Outputs") << ":";
   for (o = d->olist; o != NULL; o = o->next) {
     cout << "      " << nmz->namestr(o->id) << " ";
     outsig (o->sig);
@@ -82,7 +83,7 @@ void devices::makeimported(name id, std::string fname, errorcollector& errs, Sou
   devlink d;
   netz->adddevice (imported, id, d);
   if (!d) {
-    errs.report(mattruntimeerror("Error creating imported device in network.", at));
+    errs.report(mattruntimeerror(t("Error creating imported device in network."), at));
     return;
   }
 
@@ -563,14 +564,14 @@ void devices::executedevices (bool& ok, bool tick)
   devlink d;
   int machinecycle;
   if (debugging)
-    cout << "Start of execution cycle" << endl;
+    cout << t("Start of execution cycle") << endl;
   if (tick)
     updateclocks ();
   machinecycle = 0;
   do {
     machinecycle++;
     if (debugging)
-      cout << "machine cycle # " << machinecycle << endl;
+      cout << t("machine cycle") << " # " << machinecycle << endl;
     steadystate = true;
     for (d = netz->devicelist (); d != NULL; d = d->next) {
       switch (d->kind) {
@@ -592,7 +593,7 @@ void devices::executedevices (bool& ok, bool tick)
     }
   } while ((! steadystate) && (machinecycle < maxmachinecycles));
   if (debugging)
-    cout << "End of execution cycle" << endl;
+    cout << t("End of execution cycle") << endl;
   ok = steadystate;
 }
 

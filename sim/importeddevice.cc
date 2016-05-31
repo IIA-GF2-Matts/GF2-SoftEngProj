@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 
+#include "../com/localestrings.h"
 #include "../lang/scanner.h"
 #include "../lang/parser.h"
 
@@ -50,7 +51,7 @@ bool importeddevice::scanAndParse(std::string file) {
             for (int n = 0; n < mmz->moncount(); n++) {
                 mmz->getmonname(n, D, P);
                 if (P != blankname) {
-                    errs.report(mattwarning("In imported devices, monitors using pin names are ignored. ", mmz->getdefinedpos(n)));
+                    errs.report(mattwarning(t("In imported devices, monitors using pin names are ignored. "), mmz->getdefinedpos(n)));
                 }
                 else {
                     outputs.push_back({D, mmz->getoutplink(n)});
@@ -59,7 +60,7 @@ bool importeddevice::scanAndParse(std::string file) {
 
             // Check
             if (outputs.empty()) {
-                errs.report(mattwarning("No outputs defined for imported device.", SourcePos(file, 0, 0, 0)));
+                errs.report(mattwarning(t("No outputs defined for imported device."), SourcePos(file, 0, 0, 0)));
             }
             // Todo: Other checks required?
         }
@@ -67,7 +68,7 @@ bool importeddevice::scanAndParse(std::string file) {
         return ok;
     }
     else {
-        throw mattruntimeerror("Unable to open file for importing.", SourcePos(file, 0, 0, 0));
+        throw mattruntimeerror(t("Unable to open file for importing."), SourcePos(file, 0, 0, 0));
     }
 
     delete smz;
@@ -97,7 +98,7 @@ void importeddevice::execute() {
 
     if (!ok) {
         // Todo: Report position
-        throw mattruntimeerror("Imported device network failed to stabilise.", SourcePos());
+        throw mattruntimeerror(t("Imported device network failed to stabilise."), SourcePos());
     }
 }
 

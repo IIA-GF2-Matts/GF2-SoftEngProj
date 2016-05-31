@@ -3,6 +3,7 @@
 #include "../com/sourcepos.h"
 #include "../com/errorhandler.h"
 #include "../com/formatstring.h"
+#include "../com/localestrings.h"
 #include "network.h"
 #include "importeddevice.h"
 
@@ -244,7 +245,7 @@ void network::checknetwork (errorcollector& col)
     if (d->kind == aswitch) {
       if (d->swstate == floating) {
         col.report(mattsemanticerror(
-          formatString("Input {0}.InitialValue has not been assigned a value.",
+          formatString(t("Input {0}.InitialValue has not been assigned a value."),
             nmz->namestr(d->id)),
           d->definedAt));
       }
@@ -252,7 +253,7 @@ void network::checknetwork (errorcollector& col)
     else if (d->kind == aclock) {
       if (d->frequency == 0) {
         col.report(mattsemanticerror(
-          formatString("Input {0}.Period has not been assigned a value.",
+          formatString(t("Input {0}.Period has not been assigned a value."),
             nmz->namestr(d->id)),
           d->definedAt));
       }
@@ -262,10 +263,10 @@ void network::checknetwork (errorcollector& col)
         if (i->connect == NULL) {
           std::string errmsg;
           if (i->id == blankname) {
-            errmsg = formatString("Input {0} has not been assigned a value.",
+            errmsg = formatString(t("Input {0} has not been assigned a value."),
               nmz->namestr(d->id));
           } else {
-            errmsg = formatString("Input {0}.{1} has not been assigned a value.",
+            errmsg = formatString(t("Input {0}.{1} has not been assigned a value."),
               nmz->namestr(d->id),
               nmz->namestr(i->id));
           }
