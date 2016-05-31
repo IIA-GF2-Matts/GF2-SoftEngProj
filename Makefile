@@ -118,7 +118,7 @@ parser_unittest : gtest_main.a parser_unittest.o build/cli/lang/parser.o build/c
 build/cli/com/names.o: com/names.h com/cistring.h
 build/cli/lang/scanner.o: com/names.h com/cistring.h com/iposstream.h com/sourcepos.h com/errorhandler.h
 build/cli/lang/scanner.o: sim/network.h lang/scanner.h com/formatstring.h
-build/cli/sim/network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h
+build/cli/sim/network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h com/formatstring.h
 build/cli/lang/parser.o: com/errorhandler.h com/sourcepos.h lang/scanner.h com/iposstream.h com/names.h
 build/cli/lang/parser.o: com/cistring.h sim/network.h com/autocorrect.h lang/parser.h sim/devices.h sim/monitor.h
 build/cli/lang/parser.o: lang/networkbuilder.h com/formatstring.h
@@ -142,7 +142,7 @@ build/cli/cli/clisim.o: cli/userint.h
 build/gui/com/names.o: com/names.h com/cistring.h
 build/gui/lang/scanner.o: com/names.h com/cistring.h com/iposstream.h com/sourcepos.h com/errorhandler.h
 build/gui/lang/scanner.o: sim/network.h lang/scanner.h com/formatstring.h
-build/gui/sim/network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h
+build/gui/sim/network.o: sim/network.h com/names.h com/cistring.h com/sourcepos.h com/errorhandler.h com/formatstring.h
 build/gui/lang/parser.o: com/errorhandler.h com/sourcepos.h lang/scanner.h com/iposstream.h com/names.h
 build/gui/lang/parser.o: com/cistring.h sim/network.h com/autocorrect.h lang/parser.h sim/devices.h sim/monitor.h
 build/gui/lang/parser.o: lang/networkbuilder.h com/formatstring.h

@@ -1,8 +1,8 @@
 
 #include <iostream>
-#include <sstream>
 #include "../com/sourcepos.h"
 #include "../com/errorhandler.h"
+#include "../com/formatstring.h"
 #include "network.h"
 #include "importeddevice.h"
 
@@ -243,30 +243,33 @@ void network::checknetwork (errorcollector& col)
   for (d = devs; d != NULL; d = d->next) {
     if (d->kind == aswitch) {
       if (d->swstate == floating) {
-        std::ostringstream oss;
-        oss << "Input " << nmz->namestr(d->id) << ".InitialValue "
-            << "has not been assigned a value.";
-        col.report(mattsemanticerror(oss.str(), d->definedAt));
+        col.report(mattsemanticerror(
+          formatString("Input {0}.InitialValue has not been assigned a value.",
+            nmz->namestr(d->id)),
+          d->definedAt));
       }
     }
     else if (d->kind == aclock) {
       if (d->frequency == 0) {
-        std::ostringstream oss;
-        oss << "Input " << nmz->namestr(d->id) << ".Period "
-            << "has not been assigned a value.";
-        col.report(mattsemanticerror(oss.str(), d->definedAt));
+        col.report(mattsemanticerror(
+          formatString("Input {0}.Period has not been assigned a value.",
+            nmz->namestr(d->id)),
+          d->definedAt));
       }
     }
     else {
       for (i = d->ilist; i != NULL; i = i->next) {
         if (i->connect == NULL) {
-          std::ostringstream oss;
-          oss << "Input " << nmz->namestr(d->id);
-          if (i->id != blankname)
-            oss << "." << nmz->namestr(i->id);
-          oss << " has not been assigned a value.";
-
-          col.report(mattsemanticerror(oss.str(), d->definedAt));
+          std::string errmsg;
+          if (i->id == blankname) {
+            errmsg = formatString("Input {0} has not been assigned a value.",
+              nmz->namestr(d->id));
+          } else {
+            errmsg = formatString("Input {0}.{1} has not been assigned a value.",
+              nmz->namestr(d->id),
+              nmz->namestr(i->id));
+          }
+          col.report(mattsemanticerror(errmsg, d->definedAt));
         }
       }
     }
