@@ -6,19 +6,6 @@
 #include <stdexcept>
 
 
-/** Prints the Nth argument of a packed parameter list.
- *
- * @author Diesel
- */
-template<typename T, typename... Args>
-bool fmtprint(std::ostream& os, int N, T first, Args... args) {
-	if (!N) {
-		os << first;
-		return true;
-	}
-	return fmtprint(os, N-1, args...);
-}
-
 
 /** Prints the Nth argument of a packed parameter list (specialization for length = 1)
  *
@@ -31,6 +18,19 @@ bool fmtprint(std::ostream& os, int N, T v) {
 		return true;
 	}
 	return false;
+}
+
+/** Prints the Nth argument of a packed parameter list.
+ *
+ * @author Diesel
+ */
+template<typename T, typename... Args>
+bool fmtprint(std::ostream& os, int N, T first, Args... args) {
+	if (!N) {
+		os << first;
+		return true;
+	}
+	return fmtprint(os, N-1, args...);
 }
 
 
