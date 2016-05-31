@@ -1,0 +1,398 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-05-31 15:32+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: devices.cc:18
+msgid "high"
+msgstr "hoch"
+
+#: devices.cc:19
+msgid "low"
+msgstr "niedrig"
+
+#: devices.cc:20
+msgid "rising"
+msgstr "steigend"
+
+#: devices.cc:21
+msgid "falling"
+msgstr "rückläufig"
+
+#: devices.cc:22
+msgid "floating"
+msgstr "schwimmend"
+
+#: devices.cc:36
+msgid "Device"
+msgstr "Ding"
+
+#: devices.cc:37
+msgid "Kind"
+msgstr "Sorte"
+
+#: devices.cc:40
+msgid "Inputs"
+msgstr "Eingänge"
+
+#: devices.cc:46
+msgid "Outputs"
+msgstr "Ausgänge"
+
+#: devices.cc:86
+msgid "Error creating imported device in network."
+msgstr "Fehler importierte Ding in Netzwerk zu schaffen"
+
+#: devices.cc:567
+msgid "Start of execution cycle"
+msgstr "Beginn der Ausführungszyklus"
+
+#: devices.cc:574
+msgid "machine cycle"
+msgstr "Maschinenzyklus "
+
+#: devices.cc:596
+msgid "End of execution cycle"
+msgstr "Ende der Ausführungszyklus"
+
+#: importeddevice.cc:53
+msgid "In imported devices, monitors using pin names are ignored. "
+msgstr "In importierten Dinge, Monitore Pin-Namen verwendet werden ignoriert."
+
+#: importeddevice.cc:62
+msgid "No outputs defined for imported device."
+msgstr "Keine Ausgaben für importierte Ding definiert."
+
+#: importeddevice.cc:70
+msgid "Unable to open file for importing."
+msgstr "Datei kann nicht geöffnet für den Import."
+
+#: importeddevice.cc:100
+msgid "Imported device network failed to stabilise."
+msgstr "Datei kann nicht geöffnet für den Import."
+
+#: network.cc:247
+msgid "Input {0}.InitialValue has not been assigned a value."
+msgstr "Eingang {0}.InitialWert kein Wert zugewiesen wurde."
+
+#: network.cc:255
+msgid "Input {0}.Period has not been assigned a value."
+msgstr "Eingang {0}.Period kein Wert zugewiesen wurde."
+
+#: network.cc:265
+msgid "Input {0} has not been assigned a value."
+msgstr "Eingang {0} wurde kein Wert zugewiesen."
+
+#: network.cc:268
+msgid "Input {0}.{1} has not been assigned a value."
+msgstr "Eingang {0}.{1} wurde kein Wert zugewiesen."
+
+
+#: lang/networkbuilder.cc:56
+msgid "{0} (of type {1}) has no default output pin."
+msgstr "{0} (vom Typ {1}) hat keine Standard-Output-Pin."
+
+#: lang/networkbuilder.cc:60
+msgid "{0} (of type {1}) has no output pin {2}."
+msgstr "{0} (vom Typ {1}) hat keine Ausgangs-Pin {2}."
+
+#: lang/networkbuilder.cc:67
+msgid "Use Q or Qbar."
+msgstr "Verwenden Sie Q oder Qbar."
+
+#: lang/networkbuilder.cc:76
+msgid "Attempt to redefine {0}.{1}."
+msgstr "Versuch, neu zu definieren {0}. {1}."
+
+#: lang/networkbuilder.cc:89
+msgid "Previously defined as {0} here."
+msgstr "Früher definiert als {0} hier."
+
+#: lang/networkbuilder.cc:117 lang/networkbuilder.cc:156
+msgid "Repeated definition of the same device."
+msgstr "Definition des gleichen Dingen wiederholte."
+
+#: lang/networkbuilder.cc:121 lang/networkbuilder.cc:160
+msgid "Device types may not be assigned to devices that already exist."
+msgstr "Dingtypen können nicht auf Dingen zugewiesen werden, die bereits vorhanden sind."
+
+#: lang/networkbuilder.cc:123 lang/networkbuilder.cc:162
+msgid "Previously defined here."
+msgstr "Früher hier festgelegt."
+
+#: lang/networkbuilder.cc:140
+msgid "Unable to add device to the network."
+msgstr "Kann nicht Ding mit dem Netzwerk hinzuzufügen."
+
+#: lang/networkbuilder.cc:185
+msgid "Switches may only have an InitialValue attribute."
+msgstr "Schalter kann nur eine Initial Attribut haben."
+
+#: lang/networkbuilder.cc:192
+msgid "Clocks may only have a Period attribute."
+msgstr "Clocks kann nur ein Zeitraum Attribut haben."
+
+#: lang/networkbuilder.cc:201 lang/networkbuilder.cc:327
+msgid "Signal generators may only have SIG or Period attributes."
+msgstr "Signalgeneratoren kann nur SIG oder Period Attribute."
+
+#: lang/networkbuilder.cc:209
+msgid ""
+"AND gates may only have input pin attributes (up to 16), labelled I1 to I16"
+msgstr "AND-Gatter kann nur Eingangs-Pin Attribute haben (bis zu 16), beschriftet I1 bis I16"
+
+#: lang/networkbuilder.cc:217
+msgid ""
+"NAND gates may only have input pin attributes (up to 16), labelled I1 to I16"
+msgstr "NAND-Gatter kann nur Eingangs-Pin Attribute haben (bis zu 16), beschriftet I1 bis I16"
+
+#: lang/networkbuilder.cc:225
+msgid ""
+"OR gates may only have input pin attributes (up to 16), labelled I1 to I16"
+msgstr "OR-Gatter kann nur Eingangs-Pin Attribute haben (bis zu 16), beschriftet I1 bis I16"
+
+#: lang/networkbuilder.cc:233
+msgid ""
+"NOR gates may only have input pin attributes (up to 16), labelled I1 to I16"
+msgstr "NOR-Gatter kann nur Eingangs-Pin Attribute haben (bis zu 16), beschriftet I1 bis I16"
+
+#: lang/networkbuilder.cc:241
+msgid ""
+"XOR gates may only have input pin attributes (up to 2), labelled I1 to I2"
+msgstr "XOR-Gatter kann nur Eingangs-Pin Attribute haben (bis zu 2), beschriftet mit I1 bis I2"
+
+#: lang/networkbuilder.cc:250
+msgid ""
+"DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. "
+msgstr "DTYPE Dinge dürfen nur haben DATA, CLK, SET oder CLEAR Eingangs-Pins zugewiesen."
+
+#: lang/networkbuilder.cc:259
+msgid "Imported device {0} has no input pin {1}."
+msgstr "Importierte Ding {0} hat keinen Eingabestift {1}."
+
+#: lang/networkbuilder.cc:269
+msgid ""
+"SELECT device {0} has no input pin {1}. Correct pins are SW, HIGH and LOW."
+msgstr "SELECT Ding {0} hat keine Eingabestift {1}. Die korrekte Pins sind SW, hoch und niedrig."
+
+#: lang/networkbuilder.cc:280
+msgid "Could not assign option to an unknown device type"
+msgstr "Konnte keine Option auf einen unbekannten Dingtyp zuordnen"
+
+#: lang/networkbuilder.cc:322
+msgid "Previously defined as a bitstream here."
+msgstr "Früher als Bitstrom hier festgelegt."
+
+#: lang/networkbuilder.cc:353
+msgid ""
+"Device with requested output pin could not be found in the network. "
+"Connection not made."
+msgstr ""
+"Ding mit angeforderten Ausgangspin konnte nicht im Netzwerk gefunden werden."
+"Verbindung nicht gemacht."
+
+#: lang/networkbuilder.cc:367
+msgid "Previously defined as {0}.{1} here."
+msgstr "Früher definiert als {0}. {1} hier."
+
+#: lang/networkbuilder.cc:398
+msgid ""
+"Invalid signal name: input pins should be assigned a valid signal name or a "
+"logical state (0 or 1)"
+msgstr ""
+"Ungültige Signalname: Eingangs-Pins sollte ein gültiges Signal Name oder ein zugewiesen werden"
+"Logischen Zustand (0 oder 1)"
+
+#: lang/networkbuilder.cc:425
+msgid "Clock periods must be numeric (assigning an identifier was attempted)"
+msgstr "Taktperioden muss numerisch sein (die Zuweisung einer Kennung versucht wurde)"
+
+#: lang/networkbuilder.cc:428
+msgid "Initial values may only be 0 or 1, assigning a signal is not supported."
+msgstr "Anfangswerte können nur 0 oder 1 sein, die Zuordnung ein Signal nicht unterstützt wird."
+
+#: lang/networkbuilder.cc:431
+msgid "Attempt to assign an identifier to a property"
+msgstr "Versuch, eine Kennung zu einer Eigenschaft zuweisen"
+
+#: lang/networkbuilder.cc:450
+msgid "Devices must be defined before being referenced"
+msgstr "Dinge müssen vor dem referenzierten definiert werden"
+
+#: lang/networkbuilder.cc:454
+msgid "Unable to set input pin. {0}"
+msgstr "Kann nicht Eingangs-Pin eingestellt werden. {0}"
+
+#: lang/networkbuilder.cc:472
+msgid "Could not make connection. One of the signals could not be found."
+msgstr "Verbindung konnte nicht machen. Eines der Signale konnte nicht gefunden werden."
+
+#: lang/networkbuilder.cc:488
+msgid "Switches must have initial values of either 0 or 1"
+msgstr "Switches müssen Anfangswerte von 0 oder 1"
+
+#: lang/networkbuilder.cc:496
+msgid "Could not set switch initial value"
+msgstr "Konnte nicht gesetzt Anfangswert schalten"
+
+#: lang/networkbuilder.cc:504
+msgid "Clock periods must be integers between {0} and {1}."
+msgstr "Taktperioden müssen ganze Zahlen zwischen {0} und {1}."
+
+#: lang/networkbuilder.cc:511
+msgid "Could not set clock period"
+msgstr "Es konnte keine Taktperiode gesetzt"
+
+#: lang/networkbuilder.cc:523
+msgid "Signal generator periods must be integers between {0} and {1}."
+msgstr "Signalgenerator Perioden müssen ganze Zahlen zwischen {0} und {1}."
+
+#: lang/networkbuilder.cc:531
+msgid "Signal generator SIG inputs must be bitstreams longer than zero bits"
+msgstr "Signalgenerator SIG-Eingänge müssen bitstreams länger sein als Null-Bits"
+
+#: lang/networkbuilder.cc:559
+msgid "Devices must be defined before being monitored"
+msgstr "Dinge müssen vor dem überwacht definiert werden"
+
+#: lang/networkbuilder.cc:564
+msgid "Unable to set monitor point. {0}"
+msgstr "Kann nicht Monitorpunkt gesetzt. {0}"
+
+#: lang/networkbuilder.cc:572
+msgid "Signal is already being monitored."
+msgstr "Signal wird bereits überwacht wird."
+
+#: lang/networkbuilder.cc:583
+msgid "The 'as {0}' is not required in this case."
+msgstr "Der 'als {0}' in diesem Fall nicht erforderlich ist."
+
+#: lang/networkbuilder.cc:586
+msgid "The 'as {0}.{1}' is not required in this case."
+msgstr "Der 'als {0}. {1}' in diesem Fall nicht erforderlich ist."
+
+#: lang/networkbuilder.cc:595
+msgid "Alias signal name already exists as a device output in the network"
+msgstr "Alias ​​Signalname existiert bereits als Dingausgang im Netz"
+
+#: lang/networkbuilder.cc:599
+msgid "Alias name already exists, monitoring a different signal"
+msgstr "Alias ​​Name bereits vorhanden ist, ein anderes Signal Monitoring"
+
+#: lang/networkbuilder.cc:607
+msgid ""
+"Could not make monitor. All available monitors are used, or the device "
+"output could not be found."
+msgstr ""
+"Konnte nicht-Monitor machen. Alle verfügbaren Monitore verwendet werden, oder das Ding"
+"Ausgang konnte nicht gefunden werden."
+
+#: lang/parser.cc:56
+msgid "File parsed with {0} errors and {1} warnings."
+msgstr "Datei analysiert mit {0} Fehler und {1} Warnungen."
+
+#: lang/parser.cc:143
+msgid "Unable to read import file."
+msgstr "Kann nicht Import-Datei zu lesen."
+
+#: lang/parser.cc:159
+msgid "Expected a device name."
+msgstr "einen Dingnamen erwartet."
+
+#: lang/parser.cc:184
+msgid "Expected a device type. "
+msgstr "einen Dingtyp erwartet."
+
+#: lang/parser.cc:188
+msgid ""
+"Expected a device type such as CLOCK, SWITCH, NAND or others (see "
+"documentation)."
+msgstr ""
+"Erwartet einen Dingtyp wie CLOCK, SWITCH, NAND oder andere (siehe"
+"Dokumentation)."
+
+#: lang/parser.cc:214
+msgid ""
+"Unexpected token. Expecting ; (if the end of the statement), or { (if "
+"beginning an option block)."
+msgstr ""
+"Unerwartetes Token Erwartung;. (Wenn das Ende der Anweisung) oder {(falls"
+"Beginnen Sie eine Option Block)."
+
+#: lang/parser.cc:223
+msgid "Unterminated braces."
+msgstr "Nicht abgebrochene Klammern."
+
+#: lang/parser.cc:252
+msgid "Expected a key."
+msgstr "Erwartete einen Schlüssel."
+
+#: lang/parser.cc:260
+msgid "Expected colon."
+msgstr "Erwartete Doppelpunkt."
+
+#: lang/parser.cc:267
+msgid "Missing a semicolon on the end."
+msgstr "Fehlt ein Semikolon am Ende."
+
+#: lang/parser.cc:289
+msgid "Expected an Identifier or Number"
+msgstr "Erwartete eine Kennung oder Nummer"
+
+#: lang/parser.cc:304
+msgid "Expected a comma in the monitor list."
+msgstr "ein Komma in der Monitorliste erwartet."
+
+#: lang/parser.cc:333
+msgid "Expected a signal name."
+msgstr "einen Signalnamen erwartet."
+
+#: lang/parser.cc:344
+msgid "Expected a pin name."
+msgstr "Erwartete einen Namen Pin."
+
+#: lang/scanner.cc:117
+msgid "Unterminated block comment."
+msgstr "Unterminated Block Kommentar."
+
+#: lang/scanner.cc:128
+msgid "Illegal character sequence '/' in file."
+msgstr "Illegal Zeichenfolge '/' in der Datei."
+
+#: lang/scanner.cc:179
+msgid "Number is too large to be represented in Mattlab."
+msgstr "Nummer zu groß ist in Mattlab vertreten zu sein."
+
+#: lang/scanner.cc:213
+msgid "Illegal Character '{0}' in file."
+msgstr "Unzulässige Zeichen '{0}' in der Datei."
+
+#: lang/scanner.cc:217
+msgid "Null byte in file. Note only ISO 8859 encoding is accepted"
+msgstr "Null-Byte in der Datei. Beachten Sie nur ISO 8859-Codierung wird angenommen"
+
+#: lang/scanner.cc:220
+msgid "Illegal non-printing character, code {0} in file."
+msgstr "Illegal Nicht-Druck-Zeichen, Code {0} in der Datei."
+
+#: lang/scanner.cc:303
+msgid "Unterminated string."
+msgstr "Nicht abgebrochene Zeichenfolge."
+
+#: lang/scanner.cc:330
+msgid "Was expecting a binary digit, empty bitstreams not allowed."
+msgstr "erwartete ein binary digit, leere bitstreams nicht erlaubt."
