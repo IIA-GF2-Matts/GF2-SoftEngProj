@@ -8,6 +8,7 @@
 #include "../com/errorhandler.h"
 #include "../com/autocorrect.h"
 #include "../com/formatstring.h"
+#include "../com/localestrings.h"
 #include "../sim/network.h"
 #include "../sim/devices.h"
 #include "../sim/monitor.h"
@@ -52,18 +53,18 @@ std::string networkbuilder::getUnknownPinError(Signal& sig) {
     std::string ret;
 
     if (sig.pin.id == blankname) {
-        ret = formatString("{0} (of type {1}) has no default output pin.",
+        ret = formatString(t("{0} (of type {1}) has no default output pin."),
             _nms->namestr(sig.device.id),
             _nms->namestr(_devz->getname(dkind)));
     } else {
-        ret = formatString("{0} (of type {1}) has no output pin {2}.",
+        ret = formatString(t("{0} (of type {1}) has no output pin {2}."),
             _nms->namestr(sig.device.id),
             _nms->namestr(_devz->getname(dkind)),
             _nms->namestr(sig.pin.id));
     }
 
     if (dkind == dtype)
-        return ret + " Use Q or Qbar.";
+        return ret + " " + t("Use Q or Qbar.");
     return ret;
 }
 
@@ -72,7 +73,7 @@ std::string networkbuilder::getUnknownPinError(Signal& sig) {
  * @author Judge
  */
 std::string networkbuilder::getPredefinedError(devlink dvl, name key) {
-    return formatString("Attempt to redefine {0}.{1}.",
+    return formatString(t("Attempt to redefine {0}.{1}."),
         _nms->namestr(dvl->id),
         _nms->namestr(key));
 }
@@ -85,7 +86,7 @@ std::string networkbuilder::getPredefinedError(devlink dvl, name key) {
  */
 template<typename T>
 std::string networkbuilder::getPredefinedNote(T prevval) {
-    return formatString("Previously defined as {0} here.", prevval);
+    return formatString(t("Previously defined as {0} here."), prevval);
 }
 
 
@@ -113,13 +114,13 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
     if (dl != NULL) {
         if (dl->kind == type.devtype) {
             _errs.report(mattwarning(
-                "Repeated definition of the same device.", devName.at));
+                t("Repeated definition of the same device."), devName.at));
         }
         else {
             _errs.report(mattsemanticerror(
-                "Device types may not be assigned to devices that already exist.", devName.at));
+                t("Device types may not be assigned to devices that already exist."), devName.at));
         }
-        _errs.report(mattnote("Previously defined here.", dl->definedAt));
+        _errs.report(mattnote(t("Previously defined here."), dl->definedAt));
         return;
     }
 
@@ -136,7 +137,7 @@ void networkbuilder::defineDevice(Token& devName, Token& type) {
     if (!success) {
         // Shouldn't ever reach here
         _errs.report(mattruntimeerror(
-            "Unable to add device to the network.", type.at));
+            t("Unable to add device to the network."), type.at));
         return;
     }
 }
@@ -152,13 +153,13 @@ void networkbuilder::importDevice(Token& devName, Token& fileStr) {
     if (dl != NULL) {
         if (dl->kind == imported) {
             _errs.report(mattwarning(
-                "Repeated definition of the same device.", devName.at));
+                t("Repeated definition of the same device."), devName.at));
         }
         else {
             _errs.report(mattsemanticerror(
-                "Device types may not be assigned to devices that already exist.", devName.at));
+                t("Device types may not be assigned to devices that already exist."), devName.at));
         }
-        _errs.report(mattnote("Previously defined here.", dl->definedAt));
+        _errs.report(mattnote(t("Previously defined here."), dl->definedAt));
         return;
     }
 
@@ -181,14 +182,14 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case aswitch:
             if (keyTok.id != _devz->initvalnm) {
                 _errs.report(mattsemanticerror(
-                    "Switches may only have an InitialValue attribute.", keyTok.at));
+                    t("Switches may only have an InitialValue attribute."), keyTok.at));
                 return false;
             }
             break;
         case aclock:
             if (keyTok.id != _devz->periodnm) {
                 _errs.report(mattsemanticerror(
-                    "Clocks may only have a Period attribute.", keyTok.at));
+                    t("Clocks may only have a Period attribute."), keyTok.at));
                 return false;
             }
 
@@ -197,7 +198,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
             if (keyTok.id != _devz->periodnm
                 && keyTok.id != _devz->signm) {
                 _errs.report(mattsemanticerror(
-                    "Signal generators may only have SIG or Period attributes.", keyTok.at));
+                    t("Signal generators may only have SIG or Period attributes."), keyTok.at));
                 return false;
             }
 
@@ -205,7 +206,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case andgate:
             if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
-                    "AND gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
+                    t("AND gates may only have input pin attributes (up to 16), labelled I1 to I16"), keyTok.at));
                 return false;
             }
 
@@ -213,7 +214,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case nandgate:
             if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
-                    "NAND gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
+                    t("NAND gates may only have input pin attributes (up to 16), labelled I1 to I16"), keyTok.at));
                 return false;
             }
 
@@ -221,7 +222,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case orgate:
             if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
-                    "OR gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
+                    t("OR gates may only have input pin attributes (up to 16), labelled I1 to I16"), keyTok.at));
                 return false;
             }
 
@@ -229,7 +230,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case norgate:
             if (!isLegalGateInputNamestring(keyTok.id, 16)) {
                 _errs.report(mattsemanticerror(
-                    "NOR gates may only have input pin attributes (up to 16), labelled I1 to I16", keyTok.at));
+                    t("NOR gates may only have input pin attributes (up to 16), labelled I1 to I16"), keyTok.at));
                 return false;
             }
 
@@ -237,7 +238,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case xorgate:
             if (!isLegalGateInputNamestring(keyTok.id, 2)) {
                 _errs.report(mattsemanticerror(
-                    "XOR gates may only have input pin attributes (up to 2), labelled I1 to I2", keyTok.at));
+                    t("XOR gates may only have input pin attributes (up to 2), labelled I1 to I2"), keyTok.at));
                 return false;
             }
 
@@ -246,7 +247,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
             if (!(keyTok.id == _devz->datapin || keyTok.id == _devz->clkpin
                     || keyTok.id == _devz->setpin || keyTok.id == _devz->clrpin)) {
                 _errs.report(mattsemanticerror(
-                    "DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. "
+                    t("DTYPE devices may only have DATA, CLK, SET or CLEAR input pins assigned. ")
                         + getClosestMatchError(_nms->namestr(keyTok.id), dtypeinset),
                     keyTok.at));
                 return false;
@@ -255,7 +256,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case imported:
             if (!dvl->device->hasInput(keyTok.id)) {
                 _errs.report(mattsemanticerror(
-                    formatString("Imported device {0} has no input pin {1}.",
+                    formatString(t("Imported device {0} has no input pin {1}."),
                         _nms->namestr(dvl->id),
                         _nms->namestr(keyTok.id)),
                     keyTok.at));
@@ -265,7 +266,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         case aselect:
             if (!(keyTok.id == _devz->highpin || keyTok.id == _devz->lowpin || keyTok.id == _devz->swpin)) {
                 _errs.report(mattsemanticerror(
-                    formatString("SELECT device {0} has no input pin {1}. Correct pins are SW, HIGH and LOW.",
+                    formatString(t("SELECT device {0} has no input pin {1}. Correct pins are SW, HIGH and LOW."),
                         _nms->namestr(dvl->id),
                         _nms->namestr(keyTok.id)),
                     keyTok.at));
@@ -276,7 +277,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
         default:
             // Should never reach here
             _errs.report(mattruntimeerror(
-                "Could not assign option to an unknown device type", keyTok.at));
+                t("Could not assign option to an unknown device type"), keyTok.at));
             return false;
     }
 
@@ -318,12 +319,12 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                     _errs.report(mattsemanticerror(
                         getPredefinedError(dvl, keyTok.id), keyTok.at));
                     _errs.report(mattnote(
-                        "Previously defined as a bitstream here.", dvl->definedAt));
+                        t("Previously defined as a bitstream here."), dvl->definedAt));
                     return false;
                 }
             } else {
                 _errs.report(mattsemanticerror(
-                    "Signal generators may only have SIG or Period attributes.", keyTok.at));
+                    t("Signal generators may only have SIG or Period attributes."), keyTok.at));
                 return false;
             }
 
@@ -349,7 +350,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                 if (dl == NULL) {
                     // Should never reach here
                     _errs.report(mattruntimeerror(
-                        "Device with requested output pin could not be found in the network. Connection not made.", keyTok.at));
+                        t("Device with requested output pin could not be found in the network. Connection not made."), keyTok.at));
                     return false;
                 }
 
@@ -363,7 +364,7 @@ bool networkbuilder::checkKey(devlink dvl, Token& keyTok) {
                     errmsg = getPredefinedNote(_nms->namestr(dl->id));
                 else
                     errmsg = formatString(
-                        "Previously defined as {0}.{1} here.", 
+                        t("Previously defined as {0}.{1} here."), 
                         _nms->namestr(dl->id),
                         _nms->namestr(ol->id));
 
@@ -394,7 +395,7 @@ void networkbuilder::setInputValue(Token& devName, Token& keyTok, Token& valTok)
     }
     else {
         if (valTok.number != 0 && valTok.number != 1) {
-            _errs.report(mattsemanticerror("Invalid signal name: input pins should be assigned a valid signal name or a logical state (0 or 1)", valTok.at));
+            _errs.report(mattsemanticerror(t("Invalid signal name: input pins should be assigned a valid signal name or a logical state (0 or 1)"), valTok.at));
             return;
         }
         Signal sig;
@@ -421,13 +422,13 @@ void networkbuilder::setInputSignal(Token& devName, Token& keyTok, Signal& valSi
         // attempting to assign a signal to a property (not an input pin)
         if (keyTok.id == _devz->periodnm) {
             _errs.report(mattsemanticerror(
-                "Clock periods must be numeric (assigning an identifier was attempted)", valSig.device.at));
+                t("Clock periods must be numeric (assigning an identifier was attempted)"), valSig.device.at));
         } else if (keyTok.id == _devz->initvalnm) {
             _errs.report(mattsemanticerror(
-                "Initial values may only be 0 or 1, assigning a signal is not supported.", valSig.device.at));
+                t("Initial values may only be 0 or 1, assigning a signal is not supported."), valSig.device.at));
         } else {
             _errs.report(mattsemanticerror(
-                "Attempt to assign an identifier to a property", valSig.device.at));
+                t("Attempt to assign an identifier to a property"), valSig.device.at));
         }
         return;
     }
@@ -446,11 +447,11 @@ void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
     signal_legality badSignal = isBadSignal(sig);
     if (badSignal) {
         if (badSignal == ILLEGAL_DEVICE) {
-            _errs.report(mattsemanticerror("Devices must be defined before being referenced", sig.device.at));
+            _errs.report(mattsemanticerror(t("Devices must be defined before being referenced"), sig.device.at));
         } else {
             // ILLEGAL_PIN
             _errs.report(mattsemanticerror(
-                "Unable to set input pin. " + getUnknownPinError(sig), sig.device.at));
+                formatString(t("Unable to set input pin. {0}"), getUnknownPinError(sig)), sig.device.at));
         }
         return;
     }
@@ -468,7 +469,7 @@ void networkbuilder::assignPin(devlink dvl, Token keytk, Signal sig) {
     if (!success) {
         // should never reach here
         _errs.report(mattruntimeerror(
-            "Could not make connection. One of the signals could not be found.", keytk.at));
+            t("Could not make connection. One of the signals could not be found."), keytk.at));
         return;
     }
 }
@@ -484,7 +485,7 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
         // Switch
         if (valTok.type != TokType::Number || (valTok.number != 0 && valTok.number != 1)) {
             _errs.report(mattsemanticerror(
-                "Switches must have initial values of either 0 or 1", valTok.at));
+                t("Switches must have initial values of either 0 or 1"), valTok.at));
             return;
         }
 
@@ -492,7 +493,7 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
         _devz->setswitch(dvl->id, sig, success, keytk.at);
 
         if (!success) {
-            _errs.report(mattruntimeerror("Could not set switch initial value", valTok.at));
+            _errs.report(mattruntimeerror(t("Could not set switch initial value"), valTok.at));
             return;
         }
 
@@ -500,14 +501,14 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
         // Clock
         if (valTok.type != TokType::Number || valTok.number < 1 || valTok.number > 32767) {
             _errs.report(mattsemanticerror(
-                "Clock periods must be integers between 1 and 32767", valTok.at));
+                formatString(t("Clock periods must be integers between {0} and {1}."), 1, 32767), valTok.at));
             return;
         }
 
         _devz->setclock(dvl->id, valTok.number, success, keytk.at);
 
         if (!success) {
-            _errs.report(mattruntimeerror("Could not set clock period", valTok.at));
+            _errs.report(mattruntimeerror(t("Could not set clock period"), valTok.at));
             return;
         }
     } else if (dvl->kind == siggen) {
@@ -519,7 +520,7 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
                 || valTok.number < 1
                 || valTok.number > 32767) {
                     _errs.report(mattsemanticerror(
-                        "Signal generator periods must be integers between 1 and 32767", valTok.at));
+                        formatString(t("Signal generator periods must be integers between {0} and {1}."), 1, 32767), valTok.at));
                     return;
             }
             dvl->frequency = valTok.number;
@@ -527,7 +528,7 @@ void networkbuilder::assignProperty(devlink dvl, Token keytk, Token valTok) {
             if (valTok.type != TokType::Bitstream
                 || valTok.bitstr.size() <= 0) {
                 _errs.report(mattsemanticerror(
-                    "Signal generator SIG inputs must be bitstreams longer than zero bits", valTok.at));
+                    t("Signal generator SIG inputs must be bitstreams longer than zero bits"), valTok.at));
                 return;
             }
             dvl->bitstr = valTok.bitstr;
@@ -555,12 +556,12 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
     signal_legality badSignal = isBadSignal(monSig);
     if (badSignal) {
         if (badSignal == ILLEGAL_DEVICE) {
-            _errs.report(mattsemanticerror("Devices must be defined before being monitored", monSig.device.at));
+            _errs.report(mattsemanticerror(t("Devices must be defined before being monitored"), monSig.device.at));
             return;
         } else {
             // ILLEGAL_PIN
             _errs.report(mattsemanticerror(
-                "Unable to set monitor point. " + getUnknownPinError(monSig),
+                formatString(t("Unable to set monitor point. {0}"), getUnknownPinError(monSig)),
                 monSig.device.at));
             return;
         }
@@ -568,7 +569,7 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
 
     if (-1 != _mons->findmonitor(monSig.device.id, monSig.pin.id)) {
         // signal is already being monitored - warn
-        _errs.report(mattwarning("Signal is already being monitored", monSig.device.at));
+        _errs.report(mattwarning(t("Signal is already being monitored."), monSig.device.at));
     }
 
     // Check Alias
@@ -579,10 +580,10 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
             // monitoring a signal as itself
             std::string errmsg;
             if (aliSig.pin.id == blankname) {
-                errmsg = formatString("The 'as {0}' is not required in this case.",
+                errmsg = formatString(t("The 'as {0}' is not required in this case."),
                     _nms->namestr(aliSig.device.id));
             } else {
-                errmsg = formatString("The 'as {0}.{1}' is not required in this case.",
+                errmsg = formatString(t("The 'as {0}.{1}' is not required in this case."),
                     _nms->namestr(aliSig.device.id),
                     _nms->namestr(aliSig.pin.id));
             }
@@ -591,11 +592,11 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
         // Warn if signal exists
         } else if (!isBadSignal(aliSig)) {
             _errs.report(mattwarning(
-                "Alias signal name already exists as a device output in the network", aliSig.device.at));
+                t("Alias signal name already exists as a device output in the network"), aliSig.device.at));
         } else if (-1 != _mons->findmonitor(monSig.device.id, monSig.pin.id, true)) {
             // alias is already used, monitoring a diff signal
             _errs.report(mattwarning(
-                "Alias name already exists, monitoring a different signal", aliSig.device.at));
+                t("Alias name already exists, monitoring a different signal"), aliSig.device.at));
         }
     }
 
@@ -603,7 +604,7 @@ void networkbuilder::defineMonitor(Signal& monSig, Signal& aliSig) {
     bool success = false;
     _mons->makemonitor(monSig.device.id, monSig.pin.id, success, aliSig.device.id, aliSig.pin.id);
     if (!success) {
-        _errs.report(mattruntimeerror("Could not make monitor. All available monitors are used, or the device output could not be found.", monSig.device.at));
+        _errs.report(mattruntimeerror(t("Could not make monitor. All available monitors are used, or the device output could not be found."), monSig.device.at));
         return;
     }
 }
