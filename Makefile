@@ -21,14 +21,20 @@ C_OBJECTS = $(patsubst %.cc,build/cli/%.o,$(CLISRC) $(SRC))
 
 
 # internationalisation
-LANGS = $(wildcard intl/*/mattlab.po)
+LANGS = $(wildcard intl/*/mattlang.po)
 LANGS_O = $(LANGS:.po=.mo)
+
+G_LANGS = $(wildcard intl/*/mattlab.po) $(LANGS)
+G_LANGS_O = $(G_LANGS:.po=.mo)
+
+C_LANGS = $(wildcard intl/*/clisim.po) $(LANGS)
+C_LANGS_O = $(C_LANGS:.po=.mo)
 
 %.mo: %.po
 	msgfmt -o $@ $<
 
 
-mattlab: $(G_OBJECTS) $(LANGS_O)
+mattlab: $(G_OBJECTS) $(G_LANGS_O)
 	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
 
 # implementation
@@ -39,11 +45,11 @@ mattlab: $(G_OBJECTS) $(LANGS_O)
 #mattlab: $(G_OBJECTS)
 #	$(GUICXX) $(FLAGS) -o mattlab $(G_OBJECTS) $(GUILINKFLAGS)
 
-clisim: $(C_OBJECTS)
+clisim: $(C_OBJECTS) $(C_LANGS_O)
 	$(CXX) $(FLAGS) -o clisim $(C_OBJECTS)
 
 clean:
-	rm -rf build $(LANGS_O) *.o mattlab clisim scanner_unittest parser_unittest
+	rm -rf build $(LANGS_O) $(G_LANGS_O) $(C_LANGS_O) *.o mattlab clisim scanner_unittest parser_unittest
 
 depend:
 	makedepend $(SRC) $(GUISRC) $(CLISRC)
