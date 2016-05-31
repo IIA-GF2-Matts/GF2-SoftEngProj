@@ -57,17 +57,18 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <list>
 #include "localestrings.h"
 
 /// The currently used localestring table.
-LocaleStrings g_langTable;
+std::list<LocaleStrings> g_langTables;
 
 
-/** 
+/** Adds a .mo file used for translations with t(...)
  *
  * @author Diesel
  */
-bool LocaleStrings::SetLocale(const char* locstr) {
+bool LocaleStrings::AddTranslations(const char* locstr, const char* cat) {
     std::locale loc(locstr);
     std::string lname = loc.name();
 
@@ -84,9 +85,14 @@ bool LocaleStrings::SetLocale(const char* locstr) {
         fname << lname;
     }
 
-    fname << "/clisim.mo";
+    fname << "/" << cat << ".mo";
 
-    return g_langTable.open(fname.str().c_str());
+    LocaleStrings tbl;
+    if (tbl.open(fname.str().c_str())) {
+        g_langTables.push_back(tbl);
+        return true;
+    }
+    return false;
 }
 
 
@@ -95,7 +101,13 @@ bool LocaleStrings::SetLocale(const char* locstr) {
  * @author Diesel
  */
 const char* t(const char* s) {
-    return g_langTable.translate(s);
+    int r;
+    for (auto& l : g_langTables) {
+        r = l.getIndex(s);
+        if (r >= 0) return l.getTranslated(r);
+    }
+
+    return s;
 }
 
 
@@ -131,6 +143,7 @@ bool LocaleStrings::dataLoad(const char* fname) {
     _L = ifs.tellg();
 
     _data = new char[_L];
+    _ref = new int(1);
     ifs.seekg(0);
     ifs.read(_data, _L);
 
@@ -254,11 +267,28 @@ bool LocaleStrings::open(const char* file) {
 LocaleStrings::LocaleStrings() {
 }
 
+#include <iostream>
+
+/** The LocaleStrings copy constructor
+ *
+ * @author Diesel
+ */
+LocaleStrings::LocaleStrings(const LocaleStrings& ls)
+    : _L(ls._L), _N(ls._N), _O(ls._O),
+        _T(ls._T), _S(ls._S), _H(ls._H),
+        _data(ls._data), _ref(ls._ref)
+{
+    *ls._ref += 1;
+}
+
 
 /** Clears resources allocated by LocaleStrings
  *
  * @author Diesel
  */
 LocaleStrings::~LocaleStrings() {
-    delete[] _data;
+    if (!--*_ref) {
+        delete[] _data;
+        delete _ref;
+    }
 }

@@ -28,6 +28,7 @@ private:
     int _H;
 
     char* _data;
+    int* _ref;
 
     bool dataLoad(const char* fname);
     bool readDataHeader();
@@ -36,12 +37,12 @@ private:
     int getIndex(const char* str, int l, int h) const;
 
 public:
-    /** Sets the current locale used for translations with t(...)
+    /** Adds a .mo file used for translations with t(...)
      *
      * @param loc  The locale name, or a blank string to use the user's locale.
      * @return     True if the locale was set correctly, false otherwise.
      */
-    static bool SetLocale(const char* loc);
+    static bool AddTranslations(const char* loc, const char* cat);
 
     /** Looks up the string in the table
      *
@@ -83,6 +84,11 @@ public:
      *
      */
     LocaleStrings();
+
+    /** The LocaleStrings copy constructor.
+     *
+     */
+    LocaleStrings(const LocaleStrings& ls);
 
     /** Clears resources allocated by LocaleStrings
      *
