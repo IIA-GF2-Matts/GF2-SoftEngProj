@@ -62,8 +62,25 @@ Token::Token(TokType t, int num)
 }
 
 
-
 // class scanner
+
+
+/** Get the parent scanner
+ *
+ * @author Judge
+ */
+scanner* scanner::getParent() {
+    return _parent;
+}
+
+/** Set the parent scanner
+ *
+ * @author Judge
+ */
+void scanner::setParent(scanner* p) {
+    _parent = p;
+}
+
 
 /** Read the next character from the input character stream
  *
@@ -340,7 +357,7 @@ std::vector<bool> scanner::readBitstream(int c1) {
  * @author Diesel
  */
 scanner::scanner(names* nmz)
-        : _open(false), _hasNext(false), _nmz(nmz), parent(NULL) {
+        : _open(false), _hasNext(false), _nmz(nmz), _parent(NULL) {
 
     kwordDev = _nmz->lookup("dev");
     kwordMonitor = _nmz->lookup("monitor");

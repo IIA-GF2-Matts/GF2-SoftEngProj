@@ -34,10 +34,10 @@ bool parser::readin() {
             tk = _scan->peek();
             parseFile(tk);
 
-            if (_scan->parent) {
+            if (_scan->getParent()) {
                 // Go back to original file.
                 scanner* old = _scan;
-                _scan = _scan->parent;
+                _scan = _scan->getParent();
                 delete old;
             }
             else
@@ -135,6 +135,17 @@ void parser::parseImport(Token& tk) {
 
     stepAndPeek(tk);
 
+    // check for recursive imports
+    //todo: check tocken position
+    scanner* sc = _scan;
+    while (sc) {
+        if (sc->getFile() == incStr.str) {
+            throw mattsemanticerror("File already included.", incStr.at);
+        }
+
+        sc = sc->getParent();
+    }
+
     // Use new scanner for file.
     fscanner* f = new fscanner(_nms);
     if (!f->open(incStr.str)) {
@@ -143,7 +154,7 @@ void parser::parseImport(Token& tk) {
         throw mattruntimeerror(t("Unable to read import file."), incStr.at);
     }
 
-    f->parent = _scan;
+    f->setParent(_scan);
     _scan = f;
     tk = _scan->peek();
 }

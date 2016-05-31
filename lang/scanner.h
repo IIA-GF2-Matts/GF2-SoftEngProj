@@ -81,6 +81,7 @@ protected:
     bool _open;
     bool _hasNext;
     names* _nmz;
+    scanner* _parent;
 
     name kwordDev;
     name kwordMonitor;
@@ -128,7 +129,6 @@ protected:
     std::vector<bool> readBitstream(int c1);
 
 public:
-    scanner* parent;
 
     /** Initialises a new scanner
      *
@@ -168,6 +168,18 @@ public:
      * @return     The file name.
      */
     std::string getFile() const;
+
+    /** Gets the parent scanner
+     *
+     * @return     A pointer to the parent scanner
+     */
+    scanner* getParent();
+
+    /** Sets the parent scanner
+     *
+     * @return     A pointer to the parent scanner
+     */
+    void setParent(scanner* p);
 };
 
 
