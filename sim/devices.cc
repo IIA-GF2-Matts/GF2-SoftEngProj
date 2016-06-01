@@ -643,10 +643,13 @@ void devices::resetdevices() {
       case norgate:
       case andgate:
       case nandgate:
+      case xorgate:
         d->olist->sig = low;
         break;
       case dtype:
         d->memory = low;
+        d->olist->sig = high;
+        d->olist->next->sig = low;
         break;
       case imported:
         d->device->dmz->resetdevices();
