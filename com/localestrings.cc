@@ -58,6 +58,7 @@ T + ((N-1)*8)| length & offset (N-1)th translation      |  | | | |
 #include <sstream>
 #include <string>
 #include <list>
+#include <cstdlib>
 #include "localestrings.h"
 
 /// The currently used localestring table.
@@ -71,6 +72,10 @@ std::list<LocaleStrings> g_langTables;
 bool LocaleStrings::AddTranslations(const char* locstr, const char* cat) {
     std::locale loc(locstr);
     std::string lname = loc.name();
+
+    // For some reason we use LC_ALL not LANG
+    const char* lnamecs = std::getenv("LC_ALL");
+    if (lnamecs) lname = lnamecs;
 
     // Try open the language file.
     std::ostringstream fname;
