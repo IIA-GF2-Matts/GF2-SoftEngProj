@@ -3,12 +3,12 @@
 dev D = DTYPE;
 
 dev CL = CLOCK {
-	Period : 1;
+	Period : 2;
 }
 
 dev SIG = SIGGEN {
 	Period : 1;
-	Sig : $0110;
+	Sig : $011100;
 }
 
 dev D {
