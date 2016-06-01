@@ -191,16 +191,16 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int mon_num, int zoomrange[2]
       if (s==indet) {
         signal_y = y + dy;
         if (!stippled) {
+          // signal has switched to indet so end current line and turn on stippled line
           glEnd();
           glEnable(GL_LINE_STIPPLE);
           glBegin(GL_LINE_STRIP);
           stippled = true;
         }
-        glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
-        glVertex2f(dx*(i-zoomrange[0]+1) + label_width, signal_y);
       }
       else {
         if (stippled) {
+          // signal no longer indet so end stippled line and turn off stippling
           glEnd();
           glDisable(GL_LINE_STIPPLE);
           glBegin(GL_LINE_STRIP);
@@ -208,12 +208,13 @@ void MyGLCanvas::drawPlot(asignal s, int plot_num, int mon_num, int zoomrange[2]
         }
         if (s==low) signal_y = y;
         if (s==high) signal_y = y + 2*dy;
-        glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
-        glVertex2f(dx*(i-zoomrange[0]+1) + label_width, signal_y);
       }
+      glVertex2f(dx*(i-zoomrange[0]) + label_width, signal_y);
+      glVertex2f(dx*(i-zoomrange[0]+1) + label_width, signal_y);
     }
   }
   glEnd();
+  // Ensure stippling is left disabled for next line.
   glDisable(GL_LINE_STIPPLE);
   glLineWidth(1.0);
 
