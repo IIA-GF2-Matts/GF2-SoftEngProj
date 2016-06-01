@@ -325,10 +325,8 @@ void MyFrame::OnRunButton(wxCommandEvent &event)
 {
     if (!fileOpen) return;
 
-    if (mmz->cycles()) {
         // reset the network, start from scratch
-        dmz->resetdevices();
-    }
+    dmz->resetdevices();
     mmz->resetmonitor();
     int spinValue = spin->GetValue();
     if (runnetwork(spinValue)) {
