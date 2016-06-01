@@ -45,6 +45,9 @@ bool parser::readin() {
         }
 
        _netz->checknetwork(errs);
+
+       if (errs.errCount() == 0)
+        _devz->resetdevices();
     }
     catch (matterror& e) {
         errs.report(e);
