@@ -20,7 +20,9 @@ const std::set<namestring> devicesset = {
   "OR",
   "NOR",
   "XOR",
-  "DTYPE"
+  "DTYPE",
+  "SIGGEN",
+  "SELECT"
 };
 
 /** Candidate set of dtype inputs

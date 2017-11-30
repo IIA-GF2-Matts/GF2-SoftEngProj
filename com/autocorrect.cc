@@ -79,7 +79,7 @@ int closestMatchesT(T s, const std::set<T> &candidates, std::list<T> &matches) {
 }
 
 /** Takes an input name and generates an error message suggesting possible
- *  intented inputs based on a set of candidates. 
+ *  intended inputs based on a set of candidates. 
  *  If no close matches are found, the stream is not altered.
  *
  *  @author  Judge   
@@ -99,14 +99,13 @@ std::string getClosestMatchError(namestring nm, std::set<namestring> candidates)
         
         if (matches.size() > 1) {
             return formatString(
-                "Did you mean {0} or {1}?", oss.str(), *std::prev(matches.end()));
+                "Did you mean {0} or {1}?", *std::prev(matches.end(), 2), *std::prev(matches.end()));
 
         } else if (matches.size() == 1) {
             return formatString(
-                "Did you mean {0}?", oss.str(), *std::prev(matches.end()));
+                "Did you mean {0}?", *std::prev(matches.end()));
 
-        } else {
-            return "";
-        }
+        } 
     }
+    return "";
 }
